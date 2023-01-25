@@ -19,6 +19,7 @@ struct Model {
   }
 }
 
+@available(iOS 15.0, *)
 struct ColorView: View {
   let sectionTitle: String
   let array: [Model]
@@ -42,6 +43,7 @@ struct ColorView: View {
   }
 }
 
+@available(iOS 15.0, *)
 struct LeftSection: View {
   let sectionTitle: String
   let array: [String]
@@ -63,6 +65,7 @@ struct LeftSection: View {
   }
 }
 
+@available(iOS 15.0, *)
 struct MaterialDesignColorBoard: View {
   var body: some View {
     VStack {
@@ -441,6 +444,7 @@ struct MaterialDesignColorBoard: View {
   }
 }
 
+@available(iOS 15.0, *)
 struct MaterialDesignColorBoard_Previews: PreviewProvider {
   static var previews: some View {
     MaterialDesignColorBoard()
