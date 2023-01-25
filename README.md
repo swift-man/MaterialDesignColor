@@ -8,9 +8,13 @@ SwiftUI-Version
 ![Badge - Platform](https://img.shields.io/badge/platform-mac_12|ios_13|watchos_6|tvos_13-yellow?style=flat-square)
 ![Badge - License](https://img.shields.io/badge/license-MIT-black?style=flat-square)  
 
-## Material palette
-* [COLOR TOOL](https://m2.material.io/resources/color/#!/?view.left=0&view.right=0)
-* [나무위키 - 머터리얼 - 컬러 팔레트](https://namu.wiki/w/%EB%A8%B8%ED%8B%B0%EB%A6%AC%EC%96%BC%20%EB%94%94%EC%9E%90%EC%9D%B8#toc)
+---
+
+# [나무위키 > 머터리얼 > 컬러 팔레트](https://namu.wiki/w/%EB%A8%B8%ED%8B%B0%EB%A6%AC%EC%96%BC%20%EB%94%94%EC%9E%90%EC%9D%B8#toc)
+
+## Material palette Color Tool
+* [COLOR TOOL](https://m2.material.io/resources/color/#!/?view.left=0&view.right=0)  
+![Image](assets/1.png)  
 
 ## Xcode Preview
 ![Image](assets/6.png)  
