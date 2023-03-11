@@ -3,9 +3,12 @@ SwiftUI-Version
 
 ![Badge](https://img.shields.io/badge/swift-white.svg?style=flat-square&logo=Swift)
 ![Badge](https://img.shields.io/badge/SwiftUI-001b87.svg?style=flat-square&logo=Swift&logoColor=black)
-![Badge - Version](https://img.shields.io/badge/Version-1.0.1-1177AA?style=flat-square)
+![Badge - Version](https://img.shields.io/badge/Version-1.0.2-1177AA?style=flat-square)
 ![Badge - Swift Package Manager](https://img.shields.io/badge/SPM-compatible-orange?style=flat-square)
-![Badge - Platform](https://img.shields.io/badge/platform-mac_12|ios_13|watchos_6|tvos_13-yellow?style=flat-square)
+![Badge - Platform](https://img.shields.io/badge/macOS-v10.15-yellow?style=flat-square)
+![Badge - Platform](https://img.shields.io/badge/iOS-v13.0-yellow?style=flat-square)
+![Badge - Platform](https://img.shields.io/badge/tvOS-v13.0-yellow?style=flat-square)
+![Badge - Platform](https://img.shields.io/badge/watchOS-v6.0-yellow?style=flat-square)
 ![Badge - License](https://img.shields.io/badge/license-MIT-black?style=flat-square)  
 
 ---
@@ -47,12 +50,12 @@ Once you have your Swift package set up, adding Alamofire as a dependency is as 
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/swift-man/MaterialDesignColor.git", from: "1.0.1")
+    .package(url: "https://github.com/swift-man/MaterialDesignColor.git", from: "1.0.2")
 ]
 ```
 
 ## Xcode Preview
-Open file in Xcode MaterialDesignPreview.swift
+Open file in Xcode `MaterialDesignPreview.swift` or `/assets/6.png`
 
 ![Image](assets/6.png)  
 
