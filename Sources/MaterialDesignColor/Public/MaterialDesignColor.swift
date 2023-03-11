@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 12, tvOS 13, watchOS 6, *)
+@available(iOS 12.0, macOS 10.15, tvOS 11, watchOS 4, *)
 extension Color {
   // MARK: - Red
   public static let red50 = Color(hex: "#FFEBEE")
