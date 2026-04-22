@@ -1,14 +1,14 @@
 import MaterialDesignColor
 import SwiftUI
-import XCTest
+import Testing
 
-final class MaterialDesignColorCompatibilityTests: XCTestCase {
-  func testLegacyModuleExposesSwiftUIColorExtensions() {
+struct MaterialDesignColorCompatibilityTests {
+  @Test func legacyModuleExposesSwiftUIColorExtensions() {
     let color: Color = .pink400
     _ = color
   }
 
-  func testLegacyModuleExposesMaterialTheme() {
-    XCTAssertEqual(MaterialTheme.light.colorScheme.primary.hex, "#65558F")
+  @Test func legacyModuleExposesMaterialTheme() {
+    #expect(MaterialTheme.light.colorScheme.primary.hex == "#65558F")
   }
 }

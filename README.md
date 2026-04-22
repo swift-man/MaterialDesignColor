@@ -39,7 +39,7 @@ The default light/dark Material 3 schemes in this repository were generated from
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/swift-man/MaterialDesignColor.git", from: "1.0.2")
+  .package(url: "https://github.com/swift-man/MaterialDesignColor.git", from: "2.0.0")
 ]
 ```
 
