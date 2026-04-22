@@ -1,0 +1,20 @@
+{
+  "name": "@swift-man/material-design-color",
+  "version": "0.0.0",
+  "description": "Material Design color palette for React Native and Expo.",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}

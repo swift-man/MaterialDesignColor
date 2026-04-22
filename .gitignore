@@ -48,6 +48,19 @@ playground.xcworkspace
 
 .build/
 
+# Build outputs
+**/build/
+
+# Node / React Native
+node_modules/
+dist/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+
 # CocoaPods
 #
 # We recommend against adding the Pods directory to your .gitignore. However
