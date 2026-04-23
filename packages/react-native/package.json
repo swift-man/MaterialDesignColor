@@ -1,10 +1,36 @@
 {
   "name": "@swift-man/material-design-color",
-  "version": "0.0.0",
+  "version": "2.0.0",
   "description": "Material Design color palette for React Native and Expo.",
   "license": "MIT",
+  "author": "swift-man",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/swift-man/MaterialDesignColor.git",
+    "directory": "packages/react-native"
+  },
+  "keywords": [
+    "material",
+    "material-design",
+    "material3",
+    "colors",
+    "react-native",
+    "expo"
+  ],
   "main": "dist/index.js",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
+  "react-native": "src/index.ts",
+  "source": "src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "react-native": "./src/index.ts",
+      "source": "./src/index.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
   "files": [
     "dist",
     "src",
@@ -13,7 +39,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "check": "tsc -p tsconfig.json --noEmit",
-    "prepack": "npm run build"
+    "prepare": "npm run build"
   },
   "devDependencies": {
     "typescript": "^5.4.0"
