@@ -263,7 +263,7 @@ If platform release cycles become very different later, use platform-prefixed ta
 
 ```text
 ios-v2.1.0
-react-native-v1.2.0
+js-v1.2.0
 python-v1.0.0
 ```
 

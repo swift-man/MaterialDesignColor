@@ -13,6 +13,9 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    # Releases are always cut from main; manual dispatch is restricted to main
+    # so we can't accidentally publish whatever sits on a feature branch as `latest`.
+    if: github.event_name == 'release' || github.ref == 'refs/heads/main'
     permissions:
       contents: read
       id-token: write   # required for npm provenance
@@ -39,7 +42,9 @@ jobs:
           fi
 
       - name: Install dependencies
-        run: npm install --no-package-lock
+        # --ignore-scripts skips the package's own `prepare` step so we can run
+        # type-check and build explicitly below without doing the build twice.
+        run: npm install --ignore-scripts --no-package-lock
 
       - name: Type-check
         run: npm run check
