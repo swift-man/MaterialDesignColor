@@ -54,6 +54,9 @@ playground.xcworkspace
 # Node / React Native
 node_modules/
 dist/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
 
 # Python
 __pycache__/
