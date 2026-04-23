@@ -1,4 +1,5 @@
 {
+  "$schema": "./schema.json",
   "red50": "#FFEBEE",
   "red100": "#FFCDD2",
   "red200": "#EF9A9A",
