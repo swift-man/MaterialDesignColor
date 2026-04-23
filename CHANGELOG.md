@@ -19,7 +19,7 @@
 ### New (iOS)
 - `MaterialDesignColorCore` — pure-data target (no UI dependency).
 - `MaterialDesignColorSwiftUI` — `Color` extensions + `MaterialTheme` environment.
-- `MaterialDesignColorUIKit` — `UIColor` extensions.
+- `MaterialDesignColorUIKit` — `UIColor` extensions, plus `UIColor.materialBaseline(\.role)` for adaptive light/dark colors via `UIColor(dynamicProvider:)`.
 - `MaterialDesignColor` — umbrella shim re-exporting SwiftUI surface for source-level back-compat with v1.
 
 ### New packages
