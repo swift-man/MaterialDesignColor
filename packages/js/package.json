@@ -1,19 +1,23 @@
 {
   "name": "@swift-man/material-design-color",
   "version": "2.0.0",
-  "description": "Material Design color palette for React Native and Expo.",
+  "description": "Material Design 3 color schemes (light/dark, 48 roles) and Material 2 palette for TypeScript / JavaScript. Framework-agnostic — works in React Native, Expo, web, Node.",
   "license": "MIT",
   "author": "swift-man",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/swift-man/MaterialDesignColor.git",
-    "directory": "packages/react-native"
+    "directory": "packages/js"
   },
   "keywords": [
     "material",
     "material-design",
     "material3",
+    "material-design-3",
     "colors",
+    "color-palette",
+    "design-tokens",
+    "typescript",
     "react-native",
     "expo"
   ],
@@ -36,6 +40,9 @@
     "src",
     "README.md"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "check": "tsc -p tsconfig.json --noEmit",

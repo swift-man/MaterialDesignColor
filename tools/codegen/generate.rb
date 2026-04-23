@@ -537,12 +537,12 @@ write_file(
   check: check
 )
 write_file(
-  "packages/react-native/src/colors.ts",
+  "packages/js/src/colors.ts",
   react_native_colors(material2_tokens),
   check: check
 )
 write_file(
-  "packages/react-native/src/colorScheme.ts",
+  "packages/js/src/colorScheme.ts",
   react_native_color_scheme(material3_roles, material3_baseline),
   check: check
 )
