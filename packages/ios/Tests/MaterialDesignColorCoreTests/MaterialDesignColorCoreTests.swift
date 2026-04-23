@@ -23,4 +23,10 @@ struct MaterialDesignColorCoreTests {
     #expect(MaterialColorScheme.baselineDark.surfaceContainerHighest.hex == "#36343A")
     #expect(MaterialTheme.dark.colorScheme.primary.hex == "#CFBDFE")
   }
+
+  @Test func material3SourceColor() {
+    #expect(MaterialTheme.materialSourceColor.hex == "#6750A4")
+    #expect(MaterialTheme.light.sourceColor.hex == "#6750A4")
+    #expect(MaterialTheme.dark.sourceColor.hex == "#6750A4")
+  }
 }

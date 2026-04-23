@@ -114,7 +114,6 @@ ROLE_FIELDS: Dict[str, str] = {
 @dataclass(frozen=True)
 class MaterialColorScheme:
     appearance: str
-    source_color: MaterialColor
     primary: MaterialColor
     on_primary: MaterialColor
     primary_container: MaterialColor
@@ -171,14 +170,17 @@ class MaterialColorScheme:
         return {role: self.role_color(role).hex for role in COLOR_SCHEME_ROLES}
 
 
+MATERIAL_SOURCE_COLOR = MaterialColor("sourceColor", "#6750A4")
+
+
 @dataclass(frozen=True)
 class MaterialTheme:
     color_scheme: MaterialColorScheme
+    source_color: MaterialColor = MATERIAL_SOURCE_COLOR
 
 
 LIGHT_COLOR_SCHEME = MaterialColorScheme(
     appearance="light",
-    source_color=MaterialColor("sourceColor", "#6750A4"),
     primary=MaterialColor("primary", "#65558F"),
     on_primary=MaterialColor("onPrimary", "#FFFFFF"),
     primary_container=MaterialColor("primaryContainer", "#E9DDFF"),
@@ -232,7 +234,6 @@ LIGHT_COLOR_SCHEME = MaterialColorScheme(
 
 DARK_COLOR_SCHEME = MaterialColorScheme(
     appearance="dark",
-    source_color=MaterialColor("sourceColor", "#6750A4"),
     primary=MaterialColor("primary", "#CFBDFE"),
     on_primary=MaterialColor("onPrimary", "#36275D"),
     primary_container=MaterialColor("primaryContainer", "#4D3D75"),

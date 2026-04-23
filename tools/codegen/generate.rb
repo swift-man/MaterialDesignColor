@@ -80,7 +80,6 @@ def swift_scheme_static(name, appearance, roles, baseline)
   <<~SWIFT.rstrip
       public static let #{name} = MaterialColorScheme(
         appearance: .#{appearance},
-        sourceColor: MaterialColor(name: "sourceColor", hex: #{swift_string(baseline.fetch("sourceColor"))}),
     #{role_values}
       )
   SWIFT
@@ -108,7 +107,7 @@ def swift_core(material2_tokens, material3_roles, material3_baseline)
       public let blue: UInt8
       public let alpha: UInt8
 
-      public init(name: String, hex: String) {
+      internal init(name: String, hex: String) {
         let normalizedHex = hex.uppercased()
         precondition(normalizedHex.count == 7 && normalizedHex.first == "#", "Expected #RRGGBB hex color")
 
@@ -156,16 +155,13 @@ def swift_core(material2_tokens, material3_roles, material3_baseline)
 
     public struct MaterialColorScheme: Hashable, Sendable {
       public let appearance: MaterialAppearance
-      public let sourceColor: MaterialColor
     #{scheme_properties}
 
       public init(
         appearance: MaterialAppearance,
-        sourceColor: MaterialColor,
     #{scheme_init_parameters}
       ) {
         self.appearance = appearance
-        self.sourceColor = sourceColor
     #{scheme_init_assignments}
       }
 
@@ -184,11 +180,15 @@ def swift_core(material2_tokens, material3_roles, material3_baseline)
     }
 
     public struct MaterialTheme: Hashable, Sendable {
+      public let sourceColor: MaterialColor
       public let colorScheme: MaterialColorScheme
 
-      public init(colorScheme: MaterialColorScheme) {
+      public init(colorScheme: MaterialColorScheme, sourceColor: MaterialColor = MaterialTheme.materialSourceColor) {
+        self.sourceColor = sourceColor
         self.colorScheme = colorScheme
       }
+
+      public static let materialSourceColor = MaterialColor(name: "sourceColor", hex: #{swift_string(material3_baseline.fetch("sourceColor"))})
 
       public static let light = MaterialTheme(colorScheme: .baselineLight)
       public static let dark = MaterialTheme(colorScheme: .baselineDark)
@@ -428,26 +428,25 @@ def python_colors(material2_tokens)
   PYTHON
 end
 
+def python_scheme(name, appearance, roles, baseline)
+  values = roles.map do |role|
+    "    #{python_role_name(role)}=MaterialColor(#{role.inspect}, #{baseline.fetch(appearance).fetch(role).inspect}),"
+  end.join("\n")
+
+  <<~PYTHON.rstrip
+    #{name} = MaterialColorScheme(
+        appearance=#{appearance.inspect},
+    #{values}
+    )
+  PYTHON
+end
+
 def python_theme(roles, baseline)
   fields = roles.map { |role| "    #{python_role_name(role)}: MaterialColor" }.join("\n")
   role_fields = roles.map { |role| "    #{role.inspect}: #{python_role_name(role).inspect}," }.join("\n")
 
-  def scheme_python(name, appearance, roles, baseline)
-    values = roles.map do |role|
-      "    #{python_role_name(role)}=MaterialColor(#{role.inspect}, #{baseline.fetch(appearance).fetch(role).inspect}),"
-    end.join("\n")
-
-    <<~PYTHON.rstrip
-      #{name} = MaterialColorScheme(
-          appearance=#{appearance.inspect},
-          source_color=MaterialColor("sourceColor", #{baseline.fetch("sourceColor").inspect}),
-      #{values}
-      )
-    PYTHON
-  end
-
-  light_scheme = scheme_python("LIGHT_COLOR_SCHEME", "light", roles, baseline)
-  dark_scheme = scheme_python("DARK_COLOR_SCHEME", "dark", roles, baseline)
+  light_scheme = python_scheme("LIGHT_COLOR_SCHEME", "light", roles, baseline)
+  dark_scheme = python_scheme("DARK_COLOR_SCHEME", "dark", roles, baseline)
 
   <<~PYTHON
     #{generated_header("#").rstrip}
@@ -471,7 +470,6 @@ def python_theme(roles, baseline)
     @dataclass(frozen=True)
     class MaterialColorScheme:
         appearance: str
-        source_color: MaterialColor
     #{fields}
 
         def role_color(self, role: str) -> MaterialColor:
@@ -481,9 +479,13 @@ def python_theme(roles, baseline)
             return {role: self.role_color(role).hex for role in COLOR_SCHEME_ROLES}
 
 
+    MATERIAL_SOURCE_COLOR = MaterialColor("sourceColor", #{baseline.fetch("sourceColor").inspect})
+
+
     @dataclass(frozen=True)
     class MaterialTheme:
         color_scheme: MaterialColorScheme
+        source_color: MaterialColor = MATERIAL_SOURCE_COLOR
 
 
     #{light_scheme}

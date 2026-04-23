@@ -8,7 +8,7 @@ public struct MaterialColor: Hashable, Sendable {
   public let blue: UInt8
   public let alpha: UInt8
 
-  public init(name: String, hex: String) {
+  internal init(name: String, hex: String) {
     let normalizedHex = hex.uppercased()
     precondition(normalizedHex.count == 7 && normalizedHex.first == "#", "Expected #RRGGBB hex color")
 
@@ -562,7 +562,6 @@ public enum MaterialAppearance: String, Hashable, Sendable {
 
 public struct MaterialColorScheme: Hashable, Sendable {
   public let appearance: MaterialAppearance
-  public let sourceColor: MaterialColor
   public let primary: MaterialColor
   public let onPrimary: MaterialColor
   public let primaryContainer: MaterialColor
@@ -614,7 +613,6 @@ public struct MaterialColorScheme: Hashable, Sendable {
 
   public init(
     appearance: MaterialAppearance,
-    sourceColor: MaterialColor,
     primary: MaterialColor,
     onPrimary: MaterialColor,
     primaryContainer: MaterialColor,
@@ -665,7 +663,6 @@ public struct MaterialColorScheme: Hashable, Sendable {
     onTertiaryFixedVariant: MaterialColor
   ) {
     self.appearance = appearance
-    self.sourceColor = sourceColor
     self.primary = primary
     self.onPrimary = onPrimary
     self.primaryContainer = primaryContainer
@@ -718,7 +715,6 @@ public struct MaterialColorScheme: Hashable, Sendable {
 
   public static let baselineLight = MaterialColorScheme(
     appearance: .light,
-    sourceColor: MaterialColor(name: "sourceColor", hex: "#6750A4"),
     primary: MaterialColor(name: "primary", hex: "#65558F"),
     onPrimary: MaterialColor(name: "onPrimary", hex: "#FFFFFF"),
     primaryContainer: MaterialColor(name: "primaryContainer", hex: "#E9DDFF"),
@@ -771,7 +767,6 @@ public struct MaterialColorScheme: Hashable, Sendable {
 
   public static let baselineDark = MaterialColorScheme(
     appearance: .dark,
-    sourceColor: MaterialColor(name: "sourceColor", hex: "#6750A4"),
     primary: MaterialColor(name: "primary", hex: "#CFBDFE"),
     onPrimary: MaterialColor(name: "onPrimary", hex: "#36275D"),
     primaryContainer: MaterialColor(name: "primaryContainer", hex: "#4D3D75"),
@@ -833,11 +828,15 @@ public struct MaterialColorScheme: Hashable, Sendable {
 }
 
 public struct MaterialTheme: Hashable, Sendable {
+  public let sourceColor: MaterialColor
   public let colorScheme: MaterialColorScheme
 
-  public init(colorScheme: MaterialColorScheme) {
+  public init(colorScheme: MaterialColorScheme, sourceColor: MaterialColor = MaterialTheme.materialSourceColor) {
+    self.sourceColor = sourceColor
     self.colorScheme = colorScheme
   }
+
+  public static let materialSourceColor = MaterialColor(name: "sourceColor", hex: "#6750A4")
 
   public static let light = MaterialTheme(colorScheme: .baselineLight)
   public static let dark = MaterialTheme(colorScheme: .baselineDark)
