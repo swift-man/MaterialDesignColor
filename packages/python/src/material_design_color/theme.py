@@ -166,7 +166,9 @@ class MaterialColorScheme:
     def role_color(self, role: str) -> MaterialColor:
         return getattr(self, ROLE_FIELDS[role])
 
-    def to_dict(self) -> Dict[str, str]:
+    def as_hex_map(self) -> Dict[str, str]:
+        """Map of camelCase role name to ``#RRGGBB`` hex. Not a round-trip
+        of the dataclass: fields are snake_case ``MaterialColor`` instances."""
         return {role: self.role_color(role).hex for role in COLOR_SCHEME_ROLES}
 
 

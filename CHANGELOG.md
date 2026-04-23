@@ -3,7 +3,7 @@
 ## 2.0.0
 
 ### Highlights
-- Material Design 3 baseline color schemes (light/dark, 47 roles).
+- Material Design 3 baseline color schemes (light/dark, 48 roles).
 - Multi-language packages: iOS (Swift), React Native (TypeScript), Python.
 - Token-driven codegen — `tokens/*.json` is the single source of truth, generated outputs are committed.
 
