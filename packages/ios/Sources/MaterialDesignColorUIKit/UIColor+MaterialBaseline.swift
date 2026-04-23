@@ -13,7 +13,7 @@ public extension UIColor {
   /// For a non-baseline `MaterialColorScheme` pair, build the dynamic color
   /// directly with `UIColor(dynamicProvider:)` and the `MaterialColor`-based
   /// `UIColor(materialColor:)` initializer.
-  @available(iOS 13.0, tvOS 13.0, *)
+  @available(iOS 13.0, tvOS 13.0, watchOS 6.0, *)
   static func materialBaseline(_ role: KeyPath<MaterialColorScheme, MaterialColor>) -> UIColor {
     UIColor { trait in
       let scheme: MaterialColorScheme = trait.userInterfaceStyle == .dark

@@ -2,11 +2,14 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Material Design Color Tokens",
   "type": "object",
-  "propertyNames": {
-    "pattern": "^[a-z][A-Za-z0-9]*$"
+  "properties": {
+    "$schema": { "type": "string" }
   },
-  "additionalProperties": {
-    "type": "string",
-    "pattern": "^#[0-9A-F]{6}$"
-  }
+  "patternProperties": {
+    "^[a-z][A-Za-z0-9]*$": {
+      "type": "string",
+      "pattern": "^#[0-9A-F]{6}$"
+    }
+  },
+  "additionalProperties": false
 }
