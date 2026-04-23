@@ -16,10 +16,10 @@ public extension UIColor {
   @available(iOS 13.0, tvOS 13.0, watchOS 6.0, *)
   static func materialBaseline(_ role: KeyPath<MaterialColorScheme, MaterialColor>) -> UIColor {
     UIColor { trait in
-      let scheme: MaterialColorScheme = trait.userInterfaceStyle == .dark
-        ? .baselineDark
-        : .baselineLight
-      return UIColor(materialColor: scheme[keyPath: role])
+      let materialColor = trait.userInterfaceStyle == .dark
+        ? MaterialColorScheme.baselineDark[keyPath: role]
+        : MaterialColorScheme.baselineLight[keyPath: role]
+      return UIColor(materialColor: materialColor)
     }
   }
 }
