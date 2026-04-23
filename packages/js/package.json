@@ -1,6 +1,7 @@
 {
   "name": "@swift-man/material-design-color",
   "version": "2.0.0",
+  "type": "module",
   "description": "Material Design 3 color schemes (light/dark, 48 roles) and Material 2 palette for TypeScript / JavaScript. Framework-agnostic — works in React Native, Expo, web, Node.",
   "license": "MIT",
   "author": "swift-man",

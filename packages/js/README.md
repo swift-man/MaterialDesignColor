@@ -5,10 +5,9 @@ Material Design 3 baseline color schemes (light/dark, 48 roles) and the classic 
 This package is **framework-agnostic** — pure TS with no runtime dependencies. Works in:
 - **React Native / Expo** (Metro picks up the `react-native` / `source` fields and resolves from `src/` directly)
 - Plain React, Vue, Svelte, vanilla web
-- Node.js, Deno, Bun
-- Anywhere ESM or CJS runs
+- Node.js (ESM, 16+), Deno, Bun
 
-No native modules, no Expo config plugins, no prebuild required.
+The package is published as **ESM-only** (`"type": "module"`). CommonJS consumers can use a dynamic `await import("@swift-man/material-design-color")` or migrate to ESM. No native modules, no Expo config plugins, no prebuild required.
 
 ## Install
 
@@ -59,13 +58,21 @@ export function Example() {
 }
 ```
 
-### Plain web / Node
+### Plain web
 
 ```ts
-import { lightColorScheme, darkColorScheme, colors } from "@swift-man/material-design-color";
+import { lightColorScheme } from "@swift-man/material-design-color";
 
 document.body.style.backgroundColor = lightColorScheme.surface;
-console.log(colors.blue500); // "#2196F3"
+```
+
+### Node / Deno / Bun
+
+```ts
+import { colors, lightColorScheme } from "@swift-man/material-design-color";
+
+console.log(colors.blue500);              // "#2196F3"
+console.log(lightColorScheme.primary);    // "#65558F"
 ```
 
 ## Cross-language consistency
