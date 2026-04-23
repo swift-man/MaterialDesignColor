@@ -1,7 +1,4 @@
-# This workflow will build a Swift project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-swift
-
-name: Swift
+name: CI
 
 on:
   push:
@@ -10,11 +7,27 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
-
+  swift:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Build
-      run: swift build -v
+    - uses: actions/checkout@v4
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: "3.3"
+    - uses: actions/setup-node@v4
+      with:
+        node-version: "20"
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+    - name: Verify generated sources
+      run: ruby tools/codegen/generate.rb --check
+    - name: Test Swift package
+      run: swift test -v
+    - name: Type-check React Native package
+      run: npx --yes --package typescript@5.4.5 tsc -p packages/react-native/tsconfig.json --noEmit
+    - name: Test Python package
+      run: |
+        python3 -m pip install --upgrade pip pytest
+        PYTHONPATH=packages/python/src python3 -m pytest packages/python/tests -v
