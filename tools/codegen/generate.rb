@@ -505,10 +505,14 @@ def python_theme(roles, baseline)
   PYTHON
 end
 
+def load_tokens(path)
+  JSON.parse(File.read(path)).reject { |key, _| key.start_with?("$") }
+end
+
 check = ARGV.include?("--check")
-material2_tokens = JSON.parse(File.read(MATERIAL2_TOKENS_PATH))
+material2_tokens = load_tokens(MATERIAL2_TOKENS_PATH)
 material3_roles = JSON.parse(File.read(MATERIAL3_ROLES_PATH))
-material3_baseline = JSON.parse(File.read(MATERIAL3_BASELINE_PATH))
+material3_baseline = load_tokens(MATERIAL3_BASELINE_PATH)
 
 validate_material2_tokens(material2_tokens)
 validate_material3_tokens(material3_roles, material3_baseline)
