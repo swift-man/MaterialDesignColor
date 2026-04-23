@@ -506,10 +506,10 @@ def python_theme(roles, baseline)
 end
 
 def load_tokens(path)
-  # Strip JSON-Schema metadata keys ($schema, etc) so they aren't iterated
-  # as tokens. Only applied to flat token files; M3 files are read raw because
-  # their structure is fixed (sourceColor / variant / contrastLevel / light / dark)
-  # and the generator only reads the keys it knows about.
+  # JSON-Schema 메타 키($schema 등)를 제거해 토큰으로 순회되지 않도록 한다.
+  # 평면 구조의 토큰 파일에만 적용한다. M3 파일은 구조가 고정되어 있고
+  # (sourceColor / variant / contrastLevel / light / dark) 생성기가 알고 있는
+  # 키만 골라 읽으므로 raw 로 파싱한다.
   JSON.parse(File.read(path)).reject { |key, _| key.start_with?("$") }
 end
 
