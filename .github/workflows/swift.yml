@@ -11,24 +11,23 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: "3.3"
+    - uses: actions/setup-node@v4
+      with:
+        node-version: "20"
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
     - name: Verify generated sources
       run: ruby tools/codegen/generate.rb --check
     - name: Test Swift package
       run: swift test -v
     - name: Type-check React Native package
       run: npx --yes --package typescript@5.4.5 tsc -p packages/react-native/tsconfig.json --noEmit
-    - name: Smoke-test Python package
+    - name: Test Python package
       run: |
-        python3 -m py_compile \
-          packages/python/src/material_design_color/__init__.py \
-          packages/python/src/material_design_color/colors.py \
-          packages/python/src/material_design_color/theme.py \
-          packages/python/tests/test_colors.py
-        PYTHONPATH=packages/python/src python3 - <<'PY'
-        from material_design_color import DARK_COLOR_SCHEME, LIGHT_COLOR_SCHEME, colors, create_theme
-        assert colors.pink400 == "#EC407A"
-        assert LIGHT_COLOR_SCHEME.primary.hex == "#65558F"
-        assert DARK_COLOR_SCHEME.surface_container_highest.hex == "#36343A"
-        assert create_theme(dark=True).color_scheme.primary.hex == "#CFBDFE"
-        PY
+        python3 -m pip install --upgrade pip pytest
+        PYTHONPATH=packages/python/src python3 -m pytest packages/python/tests -v

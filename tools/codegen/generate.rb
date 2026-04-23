@@ -74,8 +74,8 @@ end
 
 def swift_scheme_static(name, appearance, roles, baseline)
   role_values = roles.map do |role|
-    "    #{role}: MaterialColor(name: #{swift_string(role)}, hex: #{swift_string(baseline.fetch(appearance).fetch(role))}),"
-  end.join("\n")
+    "    #{role}: MaterialColor(name: #{swift_string(role)}, hex: #{swift_string(baseline.fetch(appearance).fetch(role))})"
+  end.join(",\n")
 
   <<~SWIFT.rstrip
       public static let #{name} = MaterialColorScheme(

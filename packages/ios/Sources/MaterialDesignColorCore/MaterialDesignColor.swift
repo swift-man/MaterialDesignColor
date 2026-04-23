@@ -766,7 +766,7 @@ public struct MaterialColorScheme: Hashable, Sendable {
     tertiaryFixed: MaterialColor(name: "tertiaryFixed", hex: "#FFD9E3"),
     tertiaryFixedDim: MaterialColor(name: "tertiaryFixedDim", hex: "#EFB8C8"),
     onTertiaryFixed: MaterialColor(name: "onTertiaryFixed", hex: "#31101D"),
-    onTertiaryFixedVariant: MaterialColor(name: "onTertiaryFixedVariant", hex: "#633B48"),
+    onTertiaryFixedVariant: MaterialColor(name: "onTertiaryFixedVariant", hex: "#633B48")
   )
 
   public static let baselineDark = MaterialColorScheme(
@@ -819,7 +819,7 @@ public struct MaterialColorScheme: Hashable, Sendable {
     tertiaryFixed: MaterialColor(name: "tertiaryFixed", hex: "#FFD9E3"),
     tertiaryFixedDim: MaterialColor(name: "tertiaryFixedDim", hex: "#EFB8C8"),
     onTertiaryFixed: MaterialColor(name: "onTertiaryFixed", hex: "#31101D"),
-    onTertiaryFixedVariant: MaterialColor(name: "onTertiaryFixedVariant", hex: "#633B48"),
+    onTertiaryFixedVariant: MaterialColor(name: "onTertiaryFixedVariant", hex: "#633B48")
   )
 
   public static func baseline(_ appearance: MaterialAppearance) -> MaterialColorScheme {
