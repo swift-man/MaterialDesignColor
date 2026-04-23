@@ -506,13 +506,17 @@ def python_theme(roles, baseline)
 end
 
 def load_tokens(path)
+  # JSON-Schema 메타 키($schema 등)를 제거해 토큰으로 순회되지 않도록 한다.
+  # 평면 구조의 토큰 파일에만 적용한다. M3 파일은 구조가 고정되어 있고
+  # (sourceColor / variant / contrastLevel / light / dark) 생성기가 알고 있는
+  # 키만 골라 읽으므로 raw 로 파싱한다.
   JSON.parse(File.read(path)).reject { |key, _| key.start_with?("$") }
 end
 
 check = ARGV.include?("--check")
 material2_tokens = load_tokens(MATERIAL2_TOKENS_PATH)
 material3_roles = JSON.parse(File.read(MATERIAL3_ROLES_PATH))
-material3_baseline = load_tokens(MATERIAL3_BASELINE_PATH)
+material3_baseline = JSON.parse(File.read(MATERIAL3_BASELINE_PATH))
 
 validate_material2_tokens(material2_tokens)
 validate_material3_tokens(material3_roles, material3_baseline)
