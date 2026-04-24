@@ -25,8 +25,16 @@ jobs:
       run: ruby tools/codegen/generate.rb --check
     - name: Test Swift package
       run: swift test -v
-    - name: Type-check JS package
-      run: npx --yes --package typescript@5.4.5 tsc -p packages/js/tsconfig.json --noEmit
+    - name: Build and smoke-test JS package
+      # Mirror the publish workflow's check + build + ESM smoke so that
+      # packaging regressions (exports map, type: module, import paths)
+      # surface at PR time instead of only at release time.
+      working-directory: packages/js
+      run: |
+        npm install --ignore-scripts --no-package-lock
+        npm run check
+        npm run build
+        npm run smoke
     - name: Test Python package
       run: |
         python3 -m pip install --upgrade pip pytest

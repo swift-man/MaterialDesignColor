@@ -43,6 +43,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "check": "tsc -p tsconfig.json --noEmit",
+    "smoke": "node scripts/smoke.mjs",
     "prepack": "node -e \"require('node:fs').copyFileSync('../../LICENSE','LICENSE')\"",
     "prepare": "npm run build"
   },
