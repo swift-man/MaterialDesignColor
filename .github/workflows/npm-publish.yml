@@ -35,10 +35,24 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          # Node 22 ships npm 11; npm Trusted Publishers (OIDC) requires
-          # npm 11.5.1+ to perform the OIDC token exchange.
-          node-version: "22"
+          # Node 24 LTS ships npm 11.x; npm Trusted Publishers (OIDC) needs
+          # npm 11.5.1+ to perform the token exchange. Node 22's older
+          # patch releases shipped npm 10.x, so picking 24 sidesteps the
+          # need to upgrade npm out-of-band.
+          node-version: "24"
           registry-url: "https://registry.npmjs.org"
+
+      - name: Verify npm version supports OIDC trusted publishers
+        # Belt-and-suspenders against actions/setup-node ever resolving an
+        # older Node 24 patch with a too-old bundled npm.
+        run: |
+          NPM_VERSION=$(npm --version)
+          REQUIRED="11.5.1"
+          if [ "$(printf '%s\n%s\n' "$REQUIRED" "$NPM_VERSION" | sort -V | head -n1)" != "$REQUIRED" ]; then
+            echo "::error::npm $NPM_VERSION installed; OIDC trusted publishers require >= $REQUIRED"
+            exit 1
+          fi
+          echo "npm $NPM_VERSION ≥ $REQUIRED ✓"
 
       - name: Verify release commit is on main
         if: github.event_name == 'release'
