@@ -58,12 +58,6 @@ jobs:
             exit 1
           fi
 
-      - name: Stage LICENSE into the package
-        # The MIT LICENSE lives at the repo root; copy it into the package
-        # directory so npm publish ships it (`files` only sees this directory).
-        working-directory: ${{ github.workspace }}
-        run: cp LICENSE packages/js/LICENSE
-
       - name: Install dependencies
         # --ignore-scripts skips the package's own `prepare` step so we can run
         # type-check and build explicitly below without doing the build twice.
