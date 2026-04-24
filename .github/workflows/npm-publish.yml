@@ -71,15 +71,7 @@ jobs:
 
       - name: Smoke-test the built artifact
         # Catch ESM/CJS or path-resolution regressions before publishing.
-        run: |
-          node --input-type=module -e "
-            import('./dist/index.js').then(m => {
-              if (m.colors.pink400 !== '#EC407A') throw new Error('pink400 mismatch: ' + m.colors.pink400);
-              if (m.lightColorScheme.primary !== '#65558F') throw new Error('lightColorScheme.primary mismatch');
-              if (m.materialSourceColor !== '#6750A4') throw new Error('materialSourceColor mismatch');
-              console.log('ESM smoke test passed.');
-            });
-          "
+        run: npm run smoke
 
       - name: Publish to npm
         run: npm publish --provenance --tag "${TAG:-latest}"
