@@ -57,6 +57,8 @@ dist/
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
+# LICENSE is staged into packages/js/ at publish time from the repo root.
+packages/js/LICENSE
 
 # Python
 __pycache__/
