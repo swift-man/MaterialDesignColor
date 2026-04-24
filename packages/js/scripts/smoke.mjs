@@ -1,7 +1,9 @@
-// Smoke-tests the built ESM artifact by importing dist/ and asserting
-// known hex values from each public namespace. Catches packaging regressions
-// (ESM/CJS shape, exports map, path resolution) that a type-check alone misses.
-import { colors, lightColorScheme, materialSourceColor } from "../dist/index.js";
+// Smoke-tests the published entry point by importing through the package
+// name (Node "self-referencing"). This routes through package.json's
+// `exports` map and `type` declaration, so a broken exports map, missing
+// `type: "module"`, or wrong `main` would fail here — none of which a
+// relative `../dist/index.js` import would catch.
+import { colors, lightColorScheme, materialSourceColor } from "@swift-man/material-design-color";
 
 const checks = [
   ["colors.pink400", colors.pink400, "#EC407A"],
