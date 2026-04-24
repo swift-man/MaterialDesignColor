@@ -17,7 +17,9 @@ jobs:
         ruby-version: "3.3"
     - uses: actions/setup-node@v4
       with:
-        node-version: "20"
+        # Match the publish workflow (Node 22 / npm 11) so the smoke test
+        # runs against the same runtime we'll publish from.
+        node-version: "22"
     - uses: actions/setup-python@v5
       with:
         python-version: "3.11"

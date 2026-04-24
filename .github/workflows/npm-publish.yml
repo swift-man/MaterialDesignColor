@@ -33,7 +33,9 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          # Node 22 ships npm 11; npm Trusted Publishers (OIDC) requires
+          # npm 11.5.1+ to perform the OIDC token exchange.
+          node-version: "22"
           registry-url: "https://registry.npmjs.org"
 
       - name: Verify release commit is on main
@@ -74,7 +76,13 @@ jobs:
         run: npm run smoke
 
       - name: Publish to npm
-        run: npm publish --provenance --tag "${TAG:-latest}"
+        # Authentication is handled by npm Trusted Publishers (OIDC) — the
+        # `id-token: write` permission above plus the registry-url from
+        # actions/setup-node lets `npm publish` exchange a short-lived OIDC
+        # token for an npm credential at publish time. No NPM_TOKEN secret
+        # required; nothing to rotate every 90 days.
+        # `provenance: true` lives in package.json's publishConfig, so it
+        # applies regardless of who runs `npm publish`.
+        run: npm publish --tag "${TAG:-latest}"
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           TAG: ${{ inputs.tag }}
