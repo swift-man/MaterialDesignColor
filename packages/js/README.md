@@ -3,7 +3,7 @@
 Material Design 3 baseline color schemes (light/dark, 48 roles) and the classic Material 2 palette as plain TypeScript constants.
 
 This package is **framework-agnostic** — pure TS with no runtime dependencies. Works in:
-- **React Native / Expo** (Metro picks up the `react-native` / `source` fields and resolves from `src/` directly)
+- **React Native / Expo** (Metro consumes the published `dist/` ESM output)
 - Plain React, Vue, Svelte, vanilla web
 - Node.js (ESM, 16+), Deno, Bun
 

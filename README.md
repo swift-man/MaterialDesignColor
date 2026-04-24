@@ -108,7 +108,7 @@ button.backgroundColor = scheme.primary.uiColor
 
 ### JavaScript / TypeScript (React Native, Expo, web, Node)
 
-The JS package is framework-agnostic — pure TypeScript with no runtime dependencies. Works in React Native and Expo (Metro picks up the `react-native`/`source` fields), as well as plain React, Vue, vanilla web, Node, Deno, and Bun. No native modules, no Expo config plugins, no prebuild required.
+The JS package is framework-agnostic — pure TypeScript compiled to ESM with no runtime dependencies. Works in React Native and Expo (Metro consumes the published `dist/` output), plain React, Vue, vanilla web, Node, Deno, and Bun. No native modules, no Expo config plugins, no prebuild required.
 
 ```bash
 npm install @swift-man/material-design-color

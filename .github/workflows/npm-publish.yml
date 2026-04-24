@@ -6,7 +6,9 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Dist-tag to publish under (default: latest)"
+        # `npm publish --tag X` only works for a *new* version. To re-tag an
+        # already-published version, use `npm dist-tag add` outside this workflow.
+        description: "Dist-tag for the new version being published (e.g. next, beta). Does not retag existing versions."
         required: false
         default: "latest"
 

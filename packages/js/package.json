@@ -25,20 +25,15 @@
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
-  "react-native": "src/index.ts",
-  "source": "src/index.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "react-native": "./src/index.ts",
-      "source": "./src/index.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     }
   },
   "files": [
     "dist",
-    "src",
     "README.md"
   ],
   "publishConfig": {
@@ -50,6 +45,6 @@
     "prepare": "npm run build"
   },
   "devDependencies": {
-    "typescript": "^5.4.0"
+    "typescript": "5.4.5"
   }
 }
