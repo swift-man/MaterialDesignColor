@@ -25,8 +25,8 @@ jobs:
       run: ruby tools/codegen/generate.rb --check
     - name: Test Swift package
       run: swift test -v
-    - name: Type-check React Native package
-      run: npx --yes --package typescript@5.4.5 tsc -p packages/react-native/tsconfig.json --noEmit
+    - name: Type-check JS package
+      run: npx --yes --package typescript@5.4.5 tsc -p packages/js/tsconfig.json --noEmit
     - name: Test Python package
       run: |
         python3 -m pip install --upgrade pip pytest

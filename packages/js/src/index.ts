@@ -1,5 +1,5 @@
-export { colors, getColor } from "./colors";
-export type { MaterialColorHex, MaterialColorName } from "./colors";
+export { colors, getColor } from "./colors.js";
+export type { MaterialColorHex, MaterialColorName } from "./colors.js";
 export {
   createMaterialTheme,
   darkColorScheme,
@@ -7,11 +7,11 @@ export {
   lightColorScheme,
   materialColorSchemeRoles,
   materialSourceColor,
-} from "./colorScheme";
+} from "./colorScheme.js";
 export type {
   MaterialColorRole,
   MaterialColorScheme,
   MaterialColorSchemeInput,
   MaterialTheme,
   MaterialThemeOptions,
-} from "./colorScheme";
+} from "./colorScheme.js";

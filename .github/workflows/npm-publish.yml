@@ -1,0 +1,88 @@
+name: Publish JS package to npm
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        # `npm publish --tag X` only works for a *new* version. To re-tag an
+        # already-published version, use `npm dist-tag add` outside this workflow.
+        description: "Dist-tag for the new version being published (e.g. next, beta). Does not retag existing versions."
+        required: false
+        default: "latest"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    # Releases are always cut from main; manual dispatch is restricted to main
+    # so we can't accidentally publish whatever sits on a feature branch as `latest`.
+    if: github.event_name == 'release' || github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      id-token: write   # required for npm provenance
+    defaults:
+      run:
+        working-directory: packages/js
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Need full history so we can ancestor-check the release commit against main.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Verify release commit is on main
+        if: github.event_name == 'release'
+        # Catches releases accidentally cut from a feature branch or stale commit.
+        # npm versions are immutable, so this has to fail before publish, not after.
+        working-directory: ${{ github.workspace }}
+        run: |
+          git fetch origin main:refs/remotes/origin/main
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::Release commit $GITHUB_SHA is not reachable from origin/main; refusing to publish."
+            exit 1
+          fi
+
+      - name: Verify package.json version matches release tag
+        if: github.event_name == 'release'
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          RELEASE_TAG="${GITHUB_REF_NAME#v}"
+          if [ "$PKG_VERSION" != "$RELEASE_TAG" ]; then
+            echo "::error::package.json version ($PKG_VERSION) does not match release tag ($RELEASE_TAG)"
+            exit 1
+          fi
+
+      - name: Install dependencies
+        # --ignore-scripts skips the package's own `prepare` step so we can run
+        # type-check and build explicitly below without doing the build twice.
+        run: npm install --ignore-scripts --no-package-lock
+
+      - name: Type-check
+        run: npm run check
+
+      - name: Build
+        run: npm run build
+
+      - name: Smoke-test the built artifact
+        # Catch ESM/CJS or path-resolution regressions before publishing.
+        run: |
+          node --input-type=module -e "
+            import('./dist/index.js').then(m => {
+              if (m.colors.pink400 !== '#EC407A') throw new Error('pink400 mismatch: ' + m.colors.pink400);
+              if (m.lightColorScheme.primary !== '#65558F') throw new Error('lightColorScheme.primary mismatch');
+              if (m.materialSourceColor !== '#6750A4') throw new Error('materialSourceColor mismatch');
+              console.log('ESM smoke test passed.');
+            });
+          "
+
+      - name: Publish to npm
+        run: npm publish --provenance --tag "${TAG:-latest}"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          TAG: ${{ inputs.tag }}

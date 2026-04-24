@@ -106,9 +106,15 @@ label.textColor = scheme.onSurface.uiColor
 button.backgroundColor = scheme.primary.uiColor
 ```
 
-### React Native - Expo
+### JavaScript / TypeScript (React Native, Expo, web, Node)
 
-The React Native package is pure TypeScript and does not require native modules, config plugins, or Expo prebuilds.
+The JS package is framework-agnostic — pure TypeScript compiled to ESM with no runtime dependencies. Works in React Native and Expo (Metro consumes the published `dist/` output), plain React, Vue, vanilla web, Node, Deno, and Bun. No native modules, no Expo config plugins, no prebuild required.
+
+```bash
+npm install @swift-man/material-design-color
+# or: yarn add @swift-man/material-design-color
+# or: pnpm add @swift-man/material-design-color
+```
 
 ```ts
 import { createMaterialTheme } from "@swift-man/material-design-color";
@@ -186,7 +192,7 @@ MaterialDesignColor/
         MaterialDesignColorUIKit/
       Tests/
 
-    react-native/
+    js/
       package.json
       src/
 
@@ -250,14 +256,14 @@ Each package can publish its own artifact from that same tag:
 | Platform | Folder | Registry |
 | --- | --- | --- |
 | iOS | root `Package.swift` + `packages/ios` | Swift Package Manager |
-| React Native | `packages/react-native` | npm |
+| JavaScript / TypeScript (RN, Expo, web, Node) | `packages/js` | npm |
 | Python | `packages/python` | PyPI |
 
 If platform release cycles become very different later, use platform-prefixed tags:
 
 ```text
 ios-v2.1.0
-react-native-v1.2.0
+js-v1.2.0
 python-v1.0.0
 ```
 

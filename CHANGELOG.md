@@ -26,7 +26,7 @@ The v1 public surface was the SwiftUI `Color.<token>` extensions (`Color.red50`,
 - `MaterialDesignColor` — umbrella shim re-exporting SwiftUI surface for source-level back-compat with v1.
 
 ### New packages
-- `@swift-man/material-design-color` — React Native / Expo (`packages/react-native`).
+- `@swift-man/material-design-color` — JavaScript / TypeScript (`packages/js`); framework-agnostic, works in React Native, Expo, web, Node.
 - `material-design-color` — Python (`packages/python`).
 
 ### Repository layout
