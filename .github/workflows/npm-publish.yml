@@ -74,7 +74,11 @@ jobs:
         run: npm run smoke
 
       - name: Publish to npm
+        # Authentication is handled by npm Trusted Publishers (OIDC) — the
+        # `id-token: write` permission above plus the registry-url from
+        # actions/setup-node lets `npm publish` exchange a short-lived OIDC
+        # token for an npm credential at publish time. No NPM_TOKEN secret
+        # required; nothing to rotate every 90 days.
         run: npm publish --provenance --tag "${TAG:-latest}"
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           TAG: ${{ inputs.tag }}
