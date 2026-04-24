@@ -8,9 +8,11 @@ on:
       tag:
         # `npm publish --tag X` only works for a *new* version. To re-tag an
         # already-published version, use `npm dist-tag add` outside this workflow.
-        description: "Dist-tag for the new version being published (e.g. next, beta). Does not retag existing versions."
+        # Leave blank to auto-detect: semver prereleases (anything with a `-`
+        # in the version) publish under `next`, stable versions under `latest`.
+        description: "Dist-tag override (leave blank for auto: prerelease→next, stable→latest)"
         required: false
-        default: "latest"
+        default: ""
 
 jobs:
   publish:
@@ -33,10 +35,24 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          # Node 22 ships npm 11; npm Trusted Publishers (OIDC) requires
-          # npm 11.5.1+ to perform the OIDC token exchange.
-          node-version: "22"
+          # Node 24 LTS ships npm 11.x; npm Trusted Publishers (OIDC) needs
+          # npm 11.5.1+ to perform the token exchange. Node 22's older
+          # patch releases shipped npm 10.x, so picking 24 sidesteps the
+          # need to upgrade npm out-of-band.
+          node-version: "24"
           registry-url: "https://registry.npmjs.org"
+
+      - name: Verify npm version supports OIDC trusted publishers
+        # Belt-and-suspenders against actions/setup-node ever resolving an
+        # older Node 24 patch with a too-old bundled npm.
+        run: |
+          NPM_VERSION=$(npm --version)
+          REQUIRED="11.5.1"
+          if [ "$(printf '%s\n%s\n' "$REQUIRED" "$NPM_VERSION" | sort -V | head -n1)" != "$REQUIRED" ]; then
+            echo "::error::npm $NPM_VERSION installed; OIDC trusted publishers require >= $REQUIRED"
+            exit 1
+          fi
+          echo "npm $NPM_VERSION ≥ $REQUIRED ✓"
 
       - name: Verify release commit is on main
         if: github.event_name == 'release'
@@ -75,6 +91,26 @@ jobs:
         # Catch ESM/CJS or path-resolution regressions before publishing.
         run: npm run smoke
 
+      - name: Resolve npm dist-tag
+        id: dist_tag
+        # A semver prerelease (2.0.1-rc.1) accidentally going out under the
+        # `latest` tag would displace the stable release for every consumer
+        # doing `npm install <pkg>`. Auto-route prereleases to `next`; allow
+        # an explicit override via workflow_dispatch.
+        env:
+          INPUT_TAG: ${{ inputs.tag }}
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          if [ -n "$INPUT_TAG" ]; then
+            DIST_TAG="$INPUT_TAG"
+          elif [[ "$PKG_VERSION" == *-* ]]; then
+            DIST_TAG="next"
+          else
+            DIST_TAG="latest"
+          fi
+          echo "Publishing $PKG_VERSION under dist-tag: $DIST_TAG"
+          echo "tag=$DIST_TAG" >> "$GITHUB_OUTPUT"
+
       - name: Publish to npm
         # Authentication is handled by npm Trusted Publishers (OIDC) — the
         # `id-token: write` permission above plus the registry-url from
@@ -83,6 +119,4 @@ jobs:
         # required; nothing to rotate every 90 days.
         # `provenance: true` lives in package.json's publishConfig, so it
         # applies regardless of who runs `npm publish`.
-        run: npm publish --tag "${TAG:-latest}"
-        env:
-          TAG: ${{ inputs.tag }}
+        run: npm publish --tag "${{ steps.dist_tag.outputs.tag }}"
