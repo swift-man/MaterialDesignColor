@@ -8,6 +8,7 @@ review:
   - "**/*.py"
   - "**/*.rb"
   - "**/*.json"
+  - "**/*.md"
   - "**/*.yml"
   - "**/*.yaml"
   - "Package.swift"
@@ -85,7 +86,6 @@ review:
   # generated documentation output
   - "docs/**"
   - "**/*.doccarchive/**"
-  - "**/*.docc/**"
 
   always_review:
   - ".reviewbot.yml"

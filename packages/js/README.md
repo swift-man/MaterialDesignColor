@@ -1,6 +1,6 @@
 # MaterialDesignColor for JavaScript / TypeScript
 
-Material Design 3 baseline color schemes (light/dark, 48 roles) and the classic Material 2 palette as plain TypeScript constants.
+Material Design 3 preset color schemes (light/dark, 48 roles) and the classic Material 2 palette as plain TypeScript constants.
 
 This package is **framework-agnostic** — pure TS with no runtime dependencies. Works in:
 - **React Native / Expo** (Metro consumes the published `dist/` ESM output)
@@ -21,15 +21,18 @@ pnpm add @swift-man/material-design-color
 
 ## Usage
 
-### Material 3 baseline color schemes
+### Material 3 preset color schemes
 
 ```ts
-import { createMaterialTheme } from "@swift-man/material-design-color";
+import { createMaterialTheme, getMaterialThemeKeyColors } from "@swift-man/material-design-color";
 
-const theme = createMaterialTheme({ dark: false });
-const primary = theme.colorScheme.primary;          // "#65558F"
+const theme = createMaterialTheme({ preset: "expressive", dark: false });
+const primary = theme.colorScheme.primary;          // "#006B5A"
 const onPrimaryContainer = theme.colorScheme.onPrimaryContainer;
+const keyPrimary = getMaterialThemeKeyColors("expressive").primary;
 ```
+
+Available presets: `tonalSpot`, `fidelity`, `content`, `monochrome`, `neutral`, `vibrant`, `expressive`, `rainbow`, `fruitSalad`.
 
 ### Material 2 palette
 
@@ -46,7 +49,7 @@ const accent = colors.tealA700;                     // "#00BFA5"
 import { createMaterialTheme, colors } from "@swift-man/material-design-color";
 import { View, Text } from "react-native";
 
-const theme = createMaterialTheme({ dark: true });
+const theme = createMaterialTheme({ preset: "fruitSalad", dark: true });
 
 export function Example() {
   return (
@@ -61,9 +64,9 @@ export function Example() {
 ### Plain web
 
 ```ts
-import { lightColorScheme } from "@swift-man/material-design-color";
+import { getMaterialTheme } from "@swift-man/material-design-color";
 
-document.body.style.backgroundColor = lightColorScheme.surface;
+document.body.style.backgroundColor = getMaterialTheme("neutral").colorScheme.surface;
 ```
 
 ### Node / Deno / Bun

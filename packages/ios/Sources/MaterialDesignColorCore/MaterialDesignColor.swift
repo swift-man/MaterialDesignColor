@@ -560,6 +560,140 @@ public enum MaterialAppearance: String, Hashable, Sendable {
   case dark
 }
 
+public struct MaterialThemeKeyColors: Hashable, Sendable {
+  public let primary: MaterialColor
+  public let secondary: MaterialColor
+  public let tertiary: MaterialColor
+  public let neutral: MaterialColor
+  public let neutralVariant: MaterialColor
+
+  public init(
+    primary: MaterialColor,
+    secondary: MaterialColor,
+    tertiary: MaterialColor,
+    neutral: MaterialColor,
+    neutralVariant: MaterialColor
+  ) {
+    self.primary = primary
+    self.secondary = secondary
+    self.tertiary = tertiary
+    self.neutral = neutral
+    self.neutralVariant = neutralVariant
+  }
+}
+
+public enum MaterialThemePreset: String, CaseIterable, Hashable, Sendable {
+  case tonalSpot
+  case fidelity
+  case content
+  case monochrome
+  case neutral
+  case vibrant
+  case expressive
+  case rainbow
+  case fruitSalad
+
+  public var sourceColor: MaterialColor {
+    switch self {
+    case .tonalSpot:
+      return MaterialColor(name: "sourceColor", hex: "#6750A4")
+    case .fidelity:
+      return MaterialColor(name: "sourceColor", hex: "#6750A4")
+    case .content:
+      return MaterialColor(name: "sourceColor", hex: "#6750A4")
+    case .monochrome:
+      return MaterialColor(name: "sourceColor", hex: "#6750A4")
+    case .neutral:
+      return MaterialColor(name: "sourceColor", hex: "#6750A4")
+    case .vibrant:
+      return MaterialColor(name: "sourceColor", hex: "#6750A4")
+    case .expressive:
+      return MaterialColor(name: "sourceColor", hex: "#6750A4")
+    case .rainbow:
+      return MaterialColor(name: "sourceColor", hex: "#6750A4")
+    case .fruitSalad:
+      return MaterialColor(name: "sourceColor", hex: "#6750A4")
+    }
+  }
+
+  public var keyColors: MaterialThemeKeyColors {
+    switch self {
+    case .tonalSpot:
+      return MaterialThemeKeyColors(
+        primary: MaterialColor(name: "primary", hex: "#7E6EA9"),
+        secondary: MaterialColor(name: "secondary", hex: "#7B748A"),
+        tertiary: MaterialColor(name: "tertiary", hex: "#996A79"),
+        neutral: MaterialColor(name: "neutral", hex: "#7A767D"),
+        neutralVariant: MaterialColor(name: "neutralVariant", hex: "#7A757F")
+      )
+    case .fidelity:
+      return MaterialThemeKeyColors(
+        primary: MaterialColor(name: "primary", hex: "#8069BF"),
+        secondary: MaterialColor(name: "secondary", hex: "#7C7296"),
+        tertiary: MaterialColor(name: "tertiary", hex: "#C9A74D"),
+        neutral: MaterialColor(name: "neutral", hex: "#7A767D"),
+        neutralVariant: MaterialColor(name: "neutralVariant", hex: "#7A7582")
+      )
+    case .content:
+      return MaterialThemeKeyColors(
+        primary: MaterialColor(name: "primary", hex: "#8069BF"),
+        secondary: MaterialColor(name: "secondary", hex: "#7C7296"),
+        tertiary: MaterialColor(name: "tertiary", hex: "#924274"),
+        neutral: MaterialColor(name: "neutral", hex: "#7A767D"),
+        neutralVariant: MaterialColor(name: "neutralVariant", hex: "#7A7582")
+      )
+    case .monochrome:
+      return MaterialThemeKeyColors(
+        primary: MaterialColor(name: "primary", hex: "#777777"),
+        secondary: MaterialColor(name: "secondary", hex: "#777777"),
+        tertiary: MaterialColor(name: "tertiary", hex: "#777777"),
+        neutral: MaterialColor(name: "neutral", hex: "#777777"),
+        neutralVariant: MaterialColor(name: "neutralVariant", hex: "#777777")
+      )
+    case .neutral:
+      return MaterialThemeKeyColors(
+        primary: MaterialColor(name: "primary", hex: "#7A7484"),
+        secondary: MaterialColor(name: "secondary", hex: "#7A757F"),
+        tertiary: MaterialColor(name: "tertiary", hex: "#7B748A"),
+        neutral: MaterialColor(name: "neutral", hex: "#797678"),
+        neutralVariant: MaterialColor(name: "neutralVariant", hex: "#797678")
+      )
+    case .vibrant:
+      return MaterialThemeKeyColors(
+        primary: MaterialColor(name: "primary", hex: "#6C0BFF"),
+        secondary: MaterialColor(name: "secondary", hex: "#856F92"),
+        tertiary: MaterialColor(name: "tertiary", hex: "#946994"),
+        neutral: MaterialColor(name: "neutral", hex: "#7A7582"),
+        neutralVariant: MaterialColor(name: "neutralVariant", hex: "#7A7484")
+      )
+    case .expressive:
+      return MaterialThemeKeyColors(
+        primary: MaterialColor(name: "primary", hex: "#1B8672"),
+        secondary: MaterialColor(name: "secondary", hex: "#936B83"),
+        tertiary: MaterialColor(name: "tertiary", hex: "#8D6B9B"),
+        neutral: MaterialColor(name: "neutral", hex: "#7C757E"),
+        neutralVariant: MaterialColor(name: "neutralVariant", hex: "#7E7382")
+      )
+    case .rainbow:
+      return MaterialThemeKeyColors(
+        primary: MaterialColor(name: "primary", hex: "#8069BF"),
+        secondary: MaterialColor(name: "secondary", hex: "#7B748A"),
+        tertiary: MaterialColor(name: "tertiary", hex: "#996A79"),
+        neutral: MaterialColor(name: "neutral", hex: "#777777"),
+        neutralVariant: MaterialColor(name: "neutralVariant", hex: "#777777")
+      )
+    case .fruitSalad:
+      return MaterialThemeKeyColors(
+        primary: MaterialColor(name: "primary", hex: "#247CBB"),
+        secondary: MaterialColor(name: "secondary", hex: "#4B7BA7"),
+        tertiary: MaterialColor(name: "tertiary", hex: "#7E6EA9"),
+        neutral: MaterialColor(name: "neutral", hex: "#7A7582"),
+        neutralVariant: MaterialColor(name: "neutralVariant", hex: "#7B748A")
+      )
+    }
+  }
+}
+
 public struct MaterialColorScheme: Hashable, Sendable {
   public let appearance: MaterialAppearance
   public let primary: MaterialColor
@@ -713,7 +847,7 @@ public struct MaterialColorScheme: Hashable, Sendable {
     self.onTertiaryFixedVariant = onTertiaryFixedVariant
   }
 
-  public static let baselineLight = MaterialColorScheme(
+  public static let tonalSpotLight = MaterialColorScheme(
     appearance: .light,
     primary: MaterialColor(name: "primary", hex: "#65558F"),
     onPrimary: MaterialColor(name: "onPrimary", hex: "#FFFFFF"),
@@ -765,7 +899,7 @@ public struct MaterialColorScheme: Hashable, Sendable {
     onTertiaryFixedVariant: MaterialColor(name: "onTertiaryFixedVariant", hex: "#633B48")
   )
 
-  public static let baselineDark = MaterialColorScheme(
+  public static let tonalSpotDark = MaterialColorScheme(
     appearance: .dark,
     primary: MaterialColor(name: "primary", hex: "#CFBDFE"),
     onPrimary: MaterialColor(name: "onPrimary", hex: "#36275D"),
@@ -817,31 +951,916 @@ public struct MaterialColorScheme: Hashable, Sendable {
     onTertiaryFixedVariant: MaterialColor(name: "onTertiaryFixedVariant", hex: "#633B48")
   )
 
-  public static func baseline(_ appearance: MaterialAppearance) -> MaterialColorScheme {
-    switch appearance {
-    case .light:
-      return baselineLight
-    case .dark:
-      return baselineDark
+  public static let fidelityLight = MaterialColorScheme(
+    appearance: .light,
+    primary: MaterialColor(name: "primary", hex: "#4F378A"),
+    onPrimary: MaterialColor(name: "onPrimary", hex: "#FFFFFF"),
+    primaryContainer: MaterialColor(name: "primaryContainer", hex: "#6750A4"),
+    onPrimaryContainer: MaterialColor(name: "onPrimaryContainer", hex: "#E0D2FF"),
+    inversePrimary: MaterialColor(name: "inversePrimary", hex: "#CFBCFF"),
+    secondary: MaterialColor(name: "secondary", hex: "#63597C"),
+    onSecondary: MaterialColor(name: "onSecondary", hex: "#FFFFFF"),
+    secondaryContainer: MaterialColor(name: "secondaryContainer", hex: "#E1D4FD"),
+    onSecondaryContainer: MaterialColor(name: "onSecondaryContainer", hex: "#645A7D"),
+    tertiary: MaterialColor(name: "tertiary", hex: "#765B00"),
+    onTertiary: MaterialColor(name: "onTertiary", hex: "#FFFFFF"),
+    tertiaryContainer: MaterialColor(name: "tertiaryContainer", hex: "#C9A74D"),
+    onTertiaryContainer: MaterialColor(name: "onTertiaryContainer", hex: "#503D00"),
+    background: MaterialColor(name: "background", hex: "#FDF7FF"),
+    onBackground: MaterialColor(name: "onBackground", hex: "#1D1B20"),
+    surface: MaterialColor(name: "surface", hex: "#FDF7FF"),
+    onSurface: MaterialColor(name: "onSurface", hex: "#1D1B20"),
+    surfaceVariant: MaterialColor(name: "surfaceVariant", hex: "#E7E0EE"),
+    onSurfaceVariant: MaterialColor(name: "onSurfaceVariant", hex: "#494551"),
+    surfaceTint: MaterialColor(name: "surfaceTint", hex: "#6750A4"),
+    inverseSurface: MaterialColor(name: "inverseSurface", hex: "#322F35"),
+    inverseOnSurface: MaterialColor(name: "inverseOnSurface", hex: "#F5EFF7"),
+    error: MaterialColor(name: "error", hex: "#BA1A1A"),
+    onError: MaterialColor(name: "onError", hex: "#FFFFFF"),
+    errorContainer: MaterialColor(name: "errorContainer", hex: "#FFDAD6"),
+    onErrorContainer: MaterialColor(name: "onErrorContainer", hex: "#93000A"),
+    outline: MaterialColor(name: "outline", hex: "#7A7582"),
+    outlineVariant: MaterialColor(name: "outlineVariant", hex: "#CBC4D2"),
+    scrim: MaterialColor(name: "scrim", hex: "#000000"),
+    surfaceBright: MaterialColor(name: "surfaceBright", hex: "#FDF7FF"),
+    surfaceContainer: MaterialColor(name: "surfaceContainer", hex: "#F2ECF4"),
+    surfaceContainerHigh: MaterialColor(name: "surfaceContainerHigh", hex: "#ECE6EE"),
+    surfaceContainerHighest: MaterialColor(name: "surfaceContainerHighest", hex: "#E6E0E9"),
+    surfaceContainerLow: MaterialColor(name: "surfaceContainerLow", hex: "#F8F2FA"),
+    surfaceContainerLowest: MaterialColor(name: "surfaceContainerLowest", hex: "#FFFFFF"),
+    surfaceDim: MaterialColor(name: "surfaceDim", hex: "#DED8E0"),
+    primaryFixed: MaterialColor(name: "primaryFixed", hex: "#E9DDFF"),
+    primaryFixedDim: MaterialColor(name: "primaryFixedDim", hex: "#CFBCFF"),
+    onPrimaryFixed: MaterialColor(name: "onPrimaryFixed", hex: "#22005D"),
+    onPrimaryFixedVariant: MaterialColor(name: "onPrimaryFixedVariant", hex: "#4F378A"),
+    secondaryFixed: MaterialColor(name: "secondaryFixed", hex: "#E9DDFF"),
+    secondaryFixedDim: MaterialColor(name: "secondaryFixedDim", hex: "#CDC0E9"),
+    onSecondaryFixed: MaterialColor(name: "onSecondaryFixed", hex: "#1F1635"),
+    onSecondaryFixedVariant: MaterialColor(name: "onSecondaryFixedVariant", hex: "#4B4263"),
+    tertiaryFixed: MaterialColor(name: "tertiaryFixed", hex: "#FFDF93"),
+    tertiaryFixedDim: MaterialColor(name: "tertiaryFixedDim", hex: "#E7C365"),
+    onTertiaryFixed: MaterialColor(name: "onTertiaryFixed", hex: "#241A00"),
+    onTertiaryFixedVariant: MaterialColor(name: "onTertiaryFixedVariant", hex: "#594400")
+  )
+
+  public static let fidelityDark = MaterialColorScheme(
+    appearance: .dark,
+    primary: MaterialColor(name: "primary", hex: "#CFBCFF"),
+    onPrimary: MaterialColor(name: "onPrimary", hex: "#381E72"),
+    primaryContainer: MaterialColor(name: "primaryContainer", hex: "#6750A4"),
+    onPrimaryContainer: MaterialColor(name: "onPrimaryContainer", hex: "#E0D2FF"),
+    inversePrimary: MaterialColor(name: "inversePrimary", hex: "#6750A4"),
+    secondary: MaterialColor(name: "secondary", hex: "#CDC0E9"),
+    onSecondary: MaterialColor(name: "onSecondary", hex: "#342B4B"),
+    secondaryContainer: MaterialColor(name: "secondaryContainer", hex: "#4D4465"),
+    onSecondaryContainer: MaterialColor(name: "onSecondaryContainer", hex: "#BFB2DA"),
+    tertiary: MaterialColor(name: "tertiary", hex: "#E7C365"),
+    onTertiary: MaterialColor(name: "onTertiary", hex: "#3E2E00"),
+    tertiaryContainer: MaterialColor(name: "tertiaryContainer", hex: "#C9A74D"),
+    onTertiaryContainer: MaterialColor(name: "onTertiaryContainer", hex: "#503D00"),
+    background: MaterialColor(name: "background", hex: "#141218"),
+    onBackground: MaterialColor(name: "onBackground", hex: "#E6E0E9"),
+    surface: MaterialColor(name: "surface", hex: "#141218"),
+    onSurface: MaterialColor(name: "onSurface", hex: "#E6E0E9"),
+    surfaceVariant: MaterialColor(name: "surfaceVariant", hex: "#494551"),
+    onSurfaceVariant: MaterialColor(name: "onSurfaceVariant", hex: "#CBC4D2"),
+    surfaceTint: MaterialColor(name: "surfaceTint", hex: "#CFBCFF"),
+    inverseSurface: MaterialColor(name: "inverseSurface", hex: "#E6E0E9"),
+    inverseOnSurface: MaterialColor(name: "inverseOnSurface", hex: "#322F35"),
+    error: MaterialColor(name: "error", hex: "#FFB4AB"),
+    onError: MaterialColor(name: "onError", hex: "#690005"),
+    errorContainer: MaterialColor(name: "errorContainer", hex: "#93000A"),
+    onErrorContainer: MaterialColor(name: "onErrorContainer", hex: "#FFDAD6"),
+    outline: MaterialColor(name: "outline", hex: "#948E9C"),
+    outlineVariant: MaterialColor(name: "outlineVariant", hex: "#494551"),
+    scrim: MaterialColor(name: "scrim", hex: "#000000"),
+    surfaceBright: MaterialColor(name: "surfaceBright", hex: "#3B383E"),
+    surfaceContainer: MaterialColor(name: "surfaceContainer", hex: "#211F24"),
+    surfaceContainerHigh: MaterialColor(name: "surfaceContainerHigh", hex: "#2B292F"),
+    surfaceContainerHighest: MaterialColor(name: "surfaceContainerHighest", hex: "#36343A"),
+    surfaceContainerLow: MaterialColor(name: "surfaceContainerLow", hex: "#1D1B20"),
+    surfaceContainerLowest: MaterialColor(name: "surfaceContainerLowest", hex: "#0F0D13"),
+    surfaceDim: MaterialColor(name: "surfaceDim", hex: "#141218"),
+    primaryFixed: MaterialColor(name: "primaryFixed", hex: "#E9DDFF"),
+    primaryFixedDim: MaterialColor(name: "primaryFixedDim", hex: "#CFBCFF"),
+    onPrimaryFixed: MaterialColor(name: "onPrimaryFixed", hex: "#22005D"),
+    onPrimaryFixedVariant: MaterialColor(name: "onPrimaryFixedVariant", hex: "#4F378A"),
+    secondaryFixed: MaterialColor(name: "secondaryFixed", hex: "#E9DDFF"),
+    secondaryFixedDim: MaterialColor(name: "secondaryFixedDim", hex: "#CDC0E9"),
+    onSecondaryFixed: MaterialColor(name: "onSecondaryFixed", hex: "#1F1635"),
+    onSecondaryFixedVariant: MaterialColor(name: "onSecondaryFixedVariant", hex: "#4B4263"),
+    tertiaryFixed: MaterialColor(name: "tertiaryFixed", hex: "#FFDF93"),
+    tertiaryFixedDim: MaterialColor(name: "tertiaryFixedDim", hex: "#E7C365"),
+    onTertiaryFixed: MaterialColor(name: "onTertiaryFixed", hex: "#241A00"),
+    onTertiaryFixedVariant: MaterialColor(name: "onTertiaryFixedVariant", hex: "#594400")
+  )
+
+  public static let contentLight = MaterialColorScheme(
+    appearance: .light,
+    primary: MaterialColor(name: "primary", hex: "#4F378A"),
+    onPrimary: MaterialColor(name: "onPrimary", hex: "#FFFFFF"),
+    primaryContainer: MaterialColor(name: "primaryContainer", hex: "#6750A4"),
+    onPrimaryContainer: MaterialColor(name: "onPrimaryContainer", hex: "#E0D2FF"),
+    inversePrimary: MaterialColor(name: "inversePrimary", hex: "#CFBCFF"),
+    secondary: MaterialColor(name: "secondary", hex: "#63597C"),
+    onSecondary: MaterialColor(name: "onSecondary", hex: "#FFFFFF"),
+    secondaryContainer: MaterialColor(name: "secondaryContainer", hex: "#E1D4FD"),
+    onSecondaryContainer: MaterialColor(name: "onSecondaryContainer", hex: "#645A7D"),
+    tertiary: MaterialColor(name: "tertiary", hex: "#762A5B"),
+    onTertiary: MaterialColor(name: "onTertiary", hex: "#FFFFFF"),
+    tertiaryContainer: MaterialColor(name: "tertiaryContainer", hex: "#924274"),
+    onTertiaryContainer: MaterialColor(name: "onTertiaryContainer", hex: "#FFCAE5"),
+    background: MaterialColor(name: "background", hex: "#FDF7FF"),
+    onBackground: MaterialColor(name: "onBackground", hex: "#1D1B20"),
+    surface: MaterialColor(name: "surface", hex: "#FDF7FF"),
+    onSurface: MaterialColor(name: "onSurface", hex: "#1D1B20"),
+    surfaceVariant: MaterialColor(name: "surfaceVariant", hex: "#E7E0EE"),
+    onSurfaceVariant: MaterialColor(name: "onSurfaceVariant", hex: "#494551"),
+    surfaceTint: MaterialColor(name: "surfaceTint", hex: "#6750A4"),
+    inverseSurface: MaterialColor(name: "inverseSurface", hex: "#322F35"),
+    inverseOnSurface: MaterialColor(name: "inverseOnSurface", hex: "#F5EFF7"),
+    error: MaterialColor(name: "error", hex: "#BA1A1A"),
+    onError: MaterialColor(name: "onError", hex: "#FFFFFF"),
+    errorContainer: MaterialColor(name: "errorContainer", hex: "#FFDAD6"),
+    onErrorContainer: MaterialColor(name: "onErrorContainer", hex: "#93000A"),
+    outline: MaterialColor(name: "outline", hex: "#7A7582"),
+    outlineVariant: MaterialColor(name: "outlineVariant", hex: "#CBC4D2"),
+    scrim: MaterialColor(name: "scrim", hex: "#000000"),
+    surfaceBright: MaterialColor(name: "surfaceBright", hex: "#FDF7FF"),
+    surfaceContainer: MaterialColor(name: "surfaceContainer", hex: "#F2ECF4"),
+    surfaceContainerHigh: MaterialColor(name: "surfaceContainerHigh", hex: "#ECE6EE"),
+    surfaceContainerHighest: MaterialColor(name: "surfaceContainerHighest", hex: "#E6E0E9"),
+    surfaceContainerLow: MaterialColor(name: "surfaceContainerLow", hex: "#F8F2FA"),
+    surfaceContainerLowest: MaterialColor(name: "surfaceContainerLowest", hex: "#FFFFFF"),
+    surfaceDim: MaterialColor(name: "surfaceDim", hex: "#DED8E0"),
+    primaryFixed: MaterialColor(name: "primaryFixed", hex: "#E9DDFF"),
+    primaryFixedDim: MaterialColor(name: "primaryFixedDim", hex: "#CFBCFF"),
+    onPrimaryFixed: MaterialColor(name: "onPrimaryFixed", hex: "#22005D"),
+    onPrimaryFixedVariant: MaterialColor(name: "onPrimaryFixedVariant", hex: "#4F378A"),
+    secondaryFixed: MaterialColor(name: "secondaryFixed", hex: "#E9DDFF"),
+    secondaryFixedDim: MaterialColor(name: "secondaryFixedDim", hex: "#CDC0E9"),
+    onSecondaryFixed: MaterialColor(name: "onSecondaryFixed", hex: "#1F1635"),
+    onSecondaryFixedVariant: MaterialColor(name: "onSecondaryFixedVariant", hex: "#4B4263"),
+    tertiaryFixed: MaterialColor(name: "tertiaryFixed", hex: "#FFD8EA"),
+    tertiaryFixedDim: MaterialColor(name: "tertiaryFixedDim", hex: "#FFAEDB"),
+    onTertiaryFixed: MaterialColor(name: "onTertiaryFixed", hex: "#3C002B"),
+    onTertiaryFixedVariant: MaterialColor(name: "onTertiaryFixedVariant", hex: "#752A5B")
+  )
+
+  public static let contentDark = MaterialColorScheme(
+    appearance: .dark,
+    primary: MaterialColor(name: "primary", hex: "#CFBCFF"),
+    onPrimary: MaterialColor(name: "onPrimary", hex: "#381E72"),
+    primaryContainer: MaterialColor(name: "primaryContainer", hex: "#6750A4"),
+    onPrimaryContainer: MaterialColor(name: "onPrimaryContainer", hex: "#E0D2FF"),
+    inversePrimary: MaterialColor(name: "inversePrimary", hex: "#6750A4"),
+    secondary: MaterialColor(name: "secondary", hex: "#CDC0E9"),
+    onSecondary: MaterialColor(name: "onSecondary", hex: "#342B4B"),
+    secondaryContainer: MaterialColor(name: "secondaryContainer", hex: "#4D4465"),
+    onSecondaryContainer: MaterialColor(name: "onSecondaryContainer", hex: "#BFB2DA"),
+    tertiary: MaterialColor(name: "tertiary", hex: "#FFAEDB"),
+    onTertiary: MaterialColor(name: "onTertiary", hex: "#5A1243"),
+    tertiaryContainer: MaterialColor(name: "tertiaryContainer", hex: "#924274"),
+    onTertiaryContainer: MaterialColor(name: "onTertiaryContainer", hex: "#FFCAE5"),
+    background: MaterialColor(name: "background", hex: "#141218"),
+    onBackground: MaterialColor(name: "onBackground", hex: "#E6E0E9"),
+    surface: MaterialColor(name: "surface", hex: "#141218"),
+    onSurface: MaterialColor(name: "onSurface", hex: "#E6E0E9"),
+    surfaceVariant: MaterialColor(name: "surfaceVariant", hex: "#494551"),
+    onSurfaceVariant: MaterialColor(name: "onSurfaceVariant", hex: "#CBC4D2"),
+    surfaceTint: MaterialColor(name: "surfaceTint", hex: "#CFBCFF"),
+    inverseSurface: MaterialColor(name: "inverseSurface", hex: "#E6E0E9"),
+    inverseOnSurface: MaterialColor(name: "inverseOnSurface", hex: "#322F35"),
+    error: MaterialColor(name: "error", hex: "#FFB4AB"),
+    onError: MaterialColor(name: "onError", hex: "#690005"),
+    errorContainer: MaterialColor(name: "errorContainer", hex: "#93000A"),
+    onErrorContainer: MaterialColor(name: "onErrorContainer", hex: "#FFDAD6"),
+    outline: MaterialColor(name: "outline", hex: "#948E9C"),
+    outlineVariant: MaterialColor(name: "outlineVariant", hex: "#494551"),
+    scrim: MaterialColor(name: "scrim", hex: "#000000"),
+    surfaceBright: MaterialColor(name: "surfaceBright", hex: "#3B383E"),
+    surfaceContainer: MaterialColor(name: "surfaceContainer", hex: "#211F24"),
+    surfaceContainerHigh: MaterialColor(name: "surfaceContainerHigh", hex: "#2B292F"),
+    surfaceContainerHighest: MaterialColor(name: "surfaceContainerHighest", hex: "#36343A"),
+    surfaceContainerLow: MaterialColor(name: "surfaceContainerLow", hex: "#1D1B20"),
+    surfaceContainerLowest: MaterialColor(name: "surfaceContainerLowest", hex: "#0F0D13"),
+    surfaceDim: MaterialColor(name: "surfaceDim", hex: "#141218"),
+    primaryFixed: MaterialColor(name: "primaryFixed", hex: "#E9DDFF"),
+    primaryFixedDim: MaterialColor(name: "primaryFixedDim", hex: "#CFBCFF"),
+    onPrimaryFixed: MaterialColor(name: "onPrimaryFixed", hex: "#22005D"),
+    onPrimaryFixedVariant: MaterialColor(name: "onPrimaryFixedVariant", hex: "#4F378A"),
+    secondaryFixed: MaterialColor(name: "secondaryFixed", hex: "#E9DDFF"),
+    secondaryFixedDim: MaterialColor(name: "secondaryFixedDim", hex: "#CDC0E9"),
+    onSecondaryFixed: MaterialColor(name: "onSecondaryFixed", hex: "#1F1635"),
+    onSecondaryFixedVariant: MaterialColor(name: "onSecondaryFixedVariant", hex: "#4B4263"),
+    tertiaryFixed: MaterialColor(name: "tertiaryFixed", hex: "#FFD8EA"),
+    tertiaryFixedDim: MaterialColor(name: "tertiaryFixedDim", hex: "#FFAEDB"),
+    onTertiaryFixed: MaterialColor(name: "onTertiaryFixed", hex: "#3C002B"),
+    onTertiaryFixedVariant: MaterialColor(name: "onTertiaryFixedVariant", hex: "#752A5B")
+  )
+
+  public static let monochromeLight = MaterialColorScheme(
+    appearance: .light,
+    primary: MaterialColor(name: "primary", hex: "#000000"),
+    onPrimary: MaterialColor(name: "onPrimary", hex: "#E2E2E2"),
+    primaryContainer: MaterialColor(name: "primaryContainer", hex: "#3B3B3B"),
+    onPrimaryContainer: MaterialColor(name: "onPrimaryContainer", hex: "#FFFFFF"),
+    inversePrimary: MaterialColor(name: "inversePrimary", hex: "#C6C6C6"),
+    secondary: MaterialColor(name: "secondary", hex: "#5E5E5E"),
+    onSecondary: MaterialColor(name: "onSecondary", hex: "#FFFFFF"),
+    secondaryContainer: MaterialColor(name: "secondaryContainer", hex: "#D4D4D4"),
+    onSecondaryContainer: MaterialColor(name: "onSecondaryContainer", hex: "#1B1B1B"),
+    tertiary: MaterialColor(name: "tertiary", hex: "#3B3B3B"),
+    onTertiary: MaterialColor(name: "onTertiary", hex: "#E2E2E2"),
+    tertiaryContainer: MaterialColor(name: "tertiaryContainer", hex: "#747474"),
+    onTertiaryContainer: MaterialColor(name: "onTertiaryContainer", hex: "#FFFFFF"),
+    background: MaterialColor(name: "background", hex: "#F9F9F9"),
+    onBackground: MaterialColor(name: "onBackground", hex: "#1B1B1B"),
+    surface: MaterialColor(name: "surface", hex: "#F9F9F9"),
+    onSurface: MaterialColor(name: "onSurface", hex: "#1B1B1B"),
+    surfaceVariant: MaterialColor(name: "surfaceVariant", hex: "#E2E2E2"),
+    onSurfaceVariant: MaterialColor(name: "onSurfaceVariant", hex: "#474747"),
+    surfaceTint: MaterialColor(name: "surfaceTint", hex: "#5E5E5E"),
+    inverseSurface: MaterialColor(name: "inverseSurface", hex: "#303030"),
+    inverseOnSurface: MaterialColor(name: "inverseOnSurface", hex: "#F1F1F1"),
+    error: MaterialColor(name: "error", hex: "#BA1A1A"),
+    onError: MaterialColor(name: "onError", hex: "#FFFFFF"),
+    errorContainer: MaterialColor(name: "errorContainer", hex: "#FFDAD6"),
+    onErrorContainer: MaterialColor(name: "onErrorContainer", hex: "#410002"),
+    outline: MaterialColor(name: "outline", hex: "#777777"),
+    outlineVariant: MaterialColor(name: "outlineVariant", hex: "#C6C6C6"),
+    scrim: MaterialColor(name: "scrim", hex: "#000000"),
+    surfaceBright: MaterialColor(name: "surfaceBright", hex: "#F9F9F9"),
+    surfaceContainer: MaterialColor(name: "surfaceContainer", hex: "#EEEEEE"),
+    surfaceContainerHigh: MaterialColor(name: "surfaceContainerHigh", hex: "#E8E8E8"),
+    surfaceContainerHighest: MaterialColor(name: "surfaceContainerHighest", hex: "#E2E2E2"),
+    surfaceContainerLow: MaterialColor(name: "surfaceContainerLow", hex: "#F3F3F3"),
+    surfaceContainerLowest: MaterialColor(name: "surfaceContainerLowest", hex: "#FFFFFF"),
+    surfaceDim: MaterialColor(name: "surfaceDim", hex: "#DADADA"),
+    primaryFixed: MaterialColor(name: "primaryFixed", hex: "#5E5E5E"),
+    primaryFixedDim: MaterialColor(name: "primaryFixedDim", hex: "#474747"),
+    onPrimaryFixed: MaterialColor(name: "onPrimaryFixed", hex: "#FFFFFF"),
+    onPrimaryFixedVariant: MaterialColor(name: "onPrimaryFixedVariant", hex: "#E2E2E2"),
+    secondaryFixed: MaterialColor(name: "secondaryFixed", hex: "#C6C6C6"),
+    secondaryFixedDim: MaterialColor(name: "secondaryFixedDim", hex: "#ABABAB"),
+    onSecondaryFixed: MaterialColor(name: "onSecondaryFixed", hex: "#1B1B1B"),
+    onSecondaryFixedVariant: MaterialColor(name: "onSecondaryFixedVariant", hex: "#3B3B3B"),
+    tertiaryFixed: MaterialColor(name: "tertiaryFixed", hex: "#5E5E5E"),
+    tertiaryFixedDim: MaterialColor(name: "tertiaryFixedDim", hex: "#474747"),
+    onTertiaryFixed: MaterialColor(name: "onTertiaryFixed", hex: "#FFFFFF"),
+    onTertiaryFixedVariant: MaterialColor(name: "onTertiaryFixedVariant", hex: "#E2E2E2")
+  )
+
+  public static let monochromeDark = MaterialColorScheme(
+    appearance: .dark,
+    primary: MaterialColor(name: "primary", hex: "#FFFFFF"),
+    onPrimary: MaterialColor(name: "onPrimary", hex: "#1B1B1B"),
+    primaryContainer: MaterialColor(name: "primaryContainer", hex: "#D4D4D4"),
+    onPrimaryContainer: MaterialColor(name: "onPrimaryContainer", hex: "#000000"),
+    inversePrimary: MaterialColor(name: "inversePrimary", hex: "#5E5E5E"),
+    secondary: MaterialColor(name: "secondary", hex: "#C6C6C6"),
+    onSecondary: MaterialColor(name: "onSecondary", hex: "#1B1B1B"),
+    secondaryContainer: MaterialColor(name: "secondaryContainer", hex: "#474747"),
+    onSecondaryContainer: MaterialColor(name: "onSecondaryContainer", hex: "#E2E2E2"),
+    tertiary: MaterialColor(name: "tertiary", hex: "#E2E2E2"),
+    onTertiary: MaterialColor(name: "onTertiary", hex: "#1B1B1B"),
+    tertiaryContainer: MaterialColor(name: "tertiaryContainer", hex: "#919191"),
+    onTertiaryContainer: MaterialColor(name: "onTertiaryContainer", hex: "#000000"),
+    background: MaterialColor(name: "background", hex: "#131313"),
+    onBackground: MaterialColor(name: "onBackground", hex: "#E2E2E2"),
+    surface: MaterialColor(name: "surface", hex: "#131313"),
+    onSurface: MaterialColor(name: "onSurface", hex: "#E2E2E2"),
+    surfaceVariant: MaterialColor(name: "surfaceVariant", hex: "#474747"),
+    onSurfaceVariant: MaterialColor(name: "onSurfaceVariant", hex: "#C6C6C6"),
+    surfaceTint: MaterialColor(name: "surfaceTint", hex: "#C6C6C6"),
+    inverseSurface: MaterialColor(name: "inverseSurface", hex: "#E2E2E2"),
+    inverseOnSurface: MaterialColor(name: "inverseOnSurface", hex: "#303030"),
+    error: MaterialColor(name: "error", hex: "#FFB4AB"),
+    onError: MaterialColor(name: "onError", hex: "#690005"),
+    errorContainer: MaterialColor(name: "errorContainer", hex: "#93000A"),
+    onErrorContainer: MaterialColor(name: "onErrorContainer", hex: "#FFDAD6"),
+    outline: MaterialColor(name: "outline", hex: "#919191"),
+    outlineVariant: MaterialColor(name: "outlineVariant", hex: "#474747"),
+    scrim: MaterialColor(name: "scrim", hex: "#000000"),
+    surfaceBright: MaterialColor(name: "surfaceBright", hex: "#393939"),
+    surfaceContainer: MaterialColor(name: "surfaceContainer", hex: "#1F1F1F"),
+    surfaceContainerHigh: MaterialColor(name: "surfaceContainerHigh", hex: "#2A2A2A"),
+    surfaceContainerHighest: MaterialColor(name: "surfaceContainerHighest", hex: "#353535"),
+    surfaceContainerLow: MaterialColor(name: "surfaceContainerLow", hex: "#1B1B1B"),
+    surfaceContainerLowest: MaterialColor(name: "surfaceContainerLowest", hex: "#0E0E0E"),
+    surfaceDim: MaterialColor(name: "surfaceDim", hex: "#131313"),
+    primaryFixed: MaterialColor(name: "primaryFixed", hex: "#5E5E5E"),
+    primaryFixedDim: MaterialColor(name: "primaryFixedDim", hex: "#474747"),
+    onPrimaryFixed: MaterialColor(name: "onPrimaryFixed", hex: "#FFFFFF"),
+    onPrimaryFixedVariant: MaterialColor(name: "onPrimaryFixedVariant", hex: "#E2E2E2"),
+    secondaryFixed: MaterialColor(name: "secondaryFixed", hex: "#C6C6C6"),
+    secondaryFixedDim: MaterialColor(name: "secondaryFixedDim", hex: "#ABABAB"),
+    onSecondaryFixed: MaterialColor(name: "onSecondaryFixed", hex: "#1B1B1B"),
+    onSecondaryFixedVariant: MaterialColor(name: "onSecondaryFixedVariant", hex: "#3B3B3B"),
+    tertiaryFixed: MaterialColor(name: "tertiaryFixed", hex: "#5E5E5E"),
+    tertiaryFixedDim: MaterialColor(name: "tertiaryFixedDim", hex: "#474747"),
+    onTertiaryFixed: MaterialColor(name: "onTertiaryFixed", hex: "#FFFFFF"),
+    onTertiaryFixedVariant: MaterialColor(name: "onTertiaryFixedVariant", hex: "#E2E2E2")
+  )
+
+  public static let neutralLight = MaterialColorScheme(
+    appearance: .light,
+    primary: MaterialColor(name: "primary", hex: "#615C6B"),
+    onPrimary: MaterialColor(name: "onPrimary", hex: "#FFFFFF"),
+    primaryContainer: MaterialColor(name: "primaryContainer", hex: "#E7DFF2"),
+    onPrimaryContainer: MaterialColor(name: "onPrimaryContainer", hex: "#494453"),
+    inversePrimary: MaterialColor(name: "inversePrimary", hex: "#CBC3D5"),
+    secondary: MaterialColor(name: "secondary", hex: "#615D66"),
+    onSecondary: MaterialColor(name: "onSecondary", hex: "#FFFFFF"),
+    secondaryContainer: MaterialColor(name: "secondaryContainer", hex: "#E7E0EB"),
+    onSecondaryContainer: MaterialColor(name: "onSecondaryContainer", hex: "#49454E"),
+    tertiary: MaterialColor(name: "tertiary", hex: "#625B71"),
+    onTertiary: MaterialColor(name: "onTertiary", hex: "#FFFFFF"),
+    tertiaryContainer: MaterialColor(name: "tertiaryContainer", hex: "#E8DEF8"),
+    onTertiaryContainer: MaterialColor(name: "onTertiaryContainer", hex: "#4A4458"),
+    background: MaterialColor(name: "background", hex: "#FDF8FA"),
+    onBackground: MaterialColor(name: "onBackground", hex: "#1C1B1D"),
+    surface: MaterialColor(name: "surface", hex: "#FDF8FA"),
+    onSurface: MaterialColor(name: "onSurface", hex: "#1C1B1D"),
+    surfaceVariant: MaterialColor(name: "surfaceVariant", hex: "#E6E1E3"),
+    onSurfaceVariant: MaterialColor(name: "onSurfaceVariant", hex: "#484648"),
+    surfaceTint: MaterialColor(name: "surfaceTint", hex: "#615C6B"),
+    inverseSurface: MaterialColor(name: "inverseSurface", hex: "#313032"),
+    inverseOnSurface: MaterialColor(name: "inverseOnSurface", hex: "#F4EFF1"),
+    error: MaterialColor(name: "error", hex: "#BA1A1A"),
+    onError: MaterialColor(name: "onError", hex: "#FFFFFF"),
+    errorContainer: MaterialColor(name: "errorContainer", hex: "#FFDAD6"),
+    onErrorContainer: MaterialColor(name: "onErrorContainer", hex: "#93000A"),
+    outline: MaterialColor(name: "outline", hex: "#797678"),
+    outlineVariant: MaterialColor(name: "outlineVariant", hex: "#C9C5C7"),
+    scrim: MaterialColor(name: "scrim", hex: "#000000"),
+    surfaceBright: MaterialColor(name: "surfaceBright", hex: "#FDF8FA"),
+    surfaceContainer: MaterialColor(name: "surfaceContainer", hex: "#F1EDEE"),
+    surfaceContainerHigh: MaterialColor(name: "surfaceContainerHigh", hex: "#EBE7E9"),
+    surfaceContainerHighest: MaterialColor(name: "surfaceContainerHighest", hex: "#E6E1E3"),
+    surfaceContainerLow: MaterialColor(name: "surfaceContainerLow", hex: "#F7F2F4"),
+    surfaceContainerLowest: MaterialColor(name: "surfaceContainerLowest", hex: "#FFFFFF"),
+    surfaceDim: MaterialColor(name: "surfaceDim", hex: "#DDD9DB"),
+    primaryFixed: MaterialColor(name: "primaryFixed", hex: "#E7DFF2"),
+    primaryFixedDim: MaterialColor(name: "primaryFixedDim", hex: "#CBC3D5"),
+    onPrimaryFixed: MaterialColor(name: "onPrimaryFixed", hex: "#1D1A26"),
+    onPrimaryFixedVariant: MaterialColor(name: "onPrimaryFixedVariant", hex: "#494453"),
+    secondaryFixed: MaterialColor(name: "secondaryFixed", hex: "#E7E0EB"),
+    secondaryFixedDim: MaterialColor(name: "secondaryFixedDim", hex: "#CAC4CF"),
+    onSecondaryFixed: MaterialColor(name: "onSecondaryFixed", hex: "#1D1A22"),
+    onSecondaryFixedVariant: MaterialColor(name: "onSecondaryFixedVariant", hex: "#49454E"),
+    tertiaryFixed: MaterialColor(name: "tertiaryFixed", hex: "#E8DEF8"),
+    tertiaryFixedDim: MaterialColor(name: "tertiaryFixedDim", hex: "#CBC2DB"),
+    onTertiaryFixed: MaterialColor(name: "onTertiaryFixed", hex: "#1E192B"),
+    onTertiaryFixedVariant: MaterialColor(name: "onTertiaryFixedVariant", hex: "#4A4458")
+  )
+
+  public static let neutralDark = MaterialColorScheme(
+    appearance: .dark,
+    primary: MaterialColor(name: "primary", hex: "#CBC3D5"),
+    onPrimary: MaterialColor(name: "onPrimary", hex: "#322E3C"),
+    primaryContainer: MaterialColor(name: "primaryContainer", hex: "#494453"),
+    onPrimaryContainer: MaterialColor(name: "onPrimaryContainer", hex: "#E7DFF2"),
+    inversePrimary: MaterialColor(name: "inversePrimary", hex: "#615C6B"),
+    secondary: MaterialColor(name: "secondary", hex: "#CAC4CF"),
+    onSecondary: MaterialColor(name: "onSecondary", hex: "#322F38"),
+    secondaryContainer: MaterialColor(name: "secondaryContainer", hex: "#49454E"),
+    onSecondaryContainer: MaterialColor(name: "onSecondaryContainer", hex: "#E7E0EB"),
+    tertiary: MaterialColor(name: "tertiary", hex: "#CBC2DB"),
+    onTertiary: MaterialColor(name: "onTertiary", hex: "#332D41"),
+    tertiaryContainer: MaterialColor(name: "tertiaryContainer", hex: "#4A4458"),
+    onTertiaryContainer: MaterialColor(name: "onTertiaryContainer", hex: "#E8DEF8"),
+    background: MaterialColor(name: "background", hex: "#141314"),
+    onBackground: MaterialColor(name: "onBackground", hex: "#E6E1E3"),
+    surface: MaterialColor(name: "surface", hex: "#141314"),
+    onSurface: MaterialColor(name: "onSurface", hex: "#E6E1E3"),
+    surfaceVariant: MaterialColor(name: "surfaceVariant", hex: "#484648"),
+    onSurfaceVariant: MaterialColor(name: "onSurfaceVariant", hex: "#C9C5C7"),
+    surfaceTint: MaterialColor(name: "surfaceTint", hex: "#CBC3D5"),
+    inverseSurface: MaterialColor(name: "inverseSurface", hex: "#E6E1E3"),
+    inverseOnSurface: MaterialColor(name: "inverseOnSurface", hex: "#313032"),
+    error: MaterialColor(name: "error", hex: "#FFB4AB"),
+    onError: MaterialColor(name: "onError", hex: "#690005"),
+    errorContainer: MaterialColor(name: "errorContainer", hex: "#93000A"),
+    onErrorContainer: MaterialColor(name: "onErrorContainer", hex: "#FFDAD6"),
+    outline: MaterialColor(name: "outline", hex: "#939092"),
+    outlineVariant: MaterialColor(name: "outlineVariant", hex: "#484648"),
+    scrim: MaterialColor(name: "scrim", hex: "#000000"),
+    surfaceBright: MaterialColor(name: "surfaceBright", hex: "#3A393A"),
+    surfaceContainer: MaterialColor(name: "surfaceContainer", hex: "#201F21"),
+    surfaceContainerHigh: MaterialColor(name: "surfaceContainerHigh", hex: "#2B292B"),
+    surfaceContainerHighest: MaterialColor(name: "surfaceContainerHighest", hex: "#363436"),
+    surfaceContainerLow: MaterialColor(name: "surfaceContainerLow", hex: "#1C1B1D"),
+    surfaceContainerLowest: MaterialColor(name: "surfaceContainerLowest", hex: "#0F0E0F"),
+    surfaceDim: MaterialColor(name: "surfaceDim", hex: "#141314"),
+    primaryFixed: MaterialColor(name: "primaryFixed", hex: "#E7DFF2"),
+    primaryFixedDim: MaterialColor(name: "primaryFixedDim", hex: "#CBC3D5"),
+    onPrimaryFixed: MaterialColor(name: "onPrimaryFixed", hex: "#1D1A26"),
+    onPrimaryFixedVariant: MaterialColor(name: "onPrimaryFixedVariant", hex: "#494453"),
+    secondaryFixed: MaterialColor(name: "secondaryFixed", hex: "#E7E0EB"),
+    secondaryFixedDim: MaterialColor(name: "secondaryFixedDim", hex: "#CAC4CF"),
+    onSecondaryFixed: MaterialColor(name: "onSecondaryFixed", hex: "#1D1A22"),
+    onSecondaryFixedVariant: MaterialColor(name: "onSecondaryFixedVariant", hex: "#49454E"),
+    tertiaryFixed: MaterialColor(name: "tertiaryFixed", hex: "#E8DEF8"),
+    tertiaryFixedDim: MaterialColor(name: "tertiaryFixedDim", hex: "#CBC2DB"),
+    onTertiaryFixed: MaterialColor(name: "onTertiaryFixed", hex: "#1E192B"),
+    onTertiaryFixedVariant: MaterialColor(name: "onTertiaryFixedVariant", hex: "#4A4458")
+  )
+
+  public static let vibrantLight = MaterialColorScheme(
+    appearance: .light,
+    primary: MaterialColor(name: "primary", hex: "#6F19FF"),
+    onPrimary: MaterialColor(name: "onPrimary", hex: "#FFFFFF"),
+    primaryContainer: MaterialColor(name: "primaryContainer", hex: "#E9DDFF"),
+    onPrimaryContainer: MaterialColor(name: "onPrimaryContainer", hex: "#5400CC"),
+    inversePrimary: MaterialColor(name: "inversePrimary", hex: "#CFBCFF"),
+    secondary: MaterialColor(name: "secondary", hex: "#6B5778"),
+    onSecondary: MaterialColor(name: "onSecondary", hex: "#FFFFFF"),
+    secondaryContainer: MaterialColor(name: "secondaryContainer", hex: "#F3DAFF"),
+    onSecondaryContainer: MaterialColor(name: "onSecondaryContainer", hex: "#523F5F"),
+    tertiary: MaterialColor(name: "tertiary", hex: "#79507A"),
+    onTertiary: MaterialColor(name: "onTertiary", hex: "#FFFFFF"),
+    tertiaryContainer: MaterialColor(name: "tertiaryContainer", hex: "#FFD6FC"),
+    onTertiaryContainer: MaterialColor(name: "onTertiaryContainer", hex: "#5F3961"),
+    background: MaterialColor(name: "background", hex: "#FDF7FF"),
+    onBackground: MaterialColor(name: "onBackground", hex: "#1D1A24"),
+    surface: MaterialColor(name: "surface", hex: "#FDF7FF"),
+    onSurface: MaterialColor(name: "onSurface", hex: "#1D1A24"),
+    surfaceVariant: MaterialColor(name: "surfaceVariant", hex: "#E7DFF2"),
+    onSurfaceVariant: MaterialColor(name: "onSurfaceVariant", hex: "#494453"),
+    surfaceTint: MaterialColor(name: "surfaceTint", hex: "#6F19FF"),
+    inverseSurface: MaterialColor(name: "inverseSurface", hex: "#322F3A"),
+    inverseOnSurface: MaterialColor(name: "inverseOnSurface", hex: "#F5EEFD"),
+    error: MaterialColor(name: "error", hex: "#BA1A1A"),
+    onError: MaterialColor(name: "onError", hex: "#FFFFFF"),
+    errorContainer: MaterialColor(name: "errorContainer", hex: "#FFDAD6"),
+    onErrorContainer: MaterialColor(name: "onErrorContainer", hex: "#93000A"),
+    outline: MaterialColor(name: "outline", hex: "#7A7484"),
+    outlineVariant: MaterialColor(name: "outlineVariant", hex: "#CBC3D5"),
+    scrim: MaterialColor(name: "scrim", hex: "#000000"),
+    surfaceBright: MaterialColor(name: "surfaceBright", hex: "#FDF7FF"),
+    surfaceContainer: MaterialColor(name: "surfaceContainer", hex: "#F2EBFA"),
+    surfaceContainerHigh: MaterialColor(name: "surfaceContainerHigh", hex: "#EDE5F4"),
+    surfaceContainerHighest: MaterialColor(name: "surfaceContainerHighest", hex: "#E7E0EF"),
+    surfaceContainerLow: MaterialColor(name: "surfaceContainerLow", hex: "#F8F1FF"),
+    surfaceContainerLowest: MaterialColor(name: "surfaceContainerLowest", hex: "#FFFFFF"),
+    surfaceDim: MaterialColor(name: "surfaceDim", hex: "#DED7E6"),
+    primaryFixed: MaterialColor(name: "primaryFixed", hex: "#E9DDFF"),
+    primaryFixedDim: MaterialColor(name: "primaryFixedDim", hex: "#CFBCFF"),
+    onPrimaryFixed: MaterialColor(name: "onPrimaryFixed", hex: "#22005D"),
+    onPrimaryFixedVariant: MaterialColor(name: "onPrimaryFixedVariant", hex: "#5400CC"),
+    secondaryFixed: MaterialColor(name: "secondaryFixed", hex: "#F3DAFF"),
+    secondaryFixedDim: MaterialColor(name: "secondaryFixedDim", hex: "#D7BEE4"),
+    onSecondaryFixed: MaterialColor(name: "onSecondaryFixed", hex: "#251431"),
+    onSecondaryFixedVariant: MaterialColor(name: "onSecondaryFixedVariant", hex: "#523F5F"),
+    tertiaryFixed: MaterialColor(name: "tertiaryFixed", hex: "#FFD6FC"),
+    tertiaryFixedDim: MaterialColor(name: "tertiaryFixedDim", hex: "#E8B7E7"),
+    onTertiaryFixed: MaterialColor(name: "onTertiaryFixed", hex: "#2F0D33"),
+    onTertiaryFixedVariant: MaterialColor(name: "onTertiaryFixedVariant", hex: "#5F3961")
+  )
+
+  public static let vibrantDark = MaterialColorScheme(
+    appearance: .dark,
+    primary: MaterialColor(name: "primary", hex: "#CFBCFF"),
+    onPrimary: MaterialColor(name: "onPrimary", hex: "#3A0092"),
+    primaryContainer: MaterialColor(name: "primaryContainer", hex: "#5400CC"),
+    onPrimaryContainer: MaterialColor(name: "onPrimaryContainer", hex: "#E9DDFF"),
+    inversePrimary: MaterialColor(name: "inversePrimary", hex: "#6F19FF"),
+    secondary: MaterialColor(name: "secondary", hex: "#D7BEE4"),
+    onSecondary: MaterialColor(name: "onSecondary", hex: "#3B2948"),
+    secondaryContainer: MaterialColor(name: "secondaryContainer", hex: "#523F5F"),
+    onSecondaryContainer: MaterialColor(name: "onSecondaryContainer", hex: "#F3DAFF"),
+    tertiary: MaterialColor(name: "tertiary", hex: "#E8B7E7"),
+    onTertiary: MaterialColor(name: "onTertiary", hex: "#462349"),
+    tertiaryContainer: MaterialColor(name: "tertiaryContainer", hex: "#5F3961"),
+    onTertiaryContainer: MaterialColor(name: "onTertiaryContainer", hex: "#FFD6FC"),
+    background: MaterialColor(name: "background", hex: "#15121C"),
+    onBackground: MaterialColor(name: "onBackground", hex: "#E7E0EF"),
+    surface: MaterialColor(name: "surface", hex: "#15121C"),
+    onSurface: MaterialColor(name: "onSurface", hex: "#E7E0EF"),
+    surfaceVariant: MaterialColor(name: "surfaceVariant", hex: "#494453"),
+    onSurfaceVariant: MaterialColor(name: "onSurfaceVariant", hex: "#CBC3D5"),
+    surfaceTint: MaterialColor(name: "surfaceTint", hex: "#CFBCFF"),
+    inverseSurface: MaterialColor(name: "inverseSurface", hex: "#E7E0EF"),
+    inverseOnSurface: MaterialColor(name: "inverseOnSurface", hex: "#322F3A"),
+    error: MaterialColor(name: "error", hex: "#FFB4AB"),
+    onError: MaterialColor(name: "onError", hex: "#690005"),
+    errorContainer: MaterialColor(name: "errorContainer", hex: "#93000A"),
+    onErrorContainer: MaterialColor(name: "onErrorContainer", hex: "#FFDAD6"),
+    outline: MaterialColor(name: "outline", hex: "#948E9F"),
+    outlineVariant: MaterialColor(name: "outlineVariant", hex: "#494453"),
+    scrim: MaterialColor(name: "scrim", hex: "#000000"),
+    surfaceBright: MaterialColor(name: "surfaceBright", hex: "#3B3743"),
+    surfaceContainer: MaterialColor(name: "surfaceContainer", hex: "#211E28"),
+    surfaceContainerHigh: MaterialColor(name: "surfaceContainerHigh", hex: "#2C2833"),
+    surfaceContainerHighest: MaterialColor(name: "surfaceContainerHighest", hex: "#37333E"),
+    surfaceContainerLow: MaterialColor(name: "surfaceContainerLow", hex: "#1D1A24"),
+    surfaceContainerLowest: MaterialColor(name: "surfaceContainerLowest", hex: "#0F0D16"),
+    surfaceDim: MaterialColor(name: "surfaceDim", hex: "#15121C"),
+    primaryFixed: MaterialColor(name: "primaryFixed", hex: "#E9DDFF"),
+    primaryFixedDim: MaterialColor(name: "primaryFixedDim", hex: "#CFBCFF"),
+    onPrimaryFixed: MaterialColor(name: "onPrimaryFixed", hex: "#22005D"),
+    onPrimaryFixedVariant: MaterialColor(name: "onPrimaryFixedVariant", hex: "#5400CC"),
+    secondaryFixed: MaterialColor(name: "secondaryFixed", hex: "#F3DAFF"),
+    secondaryFixedDim: MaterialColor(name: "secondaryFixedDim", hex: "#D7BEE4"),
+    onSecondaryFixed: MaterialColor(name: "onSecondaryFixed", hex: "#251431"),
+    onSecondaryFixedVariant: MaterialColor(name: "onSecondaryFixedVariant", hex: "#523F5F"),
+    tertiaryFixed: MaterialColor(name: "tertiaryFixed", hex: "#FFD6FC"),
+    tertiaryFixedDim: MaterialColor(name: "tertiaryFixedDim", hex: "#E8B7E7"),
+    onTertiaryFixed: MaterialColor(name: "onTertiaryFixed", hex: "#2F0D33"),
+    onTertiaryFixedVariant: MaterialColor(name: "onTertiaryFixedVariant", hex: "#5F3961")
+  )
+
+  public static let expressiveLight = MaterialColorScheme(
+    appearance: .light,
+    primary: MaterialColor(name: "primary", hex: "#006B5A"),
+    onPrimary: MaterialColor(name: "onPrimary", hex: "#FFFFFF"),
+    primaryContainer: MaterialColor(name: "primaryContainer", hex: "#95F4DC"),
+    onPrimaryContainer: MaterialColor(name: "onPrimaryContainer", hex: "#005143"),
+    inversePrimary: MaterialColor(name: "inversePrimary", hex: "#79D7C0"),
+    secondary: MaterialColor(name: "secondary", hex: "#79536A"),
+    onSecondary: MaterialColor(name: "onSecondary", hex: "#FFFFFF"),
+    secondaryContainer: MaterialColor(name: "secondaryContainer", hex: "#FFD8ED"),
+    onSecondaryContainer: MaterialColor(name: "onSecondaryContainer", hex: "#5F3C52"),
+    tertiary: MaterialColor(name: "tertiary", hex: "#735280"),
+    onTertiary: MaterialColor(name: "onTertiary", hex: "#FFFFFF"),
+    tertiaryContainer: MaterialColor(name: "tertiaryContainer", hex: "#F7D8FF"),
+    onTertiaryContainer: MaterialColor(name: "onTertiaryContainer", hex: "#593B67"),
+    background: MaterialColor(name: "background", hex: "#FFF7FD"),
+    onBackground: MaterialColor(name: "onBackground", hex: "#1F1A21"),
+    surface: MaterialColor(name: "surface", hex: "#FFF7FD"),
+    onSurface: MaterialColor(name: "onSurface", hex: "#1F1A21"),
+    surfaceVariant: MaterialColor(name: "surfaceVariant", hex: "#ECDEF0"),
+    onSurfaceVariant: MaterialColor(name: "onSurfaceVariant", hex: "#4D4351"),
+    surfaceTint: MaterialColor(name: "surfaceTint", hex: "#006B5A"),
+    inverseSurface: MaterialColor(name: "inverseSurface", hex: "#342E37"),
+    inverseOnSurface: MaterialColor(name: "inverseOnSurface", hex: "#F8EDF9"),
+    error: MaterialColor(name: "error", hex: "#BA1A1A"),
+    onError: MaterialColor(name: "onError", hex: "#FFFFFF"),
+    errorContainer: MaterialColor(name: "errorContainer", hex: "#FFDAD6"),
+    onErrorContainer: MaterialColor(name: "onErrorContainer", hex: "#93000A"),
+    outline: MaterialColor(name: "outline", hex: "#7E7383"),
+    outlineVariant: MaterialColor(name: "outlineVariant", hex: "#CFC2D3"),
+    scrim: MaterialColor(name: "scrim", hex: "#000000"),
+    surfaceBright: MaterialColor(name: "surfaceBright", hex: "#FFF7FD"),
+    surfaceContainer: MaterialColor(name: "surfaceContainer", hex: "#F5EBF6"),
+    surfaceContainerHigh: MaterialColor(name: "surfaceContainerHigh", hex: "#EFE5F0"),
+    surfaceContainerHighest: MaterialColor(name: "surfaceContainerHighest", hex: "#EADFEA"),
+    surfaceContainerLow: MaterialColor(name: "surfaceContainerLow", hex: "#FBF0FB"),
+    surfaceContainerLowest: MaterialColor(name: "surfaceContainerLowest", hex: "#FFFFFF"),
+    surfaceDim: MaterialColor(name: "surfaceDim", hex: "#E1D7E2"),
+    primaryFixed: MaterialColor(name: "primaryFixed", hex: "#95F4DC"),
+    primaryFixedDim: MaterialColor(name: "primaryFixedDim", hex: "#79D7C0"),
+    onPrimaryFixed: MaterialColor(name: "onPrimaryFixed", hex: "#00201A"),
+    onPrimaryFixedVariant: MaterialColor(name: "onPrimaryFixedVariant", hex: "#005143"),
+    secondaryFixed: MaterialColor(name: "secondaryFixed", hex: "#FFD8ED"),
+    secondaryFixedDim: MaterialColor(name: "secondaryFixedDim", hex: "#E8B9D4"),
+    onSecondaryFixed: MaterialColor(name: "onSecondaryFixed", hex: "#2E1125"),
+    onSecondaryFixedVariant: MaterialColor(name: "onSecondaryFixedVariant", hex: "#5F3C52"),
+    tertiaryFixed: MaterialColor(name: "tertiaryFixed", hex: "#F7D8FF"),
+    tertiaryFixedDim: MaterialColor(name: "tertiaryFixedDim", hex: "#E0B9EE"),
+    onTertiaryFixed: MaterialColor(name: "onTertiaryFixed", hex: "#2B0E39"),
+    onTertiaryFixedVariant: MaterialColor(name: "onTertiaryFixedVariant", hex: "#593B67")
+  )
+
+  public static let expressiveDark = MaterialColorScheme(
+    appearance: .dark,
+    primary: MaterialColor(name: "primary", hex: "#79D7C0"),
+    onPrimary: MaterialColor(name: "onPrimary", hex: "#00382E"),
+    primaryContainer: MaterialColor(name: "primaryContainer", hex: "#005143"),
+    onPrimaryContainer: MaterialColor(name: "onPrimaryContainer", hex: "#95F4DC"),
+    inversePrimary: MaterialColor(name: "inversePrimary", hex: "#006B5A"),
+    secondary: MaterialColor(name: "secondary", hex: "#E8B9D4"),
+    onSecondary: MaterialColor(name: "onSecondary", hex: "#46263B"),
+    secondaryContainer: MaterialColor(name: "secondaryContainer", hex: "#5F3C52"),
+    onSecondaryContainer: MaterialColor(name: "onSecondaryContainer", hex: "#FFD8ED"),
+    tertiary: MaterialColor(name: "tertiary", hex: "#E0B9EE"),
+    onTertiary: MaterialColor(name: "onTertiary", hex: "#41244F"),
+    tertiaryContainer: MaterialColor(name: "tertiaryContainer", hex: "#593B67"),
+    onTertiaryContainer: MaterialColor(name: "onTertiaryContainer", hex: "#F7D8FF"),
+    background: MaterialColor(name: "background", hex: "#161219"),
+    onBackground: MaterialColor(name: "onBackground", hex: "#EADFEA"),
+    surface: MaterialColor(name: "surface", hex: "#161219"),
+    onSurface: MaterialColor(name: "onSurface", hex: "#EADFEA"),
+    surfaceVariant: MaterialColor(name: "surfaceVariant", hex: "#4D4351"),
+    onSurfaceVariant: MaterialColor(name: "onSurfaceVariant", hex: "#CFC2D3"),
+    surfaceTint: MaterialColor(name: "surfaceTint", hex: "#79D7C0"),
+    inverseSurface: MaterialColor(name: "inverseSurface", hex: "#EADFEA"),
+    inverseOnSurface: MaterialColor(name: "inverseOnSurface", hex: "#342E37"),
+    error: MaterialColor(name: "error", hex: "#FFB4AB"),
+    onError: MaterialColor(name: "onError", hex: "#690005"),
+    errorContainer: MaterialColor(name: "errorContainer", hex: "#93000A"),
+    onErrorContainer: MaterialColor(name: "onErrorContainer", hex: "#FFDAD6"),
+    outline: MaterialColor(name: "outline", hex: "#988D9D"),
+    outlineVariant: MaterialColor(name: "outlineVariant", hex: "#4D4351"),
+    scrim: MaterialColor(name: "scrim", hex: "#000000"),
+    surfaceBright: MaterialColor(name: "surfaceBright", hex: "#3D373F"),
+    surfaceContainer: MaterialColor(name: "surfaceContainer", hex: "#231E25"),
+    surfaceContainerHigh: MaterialColor(name: "surfaceContainerHigh", hex: "#2D2830"),
+    surfaceContainerHighest: MaterialColor(name: "surfaceContainerHighest", hex: "#38333B"),
+    surfaceContainerLow: MaterialColor(name: "surfaceContainerLow", hex: "#1F1A21"),
+    surfaceContainerLowest: MaterialColor(name: "surfaceContainerLowest", hex: "#110D14"),
+    surfaceDim: MaterialColor(name: "surfaceDim", hex: "#161219"),
+    primaryFixed: MaterialColor(name: "primaryFixed", hex: "#95F4DC"),
+    primaryFixedDim: MaterialColor(name: "primaryFixedDim", hex: "#79D7C0"),
+    onPrimaryFixed: MaterialColor(name: "onPrimaryFixed", hex: "#00201A"),
+    onPrimaryFixedVariant: MaterialColor(name: "onPrimaryFixedVariant", hex: "#005143"),
+    secondaryFixed: MaterialColor(name: "secondaryFixed", hex: "#FFD8ED"),
+    secondaryFixedDim: MaterialColor(name: "secondaryFixedDim", hex: "#E8B9D4"),
+    onSecondaryFixed: MaterialColor(name: "onSecondaryFixed", hex: "#2E1125"),
+    onSecondaryFixedVariant: MaterialColor(name: "onSecondaryFixedVariant", hex: "#5F3C52"),
+    tertiaryFixed: MaterialColor(name: "tertiaryFixed", hex: "#F7D8FF"),
+    tertiaryFixedDim: MaterialColor(name: "tertiaryFixedDim", hex: "#E0B9EE"),
+    onTertiaryFixed: MaterialColor(name: "onTertiaryFixed", hex: "#2B0E39"),
+    onTertiaryFixedVariant: MaterialColor(name: "onTertiaryFixedVariant", hex: "#593B67")
+  )
+
+  public static let rainbowLight = MaterialColorScheme(
+    appearance: .light,
+    primary: MaterialColor(name: "primary", hex: "#6750A4"),
+    onPrimary: MaterialColor(name: "onPrimary", hex: "#FFFFFF"),
+    primaryContainer: MaterialColor(name: "primaryContainer", hex: "#E9DDFF"),
+    onPrimaryContainer: MaterialColor(name: "onPrimaryContainer", hex: "#4F378A"),
+    inversePrimary: MaterialColor(name: "inversePrimary", hex: "#CFBCFF"),
+    secondary: MaterialColor(name: "secondary", hex: "#625B71"),
+    onSecondary: MaterialColor(name: "onSecondary", hex: "#FFFFFF"),
+    secondaryContainer: MaterialColor(name: "secondaryContainer", hex: "#E8DEF8"),
+    onSecondaryContainer: MaterialColor(name: "onSecondaryContainer", hex: "#4A4458"),
+    tertiary: MaterialColor(name: "tertiary", hex: "#7E5260"),
+    onTertiary: MaterialColor(name: "onTertiary", hex: "#FFFFFF"),
+    tertiaryContainer: MaterialColor(name: "tertiaryContainer", hex: "#FFD9E3"),
+    onTertiaryContainer: MaterialColor(name: "onTertiaryContainer", hex: "#633B48"),
+    background: MaterialColor(name: "background", hex: "#F9F9F9"),
+    onBackground: MaterialColor(name: "onBackground", hex: "#1B1B1B"),
+    surface: MaterialColor(name: "surface", hex: "#F9F9F9"),
+    onSurface: MaterialColor(name: "onSurface", hex: "#1B1B1B"),
+    surfaceVariant: MaterialColor(name: "surfaceVariant", hex: "#E2E2E2"),
+    onSurfaceVariant: MaterialColor(name: "onSurfaceVariant", hex: "#474747"),
+    surfaceTint: MaterialColor(name: "surfaceTint", hex: "#6750A4"),
+    inverseSurface: MaterialColor(name: "inverseSurface", hex: "#303030"),
+    inverseOnSurface: MaterialColor(name: "inverseOnSurface", hex: "#F1F1F1"),
+    error: MaterialColor(name: "error", hex: "#BA1A1A"),
+    onError: MaterialColor(name: "onError", hex: "#FFFFFF"),
+    errorContainer: MaterialColor(name: "errorContainer", hex: "#FFDAD6"),
+    onErrorContainer: MaterialColor(name: "onErrorContainer", hex: "#93000A"),
+    outline: MaterialColor(name: "outline", hex: "#777777"),
+    outlineVariant: MaterialColor(name: "outlineVariant", hex: "#C6C6C6"),
+    scrim: MaterialColor(name: "scrim", hex: "#000000"),
+    surfaceBright: MaterialColor(name: "surfaceBright", hex: "#F9F9F9"),
+    surfaceContainer: MaterialColor(name: "surfaceContainer", hex: "#EEEEEE"),
+    surfaceContainerHigh: MaterialColor(name: "surfaceContainerHigh", hex: "#E8E8E8"),
+    surfaceContainerHighest: MaterialColor(name: "surfaceContainerHighest", hex: "#E2E2E2"),
+    surfaceContainerLow: MaterialColor(name: "surfaceContainerLow", hex: "#F3F3F3"),
+    surfaceContainerLowest: MaterialColor(name: "surfaceContainerLowest", hex: "#FFFFFF"),
+    surfaceDim: MaterialColor(name: "surfaceDim", hex: "#DADADA"),
+    primaryFixed: MaterialColor(name: "primaryFixed", hex: "#E9DDFF"),
+    primaryFixedDim: MaterialColor(name: "primaryFixedDim", hex: "#CFBCFF"),
+    onPrimaryFixed: MaterialColor(name: "onPrimaryFixed", hex: "#22005D"),
+    onPrimaryFixedVariant: MaterialColor(name: "onPrimaryFixedVariant", hex: "#4F378A"),
+    secondaryFixed: MaterialColor(name: "secondaryFixed", hex: "#E8DEF8"),
+    secondaryFixedDim: MaterialColor(name: "secondaryFixedDim", hex: "#CBC2DB"),
+    onSecondaryFixed: MaterialColor(name: "onSecondaryFixed", hex: "#1E192B"),
+    onSecondaryFixedVariant: MaterialColor(name: "onSecondaryFixedVariant", hex: "#4A4458"),
+    tertiaryFixed: MaterialColor(name: "tertiaryFixed", hex: "#FFD9E3"),
+    tertiaryFixedDim: MaterialColor(name: "tertiaryFixedDim", hex: "#EFB8C8"),
+    onTertiaryFixed: MaterialColor(name: "onTertiaryFixed", hex: "#31101D"),
+    onTertiaryFixedVariant: MaterialColor(name: "onTertiaryFixedVariant", hex: "#633B48")
+  )
+
+  public static let rainbowDark = MaterialColorScheme(
+    appearance: .dark,
+    primary: MaterialColor(name: "primary", hex: "#CFBCFF"),
+    onPrimary: MaterialColor(name: "onPrimary", hex: "#381E72"),
+    primaryContainer: MaterialColor(name: "primaryContainer", hex: "#4F378A"),
+    onPrimaryContainer: MaterialColor(name: "onPrimaryContainer", hex: "#E9DDFF"),
+    inversePrimary: MaterialColor(name: "inversePrimary", hex: "#6750A4"),
+    secondary: MaterialColor(name: "secondary", hex: "#CBC2DB"),
+    onSecondary: MaterialColor(name: "onSecondary", hex: "#332D41"),
+    secondaryContainer: MaterialColor(name: "secondaryContainer", hex: "#4A4458"),
+    onSecondaryContainer: MaterialColor(name: "onSecondaryContainer", hex: "#E8DEF8"),
+    tertiary: MaterialColor(name: "tertiary", hex: "#EFB8C8"),
+    onTertiary: MaterialColor(name: "onTertiary", hex: "#4A2532"),
+    tertiaryContainer: MaterialColor(name: "tertiaryContainer", hex: "#633B48"),
+    onTertiaryContainer: MaterialColor(name: "onTertiaryContainer", hex: "#FFD9E3"),
+    background: MaterialColor(name: "background", hex: "#131313"),
+    onBackground: MaterialColor(name: "onBackground", hex: "#E2E2E2"),
+    surface: MaterialColor(name: "surface", hex: "#131313"),
+    onSurface: MaterialColor(name: "onSurface", hex: "#E2E2E2"),
+    surfaceVariant: MaterialColor(name: "surfaceVariant", hex: "#474747"),
+    onSurfaceVariant: MaterialColor(name: "onSurfaceVariant", hex: "#C6C6C6"),
+    surfaceTint: MaterialColor(name: "surfaceTint", hex: "#CFBCFF"),
+    inverseSurface: MaterialColor(name: "inverseSurface", hex: "#E2E2E2"),
+    inverseOnSurface: MaterialColor(name: "inverseOnSurface", hex: "#303030"),
+    error: MaterialColor(name: "error", hex: "#FFB4AB"),
+    onError: MaterialColor(name: "onError", hex: "#690005"),
+    errorContainer: MaterialColor(name: "errorContainer", hex: "#93000A"),
+    onErrorContainer: MaterialColor(name: "onErrorContainer", hex: "#FFDAD6"),
+    outline: MaterialColor(name: "outline", hex: "#919191"),
+    outlineVariant: MaterialColor(name: "outlineVariant", hex: "#474747"),
+    scrim: MaterialColor(name: "scrim", hex: "#000000"),
+    surfaceBright: MaterialColor(name: "surfaceBright", hex: "#393939"),
+    surfaceContainer: MaterialColor(name: "surfaceContainer", hex: "#1F1F1F"),
+    surfaceContainerHigh: MaterialColor(name: "surfaceContainerHigh", hex: "#2A2A2A"),
+    surfaceContainerHighest: MaterialColor(name: "surfaceContainerHighest", hex: "#353535"),
+    surfaceContainerLow: MaterialColor(name: "surfaceContainerLow", hex: "#1B1B1B"),
+    surfaceContainerLowest: MaterialColor(name: "surfaceContainerLowest", hex: "#0E0E0E"),
+    surfaceDim: MaterialColor(name: "surfaceDim", hex: "#131313"),
+    primaryFixed: MaterialColor(name: "primaryFixed", hex: "#E9DDFF"),
+    primaryFixedDim: MaterialColor(name: "primaryFixedDim", hex: "#CFBCFF"),
+    onPrimaryFixed: MaterialColor(name: "onPrimaryFixed", hex: "#22005D"),
+    onPrimaryFixedVariant: MaterialColor(name: "onPrimaryFixedVariant", hex: "#4F378A"),
+    secondaryFixed: MaterialColor(name: "secondaryFixed", hex: "#E8DEF8"),
+    secondaryFixedDim: MaterialColor(name: "secondaryFixedDim", hex: "#CBC2DB"),
+    onSecondaryFixed: MaterialColor(name: "onSecondaryFixed", hex: "#1E192B"),
+    onSecondaryFixedVariant: MaterialColor(name: "onSecondaryFixedVariant", hex: "#4A4458"),
+    tertiaryFixed: MaterialColor(name: "tertiaryFixed", hex: "#FFD9E3"),
+    tertiaryFixedDim: MaterialColor(name: "tertiaryFixedDim", hex: "#EFB8C8"),
+    onTertiaryFixed: MaterialColor(name: "onTertiaryFixed", hex: "#31101D"),
+    onTertiaryFixedVariant: MaterialColor(name: "onTertiaryFixedVariant", hex: "#633B48")
+  )
+
+  public static let fruitSaladLight = MaterialColorScheme(
+    appearance: .light,
+    primary: MaterialColor(name: "primary", hex: "#00639C"),
+    onPrimary: MaterialColor(name: "onPrimary", hex: "#FFFFFF"),
+    primaryContainer: MaterialColor(name: "primaryContainer", hex: "#CEE5FF"),
+    onPrimaryContainer: MaterialColor(name: "onPrimaryContainer", hex: "#004A77"),
+    inversePrimary: MaterialColor(name: "inversePrimary", hex: "#97CBFF"),
+    secondary: MaterialColor(name: "secondary", hex: "#30628C"),
+    onSecondary: MaterialColor(name: "onSecondary", hex: "#FFFFFF"),
+    secondaryContainer: MaterialColor(name: "secondaryContainer", hex: "#CEE5FF"),
+    onSecondaryContainer: MaterialColor(name: "onSecondaryContainer", hex: "#104A73"),
+    tertiary: MaterialColor(name: "tertiary", hex: "#65558F"),
+    onTertiary: MaterialColor(name: "onTertiary", hex: "#FFFFFF"),
+    tertiaryContainer: MaterialColor(name: "tertiaryContainer", hex: "#E9DDFF"),
+    onTertiaryContainer: MaterialColor(name: "onTertiaryContainer", hex: "#4D3D75"),
+    background: MaterialColor(name: "background", hex: "#FDF7FF"),
+    onBackground: MaterialColor(name: "onBackground", hex: "#1D1A24"),
+    surface: MaterialColor(name: "surface", hex: "#FDF7FF"),
+    onSurface: MaterialColor(name: "onSurface", hex: "#1D1A24"),
+    surfaceVariant: MaterialColor(name: "surfaceVariant", hex: "#E8DEF8"),
+    onSurfaceVariant: MaterialColor(name: "onSurfaceVariant", hex: "#4A4458"),
+    surfaceTint: MaterialColor(name: "surfaceTint", hex: "#00639C"),
+    inverseSurface: MaterialColor(name: "inverseSurface", hex: "#322F3A"),
+    inverseOnSurface: MaterialColor(name: "inverseOnSurface", hex: "#F5EEFD"),
+    error: MaterialColor(name: "error", hex: "#BA1A1A"),
+    onError: MaterialColor(name: "onError", hex: "#FFFFFF"),
+    errorContainer: MaterialColor(name: "errorContainer", hex: "#FFDAD6"),
+    onErrorContainer: MaterialColor(name: "onErrorContainer", hex: "#93000A"),
+    outline: MaterialColor(name: "outline", hex: "#7B748A"),
+    outlineVariant: MaterialColor(name: "outlineVariant", hex: "#CBC2DB"),
+    scrim: MaterialColor(name: "scrim", hex: "#000000"),
+    surfaceBright: MaterialColor(name: "surfaceBright", hex: "#FDF7FF"),
+    surfaceContainer: MaterialColor(name: "surfaceContainer", hex: "#F2EBFA"),
+    surfaceContainerHigh: MaterialColor(name: "surfaceContainerHigh", hex: "#EDE5F4"),
+    surfaceContainerHighest: MaterialColor(name: "surfaceContainerHighest", hex: "#E7E0EF"),
+    surfaceContainerLow: MaterialColor(name: "surfaceContainerLow", hex: "#F8F1FF"),
+    surfaceContainerLowest: MaterialColor(name: "surfaceContainerLowest", hex: "#FFFFFF"),
+    surfaceDim: MaterialColor(name: "surfaceDim", hex: "#DED7E6"),
+    primaryFixed: MaterialColor(name: "primaryFixed", hex: "#CEE5FF"),
+    primaryFixedDim: MaterialColor(name: "primaryFixedDim", hex: "#97CBFF"),
+    onPrimaryFixed: MaterialColor(name: "onPrimaryFixed", hex: "#001D33"),
+    onPrimaryFixedVariant: MaterialColor(name: "onPrimaryFixedVariant", hex: "#004A77"),
+    secondaryFixed: MaterialColor(name: "secondaryFixed", hex: "#CEE5FF"),
+    secondaryFixedDim: MaterialColor(name: "secondaryFixedDim", hex: "#9CCBFB"),
+    onSecondaryFixed: MaterialColor(name: "onSecondaryFixed", hex: "#001D33"),
+    onSecondaryFixedVariant: MaterialColor(name: "onSecondaryFixedVariant", hex: "#104A73"),
+    tertiaryFixed: MaterialColor(name: "tertiaryFixed", hex: "#E9DDFF"),
+    tertiaryFixedDim: MaterialColor(name: "tertiaryFixedDim", hex: "#CFBDFE"),
+    onTertiaryFixed: MaterialColor(name: "onTertiaryFixed", hex: "#201047"),
+    onTertiaryFixedVariant: MaterialColor(name: "onTertiaryFixedVariant", hex: "#4D3D75")
+  )
+
+  public static let fruitSaladDark = MaterialColorScheme(
+    appearance: .dark,
+    primary: MaterialColor(name: "primary", hex: "#97CBFF"),
+    onPrimary: MaterialColor(name: "onPrimary", hex: "#003354"),
+    primaryContainer: MaterialColor(name: "primaryContainer", hex: "#004A77"),
+    onPrimaryContainer: MaterialColor(name: "onPrimaryContainer", hex: "#CEE5FF"),
+    inversePrimary: MaterialColor(name: "inversePrimary", hex: "#00639C"),
+    secondary: MaterialColor(name: "secondary", hex: "#9CCBFB"),
+    onSecondary: MaterialColor(name: "onSecondary", hex: "#003354"),
+    secondaryContainer: MaterialColor(name: "secondaryContainer", hex: "#104A73"),
+    onSecondaryContainer: MaterialColor(name: "onSecondaryContainer", hex: "#CEE5FF"),
+    tertiary: MaterialColor(name: "tertiary", hex: "#CFBDFE"),
+    onTertiary: MaterialColor(name: "onTertiary", hex: "#36275D"),
+    tertiaryContainer: MaterialColor(name: "tertiaryContainer", hex: "#4D3D75"),
+    onTertiaryContainer: MaterialColor(name: "onTertiaryContainer", hex: "#E9DDFF"),
+    background: MaterialColor(name: "background", hex: "#15121C"),
+    onBackground: MaterialColor(name: "onBackground", hex: "#E7E0EF"),
+    surface: MaterialColor(name: "surface", hex: "#15121C"),
+    onSurface: MaterialColor(name: "onSurface", hex: "#E7E0EF"),
+    surfaceVariant: MaterialColor(name: "surfaceVariant", hex: "#4A4458"),
+    onSurfaceVariant: MaterialColor(name: "onSurfaceVariant", hex: "#CBC2DB"),
+    surfaceTint: MaterialColor(name: "surfaceTint", hex: "#97CBFF"),
+    inverseSurface: MaterialColor(name: "inverseSurface", hex: "#E7E0EF"),
+    inverseOnSurface: MaterialColor(name: "inverseOnSurface", hex: "#322F3A"),
+    error: MaterialColor(name: "error", hex: "#FFB4AB"),
+    onError: MaterialColor(name: "onError", hex: "#690005"),
+    errorContainer: MaterialColor(name: "errorContainer", hex: "#93000A"),
+    onErrorContainer: MaterialColor(name: "onErrorContainer", hex: "#FFDAD6"),
+    outline: MaterialColor(name: "outline", hex: "#958DA4"),
+    outlineVariant: MaterialColor(name: "outlineVariant", hex: "#4A4458"),
+    scrim: MaterialColor(name: "scrim", hex: "#000000"),
+    surfaceBright: MaterialColor(name: "surfaceBright", hex: "#3B3743"),
+    surfaceContainer: MaterialColor(name: "surfaceContainer", hex: "#211E28"),
+    surfaceContainerHigh: MaterialColor(name: "surfaceContainerHigh", hex: "#2C2833"),
+    surfaceContainerHighest: MaterialColor(name: "surfaceContainerHighest", hex: "#37333E"),
+    surfaceContainerLow: MaterialColor(name: "surfaceContainerLow", hex: "#1D1A24"),
+    surfaceContainerLowest: MaterialColor(name: "surfaceContainerLowest", hex: "#0F0D16"),
+    surfaceDim: MaterialColor(name: "surfaceDim", hex: "#15121C"),
+    primaryFixed: MaterialColor(name: "primaryFixed", hex: "#CEE5FF"),
+    primaryFixedDim: MaterialColor(name: "primaryFixedDim", hex: "#97CBFF"),
+    onPrimaryFixed: MaterialColor(name: "onPrimaryFixed", hex: "#001D33"),
+    onPrimaryFixedVariant: MaterialColor(name: "onPrimaryFixedVariant", hex: "#004A77"),
+    secondaryFixed: MaterialColor(name: "secondaryFixed", hex: "#CEE5FF"),
+    secondaryFixedDim: MaterialColor(name: "secondaryFixedDim", hex: "#9CCBFB"),
+    onSecondaryFixed: MaterialColor(name: "onSecondaryFixed", hex: "#001D33"),
+    onSecondaryFixedVariant: MaterialColor(name: "onSecondaryFixedVariant", hex: "#104A73"),
+    tertiaryFixed: MaterialColor(name: "tertiaryFixed", hex: "#E9DDFF"),
+    tertiaryFixedDim: MaterialColor(name: "tertiaryFixedDim", hex: "#CFBDFE"),
+    onTertiaryFixed: MaterialColor(name: "onTertiaryFixed", hex: "#201047"),
+    onTertiaryFixedVariant: MaterialColor(name: "onTertiaryFixedVariant", hex: "#4D3D75")
+  )
+
+  public static let baselineLight = tonalSpotLight
+  public static let baselineDark = tonalSpotDark
+
+  public static func preset(_ preset: MaterialThemePreset, appearance: MaterialAppearance) -> MaterialColorScheme {
+    switch (preset, appearance) {
+    case (.tonalSpot, .light):
+      return tonalSpotLight
+    case (.tonalSpot, .dark):
+      return tonalSpotDark
+    case (.fidelity, .light):
+      return fidelityLight
+    case (.fidelity, .dark):
+      return fidelityDark
+    case (.content, .light):
+      return contentLight
+    case (.content, .dark):
+      return contentDark
+    case (.monochrome, .light):
+      return monochromeLight
+    case (.monochrome, .dark):
+      return monochromeDark
+    case (.neutral, .light):
+      return neutralLight
+    case (.neutral, .dark):
+      return neutralDark
+    case (.vibrant, .light):
+      return vibrantLight
+    case (.vibrant, .dark):
+      return vibrantDark
+    case (.expressive, .light):
+      return expressiveLight
+    case (.expressive, .dark):
+      return expressiveDark
+    case (.rainbow, .light):
+      return rainbowLight
+    case (.rainbow, .dark):
+      return rainbowDark
+    case (.fruitSalad, .light):
+      return fruitSaladLight
+    case (.fruitSalad, .dark):
+      return fruitSaladDark
     }
+  }
+
+  public static func baseline(_ appearance: MaterialAppearance) -> MaterialColorScheme {
+    preset(.tonalSpot, appearance: appearance)
   }
 }
 
 public struct MaterialTheme: Hashable, Sendable {
   public let sourceColor: MaterialColor
   public let colorScheme: MaterialColorScheme
+  public let themePreset: MaterialThemePreset?
 
-  public init(colorScheme: MaterialColorScheme, sourceColor: MaterialColor = MaterialTheme.materialSourceColor) {
+  public init(
+    colorScheme: MaterialColorScheme,
+    sourceColor: MaterialColor = MaterialTheme.materialSourceColor,
+    themePreset: MaterialThemePreset? = nil
+  ) {
     self.sourceColor = sourceColor
     self.colorScheme = colorScheme
+    self.themePreset = themePreset
   }
 
   public static let materialSourceColor = MaterialColor(name: "sourceColor", hex: "#6750A4")
 
-  public static let light = MaterialTheme(colorScheme: .baselineLight)
-  public static let dark = MaterialTheme(colorScheme: .baselineDark)
+  public static let light = MaterialTheme.preset(.tonalSpot, appearance: .light)
+  public static let dark = MaterialTheme.preset(.tonalSpot, appearance: .dark)
+
+  public static func preset(_ preset: MaterialThemePreset, appearance: MaterialAppearance) -> MaterialTheme {
+    MaterialTheme(
+      colorScheme: .preset(preset, appearance: appearance),
+      sourceColor: preset.sourceColor,
+      themePreset: preset
+    )
+  }
 
   public static func baseline(_ appearance: MaterialAppearance) -> MaterialTheme {
-    return MaterialTheme(colorScheme: .baseline(appearance))
+    preset(.tonalSpot, appearance: appearance)
   }
 }

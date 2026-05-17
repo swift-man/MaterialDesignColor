@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### New
+- Added official Material 3 preset color schemes: `tonalSpot`, `fidelity`, `content`, `monochrome`, `neutral`, `vibrant`, `expressive`, `rainbow`, and `fruitSalad`.
+- Added preset selection APIs for Swift, JavaScript / TypeScript, and Python while keeping the existing baseline API as the `tonalSpot` alias.
+- Added preset key colors generated from Material Color Utilities 0.4.0.
+- Added DocC generation and GitHub Actions deployment to `swift-man/docs`.
+
 ## 2.0.0
 
 ### Highlights

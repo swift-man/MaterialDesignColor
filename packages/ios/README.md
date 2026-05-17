@@ -35,6 +35,14 @@ Text("Hello")
   .background(theme.colorScheme.surface.color)
 ```
 
+Official Material 3 preset variants are available without creating a custom theme:
+
+```swift
+let expressive = MaterialTheme.preset(.expressive, appearance: .light)
+let fruitSaladDark = MaterialColorScheme.preset(.fruitSalad, appearance: .dark)
+let primaryKeyColor = MaterialThemePreset.vibrant.keyColors.primary
+```
+
 ```swift
 import MaterialDesignColorUIKit
 

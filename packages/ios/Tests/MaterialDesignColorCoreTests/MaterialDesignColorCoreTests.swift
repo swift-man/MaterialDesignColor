@@ -24,6 +24,16 @@ struct MaterialDesignColorCoreTests {
     #expect(MaterialTheme.dark.colorScheme.primary.hex == "#CFBDFE")
   }
 
+  @Test func material3OfficialPresetColorSchemes() {
+    #expect(MaterialThemePreset.allCases.count == 9)
+    #expect(MaterialColorScheme.preset(.tonalSpot, appearance: .light) == MaterialColorScheme.baselineLight)
+    #expect(MaterialColorScheme.preset(.rainbow, appearance: .light).primary.hex == "#6750A4")
+    #expect(MaterialColorScheme.preset(.fruitSalad, appearance: .dark).primary.hex == "#97CBFF")
+    #expect(MaterialTheme.preset(.expressive, appearance: .light).colorScheme.primary.hex == "#006B5A")
+    #expect(MaterialTheme.preset(.vibrant, appearance: .light).themePreset == .vibrant)
+    #expect(MaterialThemePreset.vibrant.keyColors.primary.hex == "#6C0BFF")
+  }
+
   @Test func material3SourceColor() {
     #expect(MaterialTheme.materialSourceColor.hex == "#6750A4")
     #expect(MaterialTheme.light.sourceColor.hex == "#6750A4")

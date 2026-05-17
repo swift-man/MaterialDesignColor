@@ -2,4 +2,4 @@
 
 Placeholder for an Expo sample app that depends on `packages/js` (`@swift-man/material-design-color`).
 
-Use `createMaterialTheme()` and `theme.colorScheme` for Material 3 style role colors.
+Use `createMaterialTheme({ preset: "expressive" })` and `theme.colorScheme` for Material 3 preset role colors.
