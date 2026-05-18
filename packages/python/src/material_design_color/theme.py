@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, Optional, Tuple, Union
+from typing import Dict, Mapping, Optional, Tuple, Union
 
 from .colors import MaterialColor
 
@@ -1268,14 +1268,53 @@ def baseline_color_scheme(dark: bool = False) -> MaterialColorScheme:
     return preset_color_scheme(MaterialThemePreset.TONAL_SPOT, dark)
 
 
+def custom_color_scheme(
+    overrides: Mapping[str, Optional[str]],
+    dark: bool = False,
+    preset: Union[MaterialThemePreset, str] = MaterialThemePreset.TONAL_SPOT,
+) -> MaterialColorScheme:
+    base = preset_color_scheme(preset, dark)
+    values = {}
+
+    for role in COLOR_SCHEME_ROLES:
+        field = ROLE_FIELDS[role]
+        hex_value = overrides.get(role)
+        values[field] = MaterialColor(role, hex_value) if hex_value is not None else getattr(base, field)
+
+    return MaterialColorScheme(appearance=base.appearance, **values)
+
+
+def material_theme_builder_color_scheme(
+    appearance: str,
+    roles: Mapping[str, str],
+) -> MaterialColorScheme:
+    missing_roles = [role for role in COLOR_SCHEME_ROLES if role not in roles]
+
+    if missing_roles:
+        raise ValueError("missing Material color roles: " + ", ".join(missing_roles))
+
+    values = {
+        ROLE_FIELDS[role]: MaterialColor(role, roles[role])
+        for role in COLOR_SCHEME_ROLES
+    }
+    return MaterialColorScheme(appearance=appearance, **values)
+
+
 def create_theme(
     dark: bool = False,
-    color_scheme: Optional[MaterialColorScheme] = None,
+    color_scheme: Optional[Union[MaterialColorScheme, Mapping[str, Optional[str]]]] = None,
     preset: Union[MaterialThemePreset, str] = MaterialThemePreset.TONAL_SPOT,
 ) -> MaterialTheme:
     material_preset = _coerce_preset(preset)
+    if color_scheme is None:
+        material_color_scheme = preset_color_scheme(material_preset, dark)
+    elif isinstance(color_scheme, MaterialColorScheme):
+        material_color_scheme = color_scheme
+    else:
+        material_color_scheme = custom_color_scheme(color_scheme, dark=dark, preset=material_preset)
+
     return MaterialTheme(
-        color_scheme=color_scheme or preset_color_scheme(material_preset, dark),
+        color_scheme=material_color_scheme,
         source_color=PRESET_SOURCE_COLORS[material_preset],
         preset=material_preset,
     )

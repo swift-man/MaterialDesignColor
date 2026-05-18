@@ -22,6 +22,7 @@ const checks = [
   ["getMaterialTheme(fruitSalad,dark).primary", getMaterialTheme("fruitSalad", { dark: true }).colorScheme.primary, "#97CBFF"],
   ["getMaterialThemeKeyColors(vibrant).primary", getMaterialThemeKeyColors("vibrant").primary, "#6C0BFF"],
   ["createMaterialTheme(undefined override).primary", createMaterialTheme({ colorScheme: { primary: undefined } }).colorScheme.primary, "#65558F"],
+  ["createMaterialTheme(custom builder).surface", createMaterialTheme({ colorScheme: { surface: "#FFFBFE", onSurface: "#1C1B1F" } }).colorScheme.surface, "#FFFBFE"],
 ];
 
 for (const [label, actual, expected] of checks) {

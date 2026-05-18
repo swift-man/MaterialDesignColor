@@ -24,6 +24,22 @@ let primary = theme.colorScheme.primary
 let keyPrimary = MaterialThemePreset.expressive.keyColors.primary
 ```
 
+Material Theme Builder role colors can be injected with type-safe ``MaterialColorRole`` keys. Missing roles fall back to the selected preset.
+
+```swift
+let theme = MaterialTheme.custom(
+    appearance: .light,
+    overrides: [
+        .primary: "#6750A4",
+        .onPrimary: "#FFFFFF",
+        .primaryContainer: "#EADDFF",
+        .onPrimaryContainer: "#21005D",
+        .surface: "#FFFBFE",
+        .onSurface: "#1C1B1F"
+    ]
+)
+```
+
 For existing call sites, ``MaterialTheme/light``, ``MaterialTheme/dark``, ``MaterialColorScheme/baselineLight``, and ``MaterialColorScheme/baselineDark`` remain aliases for the `tonalSpot` preset.
 
 ## Topics
@@ -38,6 +54,8 @@ For existing call sites, ``MaterialTheme/light``, ``MaterialTheme/dark``, ``Mate
 ### Material 3 Color Schemes
 
 - ``MaterialColorScheme``
+- ``MaterialColorRole``
+- ``MaterialColorSchemeError``
 
 ### Material Colors
 

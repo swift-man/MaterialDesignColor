@@ -5,6 +5,7 @@
 ### New
 - Added official Material 3 preset color schemes: `tonalSpot`, `fidelity`, `content`, `monochrome`, `neutral`, `vibrant`, `expressive`, `rainbow`, and `fruitSalad`.
 - Added preset selection APIs for Swift, JavaScript / TypeScript, and Python while keeping the existing baseline API as the `tonalSpot` alias.
+- Added Material Theme Builder role-color injection APIs for Swift, JavaScript / TypeScript, and Python.
 - Added preset key colors generated from Material Color Utilities 0.4.0.
 - Added DocC generation and GitHub Actions deployment to `swift-man/docs`.
 
@@ -19,7 +20,6 @@
 The v1 public surface was the SwiftUI `Color.<token>` extensions (`Color.red50`, `Color.pink400`, ...) shipped from a single `MaterialDesignColor` module. v2 keeps that surface intact through the `MaterialDesignColor` umbrella product, so v1 call sites compile unchanged. New code should prefer `MaterialPalette.<token>` (palette enum) and the M3 surface (`MaterialColorScheme.baselineLight/Dark`, `MaterialTheme`).
 
 ### Breaking changes (iOS)
-- `MaterialColor.init(name:hex:)` is now `internal`. External code should use `MaterialPalette.<name>` or scheme accessors instead of constructing `MaterialColor` directly.
 - `MaterialColorScheme.sourceColor` removed. The source color now lives on `MaterialTheme`:
   - `MaterialTheme.sourceColor` (instance)
   - `MaterialTheme.materialSourceColor` (default static)

@@ -34,6 +34,36 @@ struct MaterialDesignColorCoreTests {
     #expect(MaterialThemePreset.vibrant.keyColors.primary.hex == "#6C0BFF")
   }
 
+  @Test func materialThemeBuilderCustomColorSchemes() throws {
+    let theme = MaterialTheme.custom(
+      appearance: .light,
+      overrides: [
+        .primary: "#6750A4",
+        .onPrimary: "#FFFFFF",
+        .primaryContainer: "#EADDFF",
+        .onPrimaryContainer: "#21005D",
+        .surface: "#FFFBFE",
+        .onSurface: "#1C1B1F"
+      ]
+    )
+
+    #expect(theme.colorScheme.primary.hex == "#6750A4")
+    #expect(theme.colorScheme[.onPrimary].hex == "#FFFFFF")
+    #expect(theme.colorScheme.primaryContainer.hex == "#EADDFF")
+    #expect(theme.colorScheme.secondary.hex == MaterialColorScheme.baselineLight.secondary.hex)
+    #expect(theme.themePreset == nil)
+
+    let roles = Dictionary(
+      uniqueKeysWithValues: MaterialColorRole.allCases.map { role in
+        (role, MaterialColorScheme.baselineLight[role].hex)
+      }
+    )
+    let scheme = try MaterialColorScheme.custom(appearance: .light, roles: roles)
+
+    #expect(scheme.primary.hex == MaterialColorScheme.baselineLight.primary.hex)
+    #expect(scheme.surface.hex == MaterialColorScheme.baselineLight.surface.hex)
+  }
+
   @Test func material3SourceColor() {
     #expect(MaterialTheme.materialSourceColor.hex == "#6750A4")
     #expect(MaterialTheme.light.sourceColor.hex == "#6750A4")

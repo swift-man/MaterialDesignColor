@@ -1,5 +1,60 @@
 // Generated from tokens/ by tools/codegen/generate.rb.
 // Do not edit by hand.
+public enum MaterialColorRole: String, CaseIterable, Hashable, Sendable {
+  case primary
+  case onPrimary
+  case primaryContainer
+  case onPrimaryContainer
+  case inversePrimary
+  case secondary
+  case onSecondary
+  case secondaryContainer
+  case onSecondaryContainer
+  case tertiary
+  case onTertiary
+  case tertiaryContainer
+  case onTertiaryContainer
+  case background
+  case onBackground
+  case surface
+  case onSurface
+  case surfaceVariant
+  case onSurfaceVariant
+  case surfaceTint
+  case inverseSurface
+  case inverseOnSurface
+  case error
+  case onError
+  case errorContainer
+  case onErrorContainer
+  case outline
+  case outlineVariant
+  case scrim
+  case surfaceBright
+  case surfaceContainer
+  case surfaceContainerHigh
+  case surfaceContainerHighest
+  case surfaceContainerLow
+  case surfaceContainerLowest
+  case surfaceDim
+  case primaryFixed
+  case primaryFixedDim
+  case onPrimaryFixed
+  case onPrimaryFixedVariant
+  case secondaryFixed
+  case secondaryFixedDim
+  case onSecondaryFixed
+  case onSecondaryFixedVariant
+  case tertiaryFixed
+  case tertiaryFixedDim
+  case onTertiaryFixed
+  case onTertiaryFixedVariant
+}
+
+public enum MaterialColorSchemeError: Error, Equatable, Sendable {
+  case missingRoles([MaterialColorRole])
+}
+
 public struct MaterialColor: Hashable, Sendable {
   public let name: String
   public let hex: String
@@ -8,7 +63,7 @@ public struct MaterialColor: Hashable, Sendable {
   public let blue: UInt8
   public let alpha: UInt8
 
-  internal init(name: String, hex: String) {
+  public init(name: String, hex: String) {
     let normalizedHex = hex.uppercased()
     precondition(normalizedHex.count == 7 && normalizedHex.first == "#", "Expected #RRGGBB hex color")
 
@@ -22,6 +77,10 @@ public struct MaterialColor: Hashable, Sendable {
     self.green = UInt8((value >> 8) & 0xFF)
     self.blue = UInt8(value & 0xFF)
     self.alpha = 0xFF
+  }
+
+  public init(role: MaterialColorRole, hex: String) {
+    self.init(name: role.rawValue, hex: hex)
   }
 
   public var rgb: (red: UInt8, green: UInt8, blue: UInt8) {
@@ -845,6 +904,241 @@ public struct MaterialColorScheme: Hashable, Sendable {
     self.tertiaryFixedDim = tertiaryFixedDim
     self.onTertiaryFixed = onTertiaryFixed
     self.onTertiaryFixedVariant = onTertiaryFixedVariant
+  }
+
+  public func color(for role: MaterialColorRole) -> MaterialColor {
+    switch role {
+    case .primary:
+      return primary
+    case .onPrimary:
+      return onPrimary
+    case .primaryContainer:
+      return primaryContainer
+    case .onPrimaryContainer:
+      return onPrimaryContainer
+    case .inversePrimary:
+      return inversePrimary
+    case .secondary:
+      return secondary
+    case .onSecondary:
+      return onSecondary
+    case .secondaryContainer:
+      return secondaryContainer
+    case .onSecondaryContainer:
+      return onSecondaryContainer
+    case .tertiary:
+      return tertiary
+    case .onTertiary:
+      return onTertiary
+    case .tertiaryContainer:
+      return tertiaryContainer
+    case .onTertiaryContainer:
+      return onTertiaryContainer
+    case .background:
+      return background
+    case .onBackground:
+      return onBackground
+    case .surface:
+      return surface
+    case .onSurface:
+      return onSurface
+    case .surfaceVariant:
+      return surfaceVariant
+    case .onSurfaceVariant:
+      return onSurfaceVariant
+    case .surfaceTint:
+      return surfaceTint
+    case .inverseSurface:
+      return inverseSurface
+    case .inverseOnSurface:
+      return inverseOnSurface
+    case .error:
+      return error
+    case .onError:
+      return onError
+    case .errorContainer:
+      return errorContainer
+    case .onErrorContainer:
+      return onErrorContainer
+    case .outline:
+      return outline
+    case .outlineVariant:
+      return outlineVariant
+    case .scrim:
+      return scrim
+    case .surfaceBright:
+      return surfaceBright
+    case .surfaceContainer:
+      return surfaceContainer
+    case .surfaceContainerHigh:
+      return surfaceContainerHigh
+    case .surfaceContainerHighest:
+      return surfaceContainerHighest
+    case .surfaceContainerLow:
+      return surfaceContainerLow
+    case .surfaceContainerLowest:
+      return surfaceContainerLowest
+    case .surfaceDim:
+      return surfaceDim
+    case .primaryFixed:
+      return primaryFixed
+    case .primaryFixedDim:
+      return primaryFixedDim
+    case .onPrimaryFixed:
+      return onPrimaryFixed
+    case .onPrimaryFixedVariant:
+      return onPrimaryFixedVariant
+    case .secondaryFixed:
+      return secondaryFixed
+    case .secondaryFixedDim:
+      return secondaryFixedDim
+    case .onSecondaryFixed:
+      return onSecondaryFixed
+    case .onSecondaryFixedVariant:
+      return onSecondaryFixedVariant
+    case .tertiaryFixed:
+      return tertiaryFixed
+    case .tertiaryFixedDim:
+      return tertiaryFixedDim
+    case .onTertiaryFixed:
+      return onTertiaryFixed
+    case .onTertiaryFixedVariant:
+      return onTertiaryFixedVariant
+    }
+  }
+
+  public subscript(role: MaterialColorRole) -> MaterialColor {
+    color(for: role)
+  }
+
+  public func overriding(_ overrides: [MaterialColorRole: String]) -> MaterialColorScheme {
+    MaterialColorScheme(
+      appearance: appearance,
+      primary: overrides[.primary].map { MaterialColor(role: .primary, hex: $0) } ?? primary,
+      onPrimary: overrides[.onPrimary].map { MaterialColor(role: .onPrimary, hex: $0) } ?? onPrimary,
+      primaryContainer: overrides[.primaryContainer].map { MaterialColor(role: .primaryContainer, hex: $0) } ?? primaryContainer,
+      onPrimaryContainer: overrides[.onPrimaryContainer].map { MaterialColor(role: .onPrimaryContainer, hex: $0) } ?? onPrimaryContainer,
+      inversePrimary: overrides[.inversePrimary].map { MaterialColor(role: .inversePrimary, hex: $0) } ?? inversePrimary,
+      secondary: overrides[.secondary].map { MaterialColor(role: .secondary, hex: $0) } ?? secondary,
+      onSecondary: overrides[.onSecondary].map { MaterialColor(role: .onSecondary, hex: $0) } ?? onSecondary,
+      secondaryContainer: overrides[.secondaryContainer].map { MaterialColor(role: .secondaryContainer, hex: $0) } ?? secondaryContainer,
+      onSecondaryContainer: overrides[.onSecondaryContainer].map { MaterialColor(role: .onSecondaryContainer, hex: $0) } ?? onSecondaryContainer,
+      tertiary: overrides[.tertiary].map { MaterialColor(role: .tertiary, hex: $0) } ?? tertiary,
+      onTertiary: overrides[.onTertiary].map { MaterialColor(role: .onTertiary, hex: $0) } ?? onTertiary,
+      tertiaryContainer: overrides[.tertiaryContainer].map { MaterialColor(role: .tertiaryContainer, hex: $0) } ?? tertiaryContainer,
+      onTertiaryContainer: overrides[.onTertiaryContainer].map { MaterialColor(role: .onTertiaryContainer, hex: $0) } ?? onTertiaryContainer,
+      background: overrides[.background].map { MaterialColor(role: .background, hex: $0) } ?? background,
+      onBackground: overrides[.onBackground].map { MaterialColor(role: .onBackground, hex: $0) } ?? onBackground,
+      surface: overrides[.surface].map { MaterialColor(role: .surface, hex: $0) } ?? surface,
+      onSurface: overrides[.onSurface].map { MaterialColor(role: .onSurface, hex: $0) } ?? onSurface,
+      surfaceVariant: overrides[.surfaceVariant].map { MaterialColor(role: .surfaceVariant, hex: $0) } ?? surfaceVariant,
+      onSurfaceVariant: overrides[.onSurfaceVariant].map { MaterialColor(role: .onSurfaceVariant, hex: $0) } ?? onSurfaceVariant,
+      surfaceTint: overrides[.surfaceTint].map { MaterialColor(role: .surfaceTint, hex: $0) } ?? surfaceTint,
+      inverseSurface: overrides[.inverseSurface].map { MaterialColor(role: .inverseSurface, hex: $0) } ?? inverseSurface,
+      inverseOnSurface: overrides[.inverseOnSurface].map { MaterialColor(role: .inverseOnSurface, hex: $0) } ?? inverseOnSurface,
+      error: overrides[.error].map { MaterialColor(role: .error, hex: $0) } ?? error,
+      onError: overrides[.onError].map { MaterialColor(role: .onError, hex: $0) } ?? onError,
+      errorContainer: overrides[.errorContainer].map { MaterialColor(role: .errorContainer, hex: $0) } ?? errorContainer,
+      onErrorContainer: overrides[.onErrorContainer].map { MaterialColor(role: .onErrorContainer, hex: $0) } ?? onErrorContainer,
+      outline: overrides[.outline].map { MaterialColor(role: .outline, hex: $0) } ?? outline,
+      outlineVariant: overrides[.outlineVariant].map { MaterialColor(role: .outlineVariant, hex: $0) } ?? outlineVariant,
+      scrim: overrides[.scrim].map { MaterialColor(role: .scrim, hex: $0) } ?? scrim,
+      surfaceBright: overrides[.surfaceBright].map { MaterialColor(role: .surfaceBright, hex: $0) } ?? surfaceBright,
+      surfaceContainer: overrides[.surfaceContainer].map { MaterialColor(role: .surfaceContainer, hex: $0) } ?? surfaceContainer,
+      surfaceContainerHigh: overrides[.surfaceContainerHigh].map { MaterialColor(role: .surfaceContainerHigh, hex: $0) } ?? surfaceContainerHigh,
+      surfaceContainerHighest: overrides[.surfaceContainerHighest].map { MaterialColor(role: .surfaceContainerHighest, hex: $0) } ?? surfaceContainerHighest,
+      surfaceContainerLow: overrides[.surfaceContainerLow].map { MaterialColor(role: .surfaceContainerLow, hex: $0) } ?? surfaceContainerLow,
+      surfaceContainerLowest: overrides[.surfaceContainerLowest].map { MaterialColor(role: .surfaceContainerLowest, hex: $0) } ?? surfaceContainerLowest,
+      surfaceDim: overrides[.surfaceDim].map { MaterialColor(role: .surfaceDim, hex: $0) } ?? surfaceDim,
+      primaryFixed: overrides[.primaryFixed].map { MaterialColor(role: .primaryFixed, hex: $0) } ?? primaryFixed,
+      primaryFixedDim: overrides[.primaryFixedDim].map { MaterialColor(role: .primaryFixedDim, hex: $0) } ?? primaryFixedDim,
+      onPrimaryFixed: overrides[.onPrimaryFixed].map { MaterialColor(role: .onPrimaryFixed, hex: $0) } ?? onPrimaryFixed,
+      onPrimaryFixedVariant: overrides[.onPrimaryFixedVariant].map { MaterialColor(role: .onPrimaryFixedVariant, hex: $0) } ?? onPrimaryFixedVariant,
+      secondaryFixed: overrides[.secondaryFixed].map { MaterialColor(role: .secondaryFixed, hex: $0) } ?? secondaryFixed,
+      secondaryFixedDim: overrides[.secondaryFixedDim].map { MaterialColor(role: .secondaryFixedDim, hex: $0) } ?? secondaryFixedDim,
+      onSecondaryFixed: overrides[.onSecondaryFixed].map { MaterialColor(role: .onSecondaryFixed, hex: $0) } ?? onSecondaryFixed,
+      onSecondaryFixedVariant: overrides[.onSecondaryFixedVariant].map { MaterialColor(role: .onSecondaryFixedVariant, hex: $0) } ?? onSecondaryFixedVariant,
+      tertiaryFixed: overrides[.tertiaryFixed].map { MaterialColor(role: .tertiaryFixed, hex: $0) } ?? tertiaryFixed,
+      tertiaryFixedDim: overrides[.tertiaryFixedDim].map { MaterialColor(role: .tertiaryFixedDim, hex: $0) } ?? tertiaryFixedDim,
+      onTertiaryFixed: overrides[.onTertiaryFixed].map { MaterialColor(role: .onTertiaryFixed, hex: $0) } ?? onTertiaryFixed,
+      onTertiaryFixedVariant: overrides[.onTertiaryFixedVariant].map { MaterialColor(role: .onTertiaryFixedVariant, hex: $0) } ?? onTertiaryFixedVariant
+    )
+  }
+
+  private static func color(_ role: MaterialColorRole, in roles: [MaterialColorRole: String]) -> MaterialColor {
+    guard let hex = roles[role] else {
+      preconditionFailure("Missing Material color role \(role.rawValue)")
+    }
+
+    return MaterialColor(role: role, hex: hex)
+  }
+
+  public static func custom(appearance: MaterialAppearance, roles: [MaterialColorRole: String]) throws -> MaterialColorScheme {
+    let missingRoles = MaterialColorRole.allCases.filter { roles[$0] == nil }
+
+    guard missingRoles.isEmpty else {
+      throw MaterialColorSchemeError.missingRoles(missingRoles)
+    }
+
+    return MaterialColorScheme(
+      appearance: appearance,
+      primary: color(.primary, in: roles),
+      onPrimary: color(.onPrimary, in: roles),
+      primaryContainer: color(.primaryContainer, in: roles),
+      onPrimaryContainer: color(.onPrimaryContainer, in: roles),
+      inversePrimary: color(.inversePrimary, in: roles),
+      secondary: color(.secondary, in: roles),
+      onSecondary: color(.onSecondary, in: roles),
+      secondaryContainer: color(.secondaryContainer, in: roles),
+      onSecondaryContainer: color(.onSecondaryContainer, in: roles),
+      tertiary: color(.tertiary, in: roles),
+      onTertiary: color(.onTertiary, in: roles),
+      tertiaryContainer: color(.tertiaryContainer, in: roles),
+      onTertiaryContainer: color(.onTertiaryContainer, in: roles),
+      background: color(.background, in: roles),
+      onBackground: color(.onBackground, in: roles),
+      surface: color(.surface, in: roles),
+      onSurface: color(.onSurface, in: roles),
+      surfaceVariant: color(.surfaceVariant, in: roles),
+      onSurfaceVariant: color(.onSurfaceVariant, in: roles),
+      surfaceTint: color(.surfaceTint, in: roles),
+      inverseSurface: color(.inverseSurface, in: roles),
+      inverseOnSurface: color(.inverseOnSurface, in: roles),
+      error: color(.error, in: roles),
+      onError: color(.onError, in: roles),
+      errorContainer: color(.errorContainer, in: roles),
+      onErrorContainer: color(.onErrorContainer, in: roles),
+      outline: color(.outline, in: roles),
+      outlineVariant: color(.outlineVariant, in: roles),
+      scrim: color(.scrim, in: roles),
+      surfaceBright: color(.surfaceBright, in: roles),
+      surfaceContainer: color(.surfaceContainer, in: roles),
+      surfaceContainerHigh: color(.surfaceContainerHigh, in: roles),
+      surfaceContainerHighest: color(.surfaceContainerHighest, in: roles),
+      surfaceContainerLow: color(.surfaceContainerLow, in: roles),
+      surfaceContainerLowest: color(.surfaceContainerLowest, in: roles),
+      surfaceDim: color(.surfaceDim, in: roles),
+      primaryFixed: color(.primaryFixed, in: roles),
+      primaryFixedDim: color(.primaryFixedDim, in: roles),
+      onPrimaryFixed: color(.onPrimaryFixed, in: roles),
+      onPrimaryFixedVariant: color(.onPrimaryFixedVariant, in: roles),
+      secondaryFixed: color(.secondaryFixed, in: roles),
+      secondaryFixedDim: color(.secondaryFixedDim, in: roles),
+      onSecondaryFixed: color(.onSecondaryFixed, in: roles),
+      onSecondaryFixedVariant: color(.onSecondaryFixedVariant, in: roles),
+      tertiaryFixed: color(.tertiaryFixed, in: roles),
+      tertiaryFixedDim: color(.tertiaryFixedDim, in: roles),
+      onTertiaryFixed: color(.onTertiaryFixed, in: roles),
+      onTertiaryFixedVariant: color(.onTertiaryFixedVariant, in: roles)
+    )
+  }
+
+  public static func custom(
+    base: MaterialThemePreset = .tonalSpot,
+    appearance: MaterialAppearance,
+    overrides: [MaterialColorRole: String]
+  ) -> MaterialColorScheme {
+    preset(base, appearance: appearance).overriding(overrides)
   }
 
   public static let tonalSpotLight = MaterialColorScheme(
@@ -1857,6 +2151,29 @@ public struct MaterialTheme: Hashable, Sendable {
       colorScheme: .preset(preset, appearance: appearance),
       sourceColor: preset.sourceColor,
       themePreset: preset
+    )
+  }
+
+  public static func custom(
+    base: MaterialThemePreset = .tonalSpot,
+    appearance: MaterialAppearance,
+    overrides: [MaterialColorRole: String],
+    sourceColor: String? = nil
+  ) -> MaterialTheme {
+    MaterialTheme(
+      colorScheme: .custom(base: base, appearance: appearance, overrides: overrides),
+      sourceColor: sourceColor.map { MaterialColor(name: "sourceColor", hex: $0) } ?? base.sourceColor
+    )
+  }
+
+  public static func custom(
+    appearance: MaterialAppearance,
+    roles: [MaterialColorRole: String],
+    sourceColor: String? = nil
+  ) throws -> MaterialTheme {
+    MaterialTheme(
+      colorScheme: try .custom(appearance: appearance, roles: roles),
+      sourceColor: sourceColor.map { MaterialColor(name: "sourceColor", hex: $0) } ?? materialSourceColor
     )
   }
 

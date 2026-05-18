@@ -34,6 +34,26 @@ const keyPrimary = getMaterialThemeKeyColors("expressive").primary;
 
 Available presets: `tonalSpot`, `fidelity`, `content`, `monochrome`, `neutral`, `vibrant`, `expressive`, `rainbow`, `fruitSalad`.
 
+### Material Theme Builder color schemes
+
+Paste role colors from Material Theme Builder into `colorScheme`. Missing roles fall back to the selected preset.
+
+```ts
+import { createMaterialTheme } from "@swift-man/material-design-color";
+
+const theme = createMaterialTheme({
+  preset: "tonalSpot",
+  colorScheme: {
+    primary: "#6750A4",
+    onPrimary: "#FFFFFF",
+    primaryContainer: "#EADDFF",
+    onPrimaryContainer: "#21005D",
+    surface: "#FFFBFE",
+    onSurface: "#1C1B1F",
+  },
+});
+```
+
 ### Material 2 palette
 
 ```ts

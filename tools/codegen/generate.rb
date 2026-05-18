@@ -155,9 +155,19 @@ def swift_core(material2_tokens, material3_roles, material3_presets)
   end.join("\n")
 
   palette_all_values = material2_tokens.keys.map { |name| "    #{name}," }.join("\n")
+  role_cases = material3_roles.map { |role| "  case #{role}" }.join("\n")
   scheme_properties = material3_roles.map { |role| "  public let #{role}: MaterialColor" }.join("\n")
   scheme_init_parameters = material3_roles.map { |role| "    #{role}: MaterialColor" }.join(",\n")
   scheme_init_assignments = material3_roles.map { |role| "    self.#{role} = #{role}" }.join("\n")
+  scheme_role_switch = material3_roles.map do |role|
+    "    case .#{role}:\n      return #{role}"
+  end.join("\n")
+  scheme_override_parameters = material3_roles.map do |role|
+    "      #{role}: overrides[.#{role}].map { MaterialColor(role: .#{role}, hex: $0) } ?? #{role}"
+  end.join(",\n")
+  scheme_custom_parameters = material3_roles.map do |role|
+    "      #{role}: color(.#{role}, in: roles)"
+  end.join(",\n")
   preset_cases = material3_presets.keys.map { |preset| "  case #{preset}" }.join("\n")
   preset_scheme_statics = material3_presets.flat_map do |preset, data|
     [
@@ -193,6 +203,14 @@ def swift_core(material2_tokens, material3_roles, material3_presets)
 
   <<~SWIFT
     #{generated_header("//").rstrip}
+    public enum MaterialColorRole: String, CaseIterable, Hashable, Sendable {
+    #{role_cases}
+    }
+
+    public enum MaterialColorSchemeError: Error, Equatable, Sendable {
+      case missingRoles([MaterialColorRole])
+    }
+
     public struct MaterialColor: Hashable, Sendable {
       public let name: String
       public let hex: String
@@ -201,7 +219,7 @@ def swift_core(material2_tokens, material3_roles, material3_presets)
       public let blue: UInt8
       public let alpha: UInt8
 
-      internal init(name: String, hex: String) {
+      public init(name: String, hex: String) {
         let normalizedHex = hex.uppercased()
         precondition(normalizedHex.count == 7 && normalizedHex.first == "#", "Expected #RRGGBB hex color")
 
@@ -215,6 +233,10 @@ def swift_core(material2_tokens, material3_roles, material3_presets)
         self.green = UInt8((value >> 8) & 0xFF)
         self.blue = UInt8(value & 0xFF)
         self.alpha = 0xFF
+      }
+
+      public init(role: MaterialColorRole, hex: String) {
+        self.init(name: role.rawValue, hex: hex)
       }
 
       public var rgb: (red: UInt8, green: UInt8, blue: UInt8) {
@@ -297,6 +319,52 @@ def swift_core(material2_tokens, material3_roles, material3_presets)
     #{scheme_init_assignments}
       }
 
+      public func color(for role: MaterialColorRole) -> MaterialColor {
+        switch role {
+    #{scheme_role_switch}
+        }
+      }
+
+      public subscript(role: MaterialColorRole) -> MaterialColor {
+        color(for: role)
+      }
+
+      public func overriding(_ overrides: [MaterialColorRole: String]) -> MaterialColorScheme {
+        MaterialColorScheme(
+          appearance: appearance,
+    #{scheme_override_parameters}
+        )
+      }
+
+      private static func color(_ role: MaterialColorRole, in roles: [MaterialColorRole: String]) -> MaterialColor {
+        guard let hex = roles[role] else {
+          preconditionFailure("Missing Material color role \\(role.rawValue)")
+        }
+
+        return MaterialColor(role: role, hex: hex)
+      }
+
+      public static func custom(appearance: MaterialAppearance, roles: [MaterialColorRole: String]) throws -> MaterialColorScheme {
+        let missingRoles = MaterialColorRole.allCases.filter { roles[$0] == nil }
+
+        guard missingRoles.isEmpty else {
+          throw MaterialColorSchemeError.missingRoles(missingRoles)
+        }
+
+        return MaterialColorScheme(
+          appearance: appearance,
+    #{scheme_custom_parameters}
+        )
+      }
+
+      public static func custom(
+        base: MaterialThemePreset = .tonalSpot,
+        appearance: MaterialAppearance,
+        overrides: [MaterialColorRole: String]
+      ) -> MaterialColorScheme {
+        preset(base, appearance: appearance).overriding(overrides)
+      }
+
     #{preset_scheme_statics}
 
       public static let baselineLight = tonalSpotLight
@@ -338,6 +406,29 @@ def swift_core(material2_tokens, material3_roles, material3_presets)
           colorScheme: .preset(preset, appearance: appearance),
           sourceColor: preset.sourceColor,
           themePreset: preset
+        )
+      }
+
+      public static func custom(
+        base: MaterialThemePreset = .tonalSpot,
+        appearance: MaterialAppearance,
+        overrides: [MaterialColorRole: String],
+        sourceColor: String? = nil
+      ) -> MaterialTheme {
+        MaterialTheme(
+          colorScheme: .custom(base: base, appearance: appearance, overrides: overrides),
+          sourceColor: sourceColor.map { MaterialColor(name: "sourceColor", hex: $0) } ?? base.sourceColor
+        )
+      }
+
+      public static func custom(
+        appearance: MaterialAppearance,
+        roles: [MaterialColorRole: String],
+        sourceColor: String? = nil
+      ) throws -> MaterialTheme {
+        MaterialTheme(
+          colorScheme: try .custom(appearance: appearance, roles: roles),
+          sourceColor: sourceColor.map { MaterialColor(name: "sourceColor", hex: $0) } ?? materialSourceColor
         )
       }
 
@@ -688,7 +779,7 @@ def python_theme(roles, presets)
 
     from dataclasses import dataclass
     from enum import Enum
-    from typing import Dict, Optional, Tuple, Union
+    from typing import Dict, Mapping, Optional, Tuple, Union
 
     from .colors import MaterialColor
 
@@ -774,14 +865,53 @@ def python_theme(roles, presets)
         return preset_color_scheme(MaterialThemePreset.TONAL_SPOT, dark)
 
 
+    def custom_color_scheme(
+        overrides: Mapping[str, Optional[str]],
+        dark: bool = False,
+        preset: Union[MaterialThemePreset, str] = MaterialThemePreset.TONAL_SPOT,
+    ) -> MaterialColorScheme:
+        base = preset_color_scheme(preset, dark)
+        values = {}
+
+        for role in COLOR_SCHEME_ROLES:
+            field = ROLE_FIELDS[role]
+            hex_value = overrides.get(role)
+            values[field] = MaterialColor(role, hex_value) if hex_value is not None else getattr(base, field)
+
+        return MaterialColorScheme(appearance=base.appearance, **values)
+
+
+    def material_theme_builder_color_scheme(
+        appearance: str,
+        roles: Mapping[str, str],
+    ) -> MaterialColorScheme:
+        missing_roles = [role for role in COLOR_SCHEME_ROLES if role not in roles]
+
+        if missing_roles:
+            raise ValueError("missing Material color roles: " + ", ".join(missing_roles))
+
+        values = {
+            ROLE_FIELDS[role]: MaterialColor(role, roles[role])
+            for role in COLOR_SCHEME_ROLES
+        }
+        return MaterialColorScheme(appearance=appearance, **values)
+
+
     def create_theme(
         dark: bool = False,
-        color_scheme: Optional[MaterialColorScheme] = None,
+        color_scheme: Optional[Union[MaterialColorScheme, Mapping[str, Optional[str]]]] = None,
         preset: Union[MaterialThemePreset, str] = MaterialThemePreset.TONAL_SPOT,
     ) -> MaterialTheme:
         material_preset = _coerce_preset(preset)
+        if color_scheme is None:
+            material_color_scheme = preset_color_scheme(material_preset, dark)
+        elif isinstance(color_scheme, MaterialColorScheme):
+            material_color_scheme = color_scheme
+        else:
+            material_color_scheme = custom_color_scheme(color_scheme, dark=dark, preset=material_preset)
+
         return MaterialTheme(
-            color_scheme=color_scheme or preset_color_scheme(material_preset, dark),
+            color_scheme=material_color_scheme,
             source_color=PRESET_SOURCE_COLORS[material_preset],
             preset=material_preset,
         )

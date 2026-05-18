@@ -12,7 +12,9 @@ from .theme import (
     MaterialThemePreset,
     baseline_color_scheme,
     create_theme,
+    custom_color_scheme,
     get_theme,
+    material_theme_builder_color_scheme,
     preset_color_scheme,
     preset_key_colors,
 )
@@ -35,8 +37,10 @@ __all__ = [
     "baseline_color_scheme",
     "colors",
     "create_theme",
+    "custom_color_scheme",
     "get_color",
     "get_theme",
+    "material_theme_builder_color_scheme",
     "preset_color_scheme",
     "preset_key_colors",
 ]

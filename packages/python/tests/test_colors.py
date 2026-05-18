@@ -6,8 +6,10 @@ from material_design_color import (
     MaterialColors,
     colors,
     create_theme,
+    custom_color_scheme,
     get_color,
     get_theme,
+    material_theme_builder_color_scheme,
     preset_color_scheme,
     preset_key_colors,
 )
@@ -35,6 +37,32 @@ def test_material3_official_preset_color_schemes():
     assert get_theme(MaterialThemePreset.EXPRESSIVE).color_scheme.primary.hex == "#006B5A"
     assert create_theme(preset="vibrant").preset is MaterialThemePreset.VIBRANT
     assert preset_key_colors("vibrant")["primary"].hex == "#6C0BFF"
+
+
+def test_material_theme_builder_custom_color_schemes():
+    overrides = {
+        "primary": "#6750A4",
+        "onPrimary": "#FFFFFF",
+        "primaryContainer": "#EADDFF",
+        "onPrimaryContainer": "#21005D",
+        "surface": "#FFFBFE",
+        "onSurface": "#1C1B1F",
+    }
+
+    theme = create_theme(color_scheme=overrides)
+
+    assert theme.color_scheme.primary.hex == "#6750A4"
+    assert theme.color_scheme.on_primary.hex == "#FFFFFF"
+    assert theme.color_scheme.primary_container.hex == "#EADDFF"
+    assert theme.color_scheme.secondary.hex == LIGHT_COLOR_SCHEME.secondary.hex
+
+    scheme = custom_color_scheme(overrides, preset="expressive")
+    assert scheme.primary.hex == "#6750A4"
+    assert scheme.secondary.hex == preset_color_scheme("expressive").secondary.hex
+
+    complete_scheme = material_theme_builder_color_scheme("light", LIGHT_COLOR_SCHEME.as_hex_map())
+    assert complete_scheme.primary.hex == LIGHT_COLOR_SCHEME.primary.hex
+    assert complete_scheme.surface.hex == LIGHT_COLOR_SCHEME.surface.hex
 
 
 def test_material3_source_color():

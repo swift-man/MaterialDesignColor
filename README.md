@@ -104,6 +104,22 @@ let theme = MaterialTheme.preset(.expressive, appearance: .light)
 let keyPrimary = MaterialThemePreset.expressive.keyColors.primary
 ```
 
+Material Theme Builder role colors can be injected with type-safe role keys. Missing roles fall back to the selected preset.
+
+```swift
+let theme = MaterialTheme.custom(
+  appearance: .light,
+  overrides: [
+    .primary: "#6750A4",
+    .onPrimary: "#FFFFFF",
+    .primaryContainer: "#EADDFF",
+    .onPrimaryContainer: "#21005D",
+    .surface: "#FFFBFE",
+    .onSurface: "#1C1B1F"
+  ]
+)
+```
+
 You can also place a theme in the SwiftUI environment:
 
 ```swift
@@ -147,6 +163,21 @@ const theme = createMaterialTheme({ preset: "expressive", dark: false });
 const color = theme.colorScheme.primary;
 ```
 
+Inject Material Theme Builder role colors with `colorScheme`:
+
+```ts
+const theme = createMaterialTheme({
+  colorScheme: {
+    primary: "#6750A4",
+    onPrimary: "#FFFFFF",
+    primaryContainer: "#EADDFF",
+    onPrimaryContainer: "#21005D",
+    surface: "#FFFBFE",
+    onSurface: "#1C1B1F",
+  },
+});
+```
+
 ```tsx
 import { createMaterialTheme } from "@swift-man/material-design-color";
 
@@ -181,6 +212,21 @@ theme = create_theme(preset="expressive", dark=True)
 primary = theme.color_scheme.primary.hex
 surface = theme.color_scheme.surface.hex
 on_surface = theme.color_scheme.on_surface.hex
+```
+
+Material Theme Builder role colors can be injected as camelCase role keys:
+
+```python
+theme = create_theme(
+    color_scheme={
+        "primary": "#6750A4",
+        "onPrimary": "#FFFFFF",
+        "primaryContainer": "#EADDFF",
+        "onPrimaryContainer": "#21005D",
+        "surface": "#FFFBFE",
+        "onSurface": "#1C1B1F",
+    }
+)
 ```
 
 Legacy palette constants are also available:
