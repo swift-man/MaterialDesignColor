@@ -65,12 +65,17 @@ def ts_literal(value)
     .strip
 end
 
+def validate_hex!(hex, label)
+  abort("missing #{label}") if hex.nil?
+  abort("invalid hex for #{label}: #{hex}") unless hex.is_a?(String) && hex.match?(/\A#[0-9A-F]{6}\z/)
+end
+
 def validate_material2_tokens(tokens)
   abort("tokens/material-colors.json must contain at least one token") if tokens.empty?
 
   tokens.each do |name, hex|
     abort("invalid token name: #{name}") unless name.match?(/\A[a-z][A-Za-z0-9]*\z/)
-    abort("invalid hex for #{name}: #{hex}") unless hex.match?(/\A#[0-9A-F]{6}\z/)
+    validate_hex!(hex, name)
   end
 end
 
@@ -85,13 +90,12 @@ def validate_material3_tokens(roles, baseline, presets)
 
     %w[light dark].each do |appearance|
       hex = baseline.fetch(appearance).fetch(role, nil)
-      abort("missing #{appearance}.#{role}") if hex.nil?
-      abort("invalid hex for #{appearance}.#{role}: #{hex}") unless hex.match?(/\A#[0-9A-F]{6}\z/)
+      validate_hex!(hex, "#{appearance}.#{role}")
     end
   end
 
   source_color = baseline["sourceColor"]
-  abort("invalid Material 3 sourceColor: #{source_color}") unless source_color.match?(/\A#[0-9A-F]{6}\z/)
+  validate_hex!(source_color, "baseline.sourceColor")
 
   presets.each do |preset, data|
     abort("invalid Material 3 preset name: #{preset}") unless preset.match?(/\A[a-z][A-Za-z0-9]*\z/)
@@ -101,12 +105,11 @@ def validate_material3_tokens(roles, baseline, presets)
     abort("tokens/material3/theme-presets.json #{preset} missing tonal palettes") unless data["tonalPalettes"].is_a?(Hash)
 
     source = data["sourceColor"]
-    abort("invalid #{preset}.sourceColor: #{source}") unless source.match?(/\A#[0-9A-F]{6}\z/)
+    validate_hex!(source, "#{preset}.sourceColor")
 
     %w[primary secondary tertiary neutral neutralVariant].each do |key_color|
       hex = data.fetch("keyColors").fetch(key_color, nil)
-      abort("missing #{preset}.keyColors.#{key_color}") if hex.nil?
-      abort("invalid hex for #{preset}.keyColors.#{key_color}: #{hex}") unless hex.match?(/\A#[0-9A-F]{6}\z/)
+      validate_hex!(hex, "#{preset}.keyColors.#{key_color}")
     end
 
     %w[primary secondary tertiary neutral neutralVariant error].each do |palette|
@@ -115,15 +118,14 @@ def validate_material3_tokens(roles, baseline, presets)
 
       tones.each do |tone, hex|
         abort("invalid tone for #{preset}.tonalPalettes.#{palette}: #{tone}") unless tone.match?(/\A[0-9]+\z/)
-        abort("invalid hex for #{preset}.tonalPalettes.#{palette}.#{tone}: #{hex}") unless hex.match?(/\A#[0-9A-F]{6}\z/)
+        validate_hex!(hex, "#{preset}.tonalPalettes.#{palette}.#{tone}")
       end
     end
 
     roles.each do |role|
       %w[light dark].each do |appearance|
         hex = data.fetch(appearance).fetch(role, nil)
-        abort("missing #{preset}.#{appearance}.#{role}") if hex.nil?
-        abort("invalid hex for #{preset}.#{appearance}.#{role}: #{hex}") unless hex.match?(/\A#[0-9A-F]{6}\z/)
+        validate_hex!(hex, "#{preset}.#{appearance}.#{role}")
       end
     end
   end
@@ -526,6 +528,27 @@ def react_native_color_scheme(roles, presets)
       return materialThemePresetKeyColors[preset];
     }
 
+    function mergeMaterialColorScheme(
+      base: MaterialColorScheme,
+      overrides?: MaterialColorSchemeInput,
+    ): MaterialColorScheme {
+      if (!overrides) {
+        return base;
+      }
+
+      const colorScheme: Record<MaterialColorRole, string> = { ...base };
+
+      for (const role of materialColorSchemeRoles) {
+        const value = overrides[role];
+
+        if (value !== undefined) {
+          colorScheme[role] = value;
+        }
+      }
+
+      return colorScheme;
+    }
+
     export function createMaterialTheme(options: MaterialThemeOptions = {}): MaterialTheme {
       const dark = options.dark ?? false;
       const preset = options.preset ?? "tonalSpot";
@@ -535,10 +558,7 @@ def react_native_color_scheme(roles, presets)
         dark,
         preset,
         sourceColor: materialThemePresetSourceColors[preset],
-        colorScheme: {
-          ...base,
-          ...options.colorScheme,
-        },
+        colorScheme: mergeMaterialColorScheme(base, options.colorScheme),
       };
     }
 

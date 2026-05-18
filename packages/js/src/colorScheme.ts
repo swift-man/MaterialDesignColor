@@ -1106,6 +1106,27 @@ export function getMaterialThemeKeyColors(
   return materialThemePresetKeyColors[preset];
 }
 
+function mergeMaterialColorScheme(
+  base: MaterialColorScheme,
+  overrides?: MaterialColorSchemeInput,
+): MaterialColorScheme {
+  if (!overrides) {
+    return base;
+  }
+
+  const colorScheme: Record<MaterialColorRole, string> = { ...base };
+
+  for (const role of materialColorSchemeRoles) {
+    const value = overrides[role];
+
+    if (value !== undefined) {
+      colorScheme[role] = value;
+    }
+  }
+
+  return colorScheme;
+}
+
 export function createMaterialTheme(options: MaterialThemeOptions = {}): MaterialTheme {
   const dark = options.dark ?? false;
   const preset = options.preset ?? "tonalSpot";
@@ -1115,10 +1136,7 @@ export function createMaterialTheme(options: MaterialThemeOptions = {}): Materia
     dark,
     preset,
     sourceColor: materialThemePresetSourceColors[preset],
-    colorScheme: {
-      ...base,
-      ...options.colorScheme,
-    },
+    colorScheme: mergeMaterialColorScheme(base, options.colorScheme),
   };
 }
 

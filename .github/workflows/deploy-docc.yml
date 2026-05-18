@@ -11,7 +11,7 @@ permissions:
 
 concurrency:
   group: deploy-docc-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy-docs:
@@ -33,4 +33,5 @@ jobs:
           publish_branch: main
           publish_dir: ./docs
           destination_dir: MaterialDesignColor
+          keep_files: true
           full_commit_message: Deploy MaterialDesignColor DocC from ${{ github.repository }}@${{ github.sha }}

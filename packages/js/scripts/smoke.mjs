@@ -5,6 +5,7 @@
 // relative `../dist/index.js` import would catch.
 import {
   colors,
+  createMaterialTheme,
   getMaterialTheme,
   getMaterialThemeKeyColors,
   lightColorScheme,
@@ -20,6 +21,7 @@ const checks = [
   ["getMaterialTheme(expressive).primary", getMaterialTheme("expressive").colorScheme.primary, "#006B5A"],
   ["getMaterialTheme(fruitSalad,dark).primary", getMaterialTheme("fruitSalad", { dark: true }).colorScheme.primary, "#97CBFF"],
   ["getMaterialThemeKeyColors(vibrant).primary", getMaterialThemeKeyColors("vibrant").primary, "#6C0BFF"],
+  ["createMaterialTheme(undefined override).primary", createMaterialTheme({ colorScheme: { primary: undefined } }).colorScheme.primary, "#65558F"],
 ];
 
 for (const [label, actual, expected] of checks) {
