@@ -27,7 +27,7 @@ let keyPrimary = MaterialThemePreset.expressive.keyColors.primary
 Material Theme Builder role colors can be injected with type-safe ``MaterialColorRole`` keys. Missing roles fall back to the selected preset.
 
 ```swift
-let theme = MaterialTheme.custom(
+let theme = try MaterialTheme.custom(
     appearance: .light,
     overrides: [
         .primary: "#6750A4",
@@ -60,4 +60,5 @@ For existing call sites, ``MaterialTheme/light``, ``MaterialTheme/dark``, ``Mate
 ### Material Colors
 
 - ``MaterialColor``
+- ``MaterialColorError``
 - ``MaterialPalette``

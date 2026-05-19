@@ -65,7 +65,21 @@ export const materialThemePresets = [
 
 export const materialSourceColor = "#6750A4";
 
-export const materialThemePresetSourceColors = {
+type DeepReadonly<T> = T extends object
+  ? { readonly [Key in keyof T]: DeepReadonly<T[Key]> }
+  : T;
+
+function deepFreeze<T extends object>(value: T): DeepReadonly<T> {
+  for (const nestedValue of Object.values(value)) {
+    if (nestedValue !== null && typeof nestedValue === "object") {
+      deepFreeze(nestedValue);
+    }
+  }
+
+  return Object.freeze(value) as DeepReadonly<T>;
+}
+
+export const materialThemePresetSourceColors = deepFreeze({
       "tonalSpot": "#6750A4",
       "fidelity": "#6750A4",
       "content": "#6750A4",
@@ -75,9 +89,9 @@ export const materialThemePresetSourceColors = {
       "expressive": "#6750A4",
       "rainbow": "#6750A4",
       "fruitSalad": "#6750A4"
-    } as const;
+    } as const);
 
-export const materialThemePresetKeyColors = {
+export const materialThemePresetKeyColors = deepFreeze({
       "tonalSpot": {
         "primary": "#7E6EA9",
         "secondary": "#7B748A",
@@ -141,9 +155,9 @@ export const materialThemePresetKeyColors = {
         "neutral": "#7A7582",
         "neutralVariant": "#7B748A"
       }
-    } as const;
+    } as const);
 
-export const materialThemePresetSchemes = {
+export const materialThemePresetSchemes = deepFreeze({
       "tonalSpot": {
         "light": {
           "primary": "#65558F",
@@ -1062,7 +1076,7 @@ export const materialThemePresetSchemes = {
           "onTertiaryFixedVariant": "#4D3D75"
         }
       }
-    } as const;
+    } as const);
 
 export const lightColorScheme = { ...materialThemePresetSchemes.tonalSpot.light };
 

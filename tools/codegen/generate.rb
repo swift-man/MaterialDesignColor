@@ -138,7 +138,7 @@ end
 
 def swift_scheme_static(name, appearance, roles, scheme)
   role_values = roles.map do |role|
-    "    #{role}: MaterialColor(name: #{swift_string(role)}, hex: #{swift_string(scheme.fetch(role))})"
+    "    #{role}: MaterialColor(uncheckedName: #{swift_string(role)}, hex: #{swift_string(scheme.fetch(role))})"
   end.join(",\n")
 
   <<~SWIFT.rstrip
@@ -151,7 +151,7 @@ end
 
 def swift_core(material2_tokens, material3_roles, material3_presets)
   palette_constants = material2_tokens.map do |name, hex|
-    "  public static let #{name} = MaterialColor(name: #{swift_string(name)}, hex: #{swift_string(hex)})"
+    "  public static let #{name} = MaterialColor(uncheckedName: #{swift_string(name)}, hex: #{swift_string(hex)})"
   end.join("\n")
 
   palette_all_values = material2_tokens.keys.map { |name| "    #{name}," }.join("\n")
@@ -163,10 +163,10 @@ def swift_core(material2_tokens, material3_roles, material3_presets)
     "    case .#{role}:\n      return #{role}"
   end.join("\n")
   scheme_override_parameters = material3_roles.map do |role|
-    "      #{role}: overrides[.#{role}].map { MaterialColor(role: .#{role}, hex: $0) } ?? #{role}"
+    "      #{role}: try overrides[.#{role}].map { try MaterialColor(role: .#{role}, hex: $0) } ?? #{role}"
   end.join(",\n")
   scheme_custom_parameters = material3_roles.map do |role|
-    "      #{role}: color(.#{role}, in: roles)"
+    "      #{role}: try color(.#{role}, in: roles)"
   end.join(",\n")
   preset_cases = material3_presets.keys.map { |preset| "  case #{preset}" }.join("\n")
   preset_scheme_statics = material3_presets.flat_map do |preset, data|
@@ -184,18 +184,18 @@ def swift_core(material2_tokens, material3_roles, material3_presets)
     ].join("\n")
   end.join("\n")
   preset_source_color_switch = material3_presets.map do |preset, data|
-    "    case .#{preset}:\n      return MaterialColor(name: \"sourceColor\", hex: #{swift_string(data.fetch("sourceColor"))})"
+    "    case .#{preset}:\n      return MaterialColor(uncheckedName: \"sourceColor\", hex: #{swift_string(data.fetch("sourceColor"))})"
   end.join("\n")
   preset_key_colors_switch = material3_presets.map do |preset, data|
     key_colors = data.fetch("keyColors")
     [
       "    case .#{preset}:",
       "      return MaterialThemeKeyColors(",
-      "        primary: MaterialColor(name: \"primary\", hex: #{swift_string(key_colors.fetch("primary"))}),",
-      "        secondary: MaterialColor(name: \"secondary\", hex: #{swift_string(key_colors.fetch("secondary"))}),",
-      "        tertiary: MaterialColor(name: \"tertiary\", hex: #{swift_string(key_colors.fetch("tertiary"))}),",
-      "        neutral: MaterialColor(name: \"neutral\", hex: #{swift_string(key_colors.fetch("neutral"))}),",
-      "        neutralVariant: MaterialColor(name: \"neutralVariant\", hex: #{swift_string(key_colors.fetch("neutralVariant"))})",
+      "        primary: MaterialColor(uncheckedName: \"primary\", hex: #{swift_string(key_colors.fetch("primary"))}),",
+      "        secondary: MaterialColor(uncheckedName: \"secondary\", hex: #{swift_string(key_colors.fetch("secondary"))}),",
+      "        tertiary: MaterialColor(uncheckedName: \"tertiary\", hex: #{swift_string(key_colors.fetch("tertiary"))}),",
+      "        neutral: MaterialColor(uncheckedName: \"neutral\", hex: #{swift_string(key_colors.fetch("neutral"))}),",
+      "        neutralVariant: MaterialColor(uncheckedName: \"neutralVariant\", hex: #{swift_string(key_colors.fetch("neutralVariant"))})",
       "      )"
     ].join("\n")
   end.join("\n")
@@ -211,6 +211,10 @@ def swift_core(material2_tokens, material3_roles, material3_presets)
       case missingRoles([MaterialColorRole])
     }
 
+    public enum MaterialColorError: Error, Equatable, Sendable {
+      case invalidHex(String)
+    }
+
     public struct MaterialColor: Hashable, Sendable {
       public let name: String
       public let hex: String
@@ -219,14 +223,27 @@ def swift_core(material2_tokens, material3_roles, material3_presets)
       public let blue: UInt8
       public let alpha: UInt8
 
-      public init(name: String, hex: String) {
-        let normalizedHex = hex.uppercased()
-        precondition(normalizedHex.count == 7 && normalizedHex.first == "#", "Expected #RRGGBB hex color")
-
-        guard let value = UInt32(String(normalizedHex.dropFirst()), radix: 16) else {
-          preconditionFailure("Expected #RRGGBB hex color")
+      public init(name: String, hex: String) throws {
+        guard let parsed = Self.parseHex(hex) else {
+          throw MaterialColorError.invalidHex(hex)
         }
 
+        self.init(name: name, normalizedHex: parsed.normalizedHex, value: parsed.value)
+      }
+
+      public init(role: MaterialColorRole, hex: String) throws {
+        try self.init(name: role.rawValue, hex: hex)
+      }
+
+      fileprivate init(uncheckedName name: String, hex: String) {
+        guard let parsed = Self.parseHex(hex) else {
+          preconditionFailure("Expected generated #RRGGBB hex color")
+        }
+
+        self.init(name: name, normalizedHex: parsed.normalizedHex, value: parsed.value)
+      }
+
+      private init(name: String, normalizedHex: String, value: UInt32) {
         self.name = name
         self.hex = normalizedHex
         self.red = UInt8((value >> 16) & 0xFF)
@@ -235,8 +252,16 @@ def swift_core(material2_tokens, material3_roles, material3_presets)
         self.alpha = 0xFF
       }
 
-      public init(role: MaterialColorRole, hex: String) {
-        self.init(name: role.rawValue, hex: hex)
+      private static func parseHex(_ hex: String) -> (normalizedHex: String, value: UInt32)? {
+        let normalizedHex = hex.uppercased()
+
+        guard normalizedHex.count == 7,
+              normalizedHex.first == "#",
+              let value = UInt32(String(normalizedHex.dropFirst()), radix: 16) else {
+          return nil
+        }
+
+        return (normalizedHex, value)
       }
 
       public var rgb: (red: UInt8, green: UInt8, blue: UInt8) {
@@ -329,19 +354,19 @@ def swift_core(material2_tokens, material3_roles, material3_presets)
         color(for: role)
       }
 
-      public func overriding(_ overrides: [MaterialColorRole: String]) -> MaterialColorScheme {
+      public func overriding(_ overrides: [MaterialColorRole: String]) throws -> MaterialColorScheme {
         MaterialColorScheme(
           appearance: appearance,
     #{scheme_override_parameters}
         )
       }
 
-      private static func color(_ role: MaterialColorRole, in roles: [MaterialColorRole: String]) -> MaterialColor {
+      private static func color(_ role: MaterialColorRole, in roles: [MaterialColorRole: String]) throws -> MaterialColor {
         guard let hex = roles[role] else {
-          preconditionFailure("Missing Material color role \\(role.rawValue)")
+          throw MaterialColorSchemeError.missingRoles([role])
         }
 
-        return MaterialColor(role: role, hex: hex)
+        return try MaterialColor(role: role, hex: hex)
       }
 
       public static func custom(appearance: MaterialAppearance, roles: [MaterialColorRole: String]) throws -> MaterialColorScheme {
@@ -361,8 +386,8 @@ def swift_core(material2_tokens, material3_roles, material3_presets)
         base: MaterialThemePreset = .tonalSpot,
         appearance: MaterialAppearance,
         overrides: [MaterialColorRole: String]
-      ) -> MaterialColorScheme {
-        preset(base, appearance: appearance).overriding(overrides)
+      ) throws -> MaterialColorScheme {
+        try preset(base, appearance: appearance).overriding(overrides)
       }
 
     #{preset_scheme_statics}
@@ -396,7 +421,7 @@ def swift_core(material2_tokens, material3_roles, material3_presets)
         self.themePreset = themePreset
       }
 
-      public static let materialSourceColor = MaterialColor(name: "sourceColor", hex: #{swift_string(tonal_spot.fetch("sourceColor"))})
+      public static let materialSourceColor = MaterialColor(uncheckedName: "sourceColor", hex: #{swift_string(tonal_spot.fetch("sourceColor"))})
 
       public static let light = MaterialTheme.preset(.tonalSpot, appearance: .light)
       public static let dark = MaterialTheme.preset(.tonalSpot, appearance: .dark)
@@ -414,10 +439,12 @@ def swift_core(material2_tokens, material3_roles, material3_presets)
         appearance: MaterialAppearance,
         overrides: [MaterialColorRole: String],
         sourceColor: String? = nil
-      ) -> MaterialTheme {
-        MaterialTheme(
-          colorScheme: .custom(base: base, appearance: appearance, overrides: overrides),
-          sourceColor: sourceColor.map { MaterialColor(name: "sourceColor", hex: $0) } ?? base.sourceColor
+      ) throws -> MaterialTheme {
+        let resolvedSourceColor = try sourceColor.map { try MaterialColor(name: "sourceColor", hex: $0) } ?? base.sourceColor
+
+        return MaterialTheme(
+          colorScheme: try .custom(base: base, appearance: appearance, overrides: overrides),
+          sourceColor: resolvedSourceColor
         )
       }
 
@@ -426,9 +453,11 @@ def swift_core(material2_tokens, material3_roles, material3_presets)
         roles: [MaterialColorRole: String],
         sourceColor: String? = nil
       ) throws -> MaterialTheme {
-        MaterialTheme(
+        let resolvedSourceColor = try sourceColor.map { try MaterialColor(name: "sourceColor", hex: $0) } ?? materialSourceColor
+
+        return MaterialTheme(
           colorScheme: try .custom(appearance: appearance, roles: roles),
-          sourceColor: sourceColor.map { MaterialColor(name: "sourceColor", hex: $0) } ?? materialSourceColor
+          sourceColor: resolvedSourceColor
         )
       }
 
@@ -571,11 +600,25 @@ def react_native_color_scheme(roles, presets)
 
     export const materialSourceColor = #{tonal_spot.fetch("sourceColor").inspect};
 
-    export const materialThemePresetSourceColors = #{ts_literal(preset_source_colors)} as const;
+    type DeepReadonly<T> = T extends object
+      ? { readonly [Key in keyof T]: DeepReadonly<T[Key]> }
+      : T;
 
-    export const materialThemePresetKeyColors = #{ts_literal(preset_key_colors)} as const;
+    function deepFreeze<T extends object>(value: T): DeepReadonly<T> {
+      for (const nestedValue of Object.values(value)) {
+        if (nestedValue !== null && typeof nestedValue === "object") {
+          deepFreeze(nestedValue);
+        }
+      }
 
-    export const materialThemePresetSchemes = #{ts_literal(preset_schemes)} as const;
+      return Object.freeze(value) as DeepReadonly<T>;
+    }
+
+    export const materialThemePresetSourceColors = deepFreeze(#{ts_literal(preset_source_colors)} as const);
+
+    export const materialThemePresetKeyColors = deepFreeze(#{ts_literal(preset_key_colors)} as const);
+
+    export const materialThemePresetSchemes = deepFreeze(#{ts_literal(preset_schemes)} as const);
 
     export const lightColorScheme = { ...materialThemePresetSchemes.tonalSpot.light };
 

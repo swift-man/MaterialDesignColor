@@ -11,8 +11,21 @@ import {
   getMaterialThemeKeyColors,
   lightColorScheme,
   materialSourceColor,
+  materialThemePresetKeyColors,
+  materialThemePresetSchemes,
+  materialThemePresetSourceColors,
   materialThemePresets,
 } from "@swift-man/material-design-color";
+
+function attemptFrozenMutation(mutate) {
+  try {
+    mutate();
+  } catch (error) {
+    if (!(error instanceof TypeError)) {
+      throw error;
+    }
+  }
+}
 
 const copiedColorScheme = getMaterialThemeColorScheme("tonalSpot");
 copiedColorScheme.primary = "#000000";
@@ -22,6 +35,18 @@ copiedKeyColors.primary = "#111111";
 
 const copiedTheme = createMaterialTheme();
 copiedTheme.colorScheme.primary = "#222222";
+
+attemptFrozenMutation(() => {
+  materialThemePresetSchemes.tonalSpot.light.primary = "#333333";
+});
+
+attemptFrozenMutation(() => {
+  materialThemePresetKeyColors.vibrant.primary = "#444444";
+});
+
+attemptFrozenMutation(() => {
+  materialThemePresetSourceColors.tonalSpot = "#555555";
+});
 
 const checks = [
   ["colors.pink400", colors.pink400, "#EC407A"],
@@ -36,6 +61,9 @@ const checks = [
   ["getMaterialThemeColorScheme mutation isolation", getMaterialThemeColorScheme("tonalSpot").primary, "#65558F"],
   ["getMaterialThemeKeyColors mutation isolation", getMaterialThemeKeyColors("vibrant").primary, "#6C0BFF"],
   ["createMaterialTheme mutation isolation", createMaterialTheme().colorScheme.primary, "#65558F"],
+  ["materialThemePresetSchemes freeze isolation", getMaterialThemeColorScheme("tonalSpot").primary, "#65558F"],
+  ["materialThemePresetKeyColors freeze isolation", getMaterialThemeKeyColors("vibrant").primary, "#6C0BFF"],
+  ["materialThemePresetSourceColors freeze isolation", createMaterialTheme().sourceColor, "#6750A4"],
 ];
 
 for (const [label, actual, expected] of checks) {

@@ -48,7 +48,7 @@ Available presets: `tonalSpot`, `fidelity`, `content`, `monochrome`, `neutral`, 
 Material Theme Builder role colors can be injected with type-safe role keys. Missing roles fall back to the selected preset.
 
 ```swift
-let builderTheme = MaterialTheme.custom(
+let builderTheme = try MaterialTheme.custom(
   appearance: .light,
   overrides: [
     .primary: "#6750A4",

@@ -35,7 +35,7 @@ struct MaterialDesignColorCoreTests {
   }
 
   @Test func materialThemeBuilderCustomColorSchemes() throws {
-    let theme = MaterialTheme.custom(
+    let theme = try MaterialTheme.custom(
       appearance: .light,
       overrides: [
         .primary: "#6750A4",
@@ -64,9 +64,45 @@ struct MaterialDesignColorCoreTests {
     #expect(scheme.surface.hex == MaterialColorScheme.baselineLight.surface.hex)
   }
 
+  @Test func invalidHexInputsThrow() {
+    expectInvalidHex("#12") {
+      _ = try MaterialColor(name: "bad", hex: "#12")
+    }
+
+    expectInvalidHex("not-a-hex") {
+      _ = try MaterialTheme.custom(
+        appearance: .light,
+        overrides: [
+          .primary: "not-a-hex"
+        ]
+      )
+    }
+
+    expectInvalidHex("#XYZXYZ") {
+      let roles = Dictionary(
+        uniqueKeysWithValues: MaterialColorRole.allCases.map { role in
+          (role, MaterialColorScheme.baselineLight[role].hex)
+        }
+      ).merging([.primary: "#XYZXYZ"]) { _, new in new }
+
+      _ = try MaterialColorScheme.custom(appearance: .light, roles: roles)
+    }
+  }
+
   @Test func material3SourceColor() {
     #expect(MaterialTheme.materialSourceColor.hex == "#6750A4")
     #expect(MaterialTheme.light.sourceColor.hex == "#6750A4")
     #expect(MaterialTheme.dark.sourceColor.hex == "#6750A4")
+  }
+
+  private func expectInvalidHex(_ expectedHex: String, _ body: () throws -> Void) {
+    do {
+      try body()
+      #expect(Bool(false))
+    } catch MaterialColorError.invalidHex(let hex) {
+      #expect(hex == expectedHex)
+    } catch {
+      #expect(Bool(false))
+    }
   }
 }
