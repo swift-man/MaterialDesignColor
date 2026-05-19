@@ -1064,9 +1064,9 @@ export const materialThemePresetSchemes = {
       }
     } as const;
 
-export const lightColorScheme = materialThemePresetSchemes.tonalSpot.light;
+export const lightColorScheme = { ...materialThemePresetSchemes.tonalSpot.light };
 
-export const darkColorScheme = materialThemePresetSchemes.tonalSpot.dark;
+export const darkColorScheme = { ...materialThemePresetSchemes.tonalSpot.dark };
 
 export type MaterialColorRole = (typeof materialColorSchemeRoles)[number];
 export type MaterialThemePreset = (typeof materialThemePresets)[number];
@@ -1097,24 +1097,24 @@ export function getMaterialThemeColorScheme(
   preset: MaterialThemePreset,
   dark = false,
 ): MaterialColorScheme {
-  return materialThemePresetSchemes[preset][dark ? "dark" : "light"];
+  return { ...materialThemePresetSchemes[preset][dark ? "dark" : "light"] };
 }
 
 export function getMaterialThemeKeyColors(
   preset: MaterialThemePreset,
 ): MaterialThemeKeyColors {
-  return materialThemePresetKeyColors[preset];
+  return { ...materialThemePresetKeyColors[preset] };
 }
 
 function mergeMaterialColorScheme(
   base: MaterialColorScheme,
   overrides?: MaterialColorSchemeInput,
 ): MaterialColorScheme {
-  if (!overrides) {
-    return base;
-  }
-
   const colorScheme: Record<MaterialColorRole, string> = { ...base };
+
+  if (!overrides) {
+    return colorScheme;
+  }
 
   for (const role of materialColorSchemeRoles) {
     const value = overrides[role];

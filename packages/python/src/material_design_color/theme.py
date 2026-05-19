@@ -1238,7 +1238,7 @@ MATERIAL_SOURCE_COLOR = PRESET_SOURCE_COLORS[MaterialThemePreset.TONAL_SPOT]
 @dataclass(frozen=True)
 class MaterialTheme:
     color_scheme: MaterialColorScheme
-    source_color: MaterialColor = MATERIAL_SOURCE_COLOR
+    source_color: Optional[MaterialColor] = MATERIAL_SOURCE_COLOR
     preset: Optional[MaterialThemePreset] = None
 
 
@@ -1308,15 +1308,21 @@ def create_theme(
     material_preset = _coerce_preset(preset)
     if color_scheme is None:
         material_color_scheme = preset_color_scheme(material_preset, dark)
+        source_color = PRESET_SOURCE_COLORS[material_preset]
+        theme_preset = material_preset
     elif isinstance(color_scheme, MaterialColorScheme):
         material_color_scheme = color_scheme
+        source_color = None
+        theme_preset = None
     else:
         material_color_scheme = custom_color_scheme(color_scheme, dark=dark, preset=material_preset)
+        source_color = None
+        theme_preset = None
 
     return MaterialTheme(
         color_scheme=material_color_scheme,
-        source_color=PRESET_SOURCE_COLORS[material_preset],
-        preset=material_preset,
+        source_color=source_color,
+        preset=theme_preset,
     )
 
 

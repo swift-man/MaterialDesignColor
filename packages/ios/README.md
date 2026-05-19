@@ -43,6 +43,8 @@ let fruitSaladDark = MaterialColorScheme.preset(.fruitSalad, appearance: .dark)
 let primaryKeyColor = MaterialThemePreset.vibrant.keyColors.primary
 ```
 
+Available presets: `tonalSpot`, `fidelity`, `content`, `monochrome`, `neutral`, `vibrant`, `expressive`, `rainbow`, `fruitSalad`.
+
 Material Theme Builder role colors can be injected with type-safe role keys. Missing roles fall back to the selected preset.
 
 ```swift

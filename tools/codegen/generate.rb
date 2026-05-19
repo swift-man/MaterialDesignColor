@@ -577,9 +577,9 @@ def react_native_color_scheme(roles, presets)
 
     export const materialThemePresetSchemes = #{ts_literal(preset_schemes)} as const;
 
-    export const lightColorScheme = materialThemePresetSchemes.tonalSpot.light;
+    export const lightColorScheme = { ...materialThemePresetSchemes.tonalSpot.light };
 
-    export const darkColorScheme = materialThemePresetSchemes.tonalSpot.dark;
+    export const darkColorScheme = { ...materialThemePresetSchemes.tonalSpot.dark };
 
     export type MaterialColorRole = (typeof materialColorSchemeRoles)[number];
     export type MaterialThemePreset = (typeof materialThemePresets)[number];
@@ -610,24 +610,24 @@ def react_native_color_scheme(roles, presets)
       preset: MaterialThemePreset,
       dark = false,
     ): MaterialColorScheme {
-      return materialThemePresetSchemes[preset][dark ? "dark" : "light"];
+      return { ...materialThemePresetSchemes[preset][dark ? "dark" : "light"] };
     }
 
     export function getMaterialThemeKeyColors(
       preset: MaterialThemePreset,
     ): MaterialThemeKeyColors {
-      return materialThemePresetKeyColors[preset];
+      return { ...materialThemePresetKeyColors[preset] };
     }
 
     function mergeMaterialColorScheme(
       base: MaterialColorScheme,
       overrides?: MaterialColorSchemeInput,
     ): MaterialColorScheme {
-      if (!overrides) {
-        return base;
-      }
-
       const colorScheme: Record<MaterialColorRole, string> = { ...base };
+
+      if (!overrides) {
+        return colorScheme;
+      }
 
       for (const role of materialColorSchemeRoles) {
         const value = overrides[role];
@@ -835,7 +835,7 @@ def python_theme(roles, presets)
     @dataclass(frozen=True)
     class MaterialTheme:
         color_scheme: MaterialColorScheme
-        source_color: MaterialColor = MATERIAL_SOURCE_COLOR
+        source_color: Optional[MaterialColor] = MATERIAL_SOURCE_COLOR
         preset: Optional[MaterialThemePreset] = None
 
 
@@ -905,15 +905,21 @@ def python_theme(roles, presets)
         material_preset = _coerce_preset(preset)
         if color_scheme is None:
             material_color_scheme = preset_color_scheme(material_preset, dark)
+            source_color = PRESET_SOURCE_COLORS[material_preset]
+            theme_preset = material_preset
         elif isinstance(color_scheme, MaterialColorScheme):
             material_color_scheme = color_scheme
+            source_color = None
+            theme_preset = None
         else:
             material_color_scheme = custom_color_scheme(color_scheme, dark=dark, preset=material_preset)
+            source_color = None
+            theme_preset = None
 
         return MaterialTheme(
             color_scheme=material_color_scheme,
-            source_color=PRESET_SOURCE_COLORS[material_preset],
-            preset=material_preset,
+            source_color=source_color,
+            preset=theme_preset,
         )
 
 

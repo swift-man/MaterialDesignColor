@@ -18,7 +18,8 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - uses: actions/checkout@v4
+      # actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
 
       - name: Build DocC
         run: |
@@ -26,7 +27,8 @@ jobs:
           touch ./docs/.nojekyll
 
       - name: Deploy to swift-man/docs
-        uses: peaceiris/actions-gh-pages@v4
+        # peaceiris/actions-gh-pages@v4
+        uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e
         with:
           deploy_key: ${{ secrets.DOCS_DEPLOY_KEY }}
           external_repository: swift-man/docs

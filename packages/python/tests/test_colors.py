@@ -55,6 +55,8 @@ def test_material_theme_builder_custom_color_schemes():
     assert theme.color_scheme.on_primary.hex == "#FFFFFF"
     assert theme.color_scheme.primary_container.hex == "#EADDFF"
     assert theme.color_scheme.secondary.hex == LIGHT_COLOR_SCHEME.secondary.hex
+    assert theme.preset is None
+    assert theme.source_color is None
 
     scheme = custom_color_scheme(overrides, preset="expressive")
     assert scheme.primary.hex == "#6750A4"

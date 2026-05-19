@@ -7,11 +7,21 @@ import {
   colors,
   createMaterialTheme,
   getMaterialTheme,
+  getMaterialThemeColorScheme,
   getMaterialThemeKeyColors,
   lightColorScheme,
   materialSourceColor,
   materialThemePresets,
 } from "@swift-man/material-design-color";
+
+const copiedColorScheme = getMaterialThemeColorScheme("tonalSpot");
+copiedColorScheme.primary = "#000000";
+
+const copiedKeyColors = getMaterialThemeKeyColors("vibrant");
+copiedKeyColors.primary = "#111111";
+
+const copiedTheme = createMaterialTheme();
+copiedTheme.colorScheme.primary = "#222222";
 
 const checks = [
   ["colors.pink400", colors.pink400, "#EC407A"],
@@ -23,6 +33,9 @@ const checks = [
   ["getMaterialThemeKeyColors(vibrant).primary", getMaterialThemeKeyColors("vibrant").primary, "#6C0BFF"],
   ["createMaterialTheme(undefined override).primary", createMaterialTheme({ colorScheme: { primary: undefined } }).colorScheme.primary, "#65558F"],
   ["createMaterialTheme(custom builder).surface", createMaterialTheme({ colorScheme: { surface: "#FFFBFE", onSurface: "#1C1B1F" } }).colorScheme.surface, "#FFFBFE"],
+  ["getMaterialThemeColorScheme mutation isolation", getMaterialThemeColorScheme("tonalSpot").primary, "#65558F"],
+  ["getMaterialThemeKeyColors mutation isolation", getMaterialThemeKeyColors("vibrant").primary, "#6C0BFF"],
+  ["createMaterialTheme mutation isolation", createMaterialTheme().colorScheme.primary, "#65558F"],
 ];
 
 for (const [label, actual, expected] of checks) {
