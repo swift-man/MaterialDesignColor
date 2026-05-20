@@ -101,7 +101,7 @@ public struct MaterialColor: Hashable, Sendable {
 
     guard normalizedHex.count == 7,
           normalizedHex.first == "#",
-          let value = UInt32(String(normalizedHex.dropFirst()), radix: 16) else {
+          let value = UInt32(normalizedHex.dropFirst(), radix: 16) else {
       return nil
     }
 

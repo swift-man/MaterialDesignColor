@@ -98,11 +98,11 @@ struct MaterialDesignColorCoreTests {
   private func expectInvalidHex(_ expectedHex: String, _ body: () throws -> Void) {
     do {
       try body()
-      #expect(Bool(false))
+      Issue.record("Expected MaterialColorError.invalidHex to be thrown")
     } catch MaterialColorError.invalidHex(let hex) {
       #expect(hex == expectedHex)
     } catch {
-      #expect(Bool(false))
+      Issue.record("Unexpected error: \(error)")
     }
   }
 }
