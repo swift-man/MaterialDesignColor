@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Tuple
 
 
 @dataclass(frozen=True)
@@ -21,7 +20,7 @@ class MaterialColor:
             raise ValueError(f"expected #RRGGBB hex color, got {self.hex!r}") from error
 
     @property
-    def rgb(self) -> Tuple[int, int, int]:
+    def rgb(self) -> tuple[int, int, int]:
         value = self.hex.lstrip("#")
         return (
             int(value[0:2], 16),
@@ -804,7 +803,7 @@ ALL = (
     MaterialColors.BLUE_GREY_900,
 )
 
-BY_NAME: Dict[str, MaterialColor] = {color.name: color for color in ALL}
+BY_NAME: dict[str, MaterialColor] = {color.name: color for color in ALL}
 
 
 def get_color(name: str) -> MaterialColor:

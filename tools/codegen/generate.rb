@@ -730,7 +730,6 @@ def python_colors(material2_tokens)
     from __future__ import annotations
 
     from dataclasses import dataclass
-    from typing import Dict, Tuple
 
 
     @dataclass(frozen=True)
@@ -748,7 +747,7 @@ def python_colors(material2_tokens)
                 raise ValueError(f"expected #RRGGBB hex color, got {self.hex!r}") from error
 
         @property
-        def rgb(self) -> Tuple[int, int, int]:
+        def rgb(self) -> tuple[int, int, int]:
             value = self.hex.lstrip("#")
             return (
                 int(value[0:2], 16),
@@ -772,7 +771,7 @@ def python_colors(material2_tokens)
     #{all_values}
     )
 
-    BY_NAME: Dict[str, MaterialColor] = {color.name: color for color in ALL}
+    BY_NAME: dict[str, MaterialColor] = {color.name: color for color in ALL}
 
 
     def get_color(name: str) -> MaterialColor:
@@ -829,19 +828,20 @@ def python_theme(roles, presets)
     #{generated_header("#").rstrip}
     from __future__ import annotations
 
+    from collections.abc import Mapping
     from dataclasses import dataclass
     from enum import Enum
     from types import MappingProxyType
-    from typing import Dict, Mapping, Optional, Tuple, Union
+    from typing import Optional, Union
 
     from .colors import MaterialColor
 
 
-    COLOR_SCHEME_ROLES: Tuple[str, ...] = (
+    COLOR_SCHEME_ROLES: tuple[str, ...] = (
     #{roles.map { |role| "    #{role.inspect}," }.join("\n")}
     )
 
-    ROLE_FIELDS: Dict[str, str] = {
+    ROLE_FIELDS: dict[str, str] = {
     #{role_fields}
     }
 
@@ -858,7 +858,7 @@ def python_theme(roles, presets)
         def role_color(self, role: str) -> MaterialColor:
             return getattr(self, ROLE_FIELDS[role])
 
-        def as_hex_map(self) -> Dict[str, str]:
+        def as_hex_map(self) -> dict[str, str]:
             """Map of camelCase role name to ``#RRGGBB`` hex. Not a round-trip
             of the dataclass: fields are snake_case ``MaterialColor`` instances."""
             return {role: self.role_color(role).hex for role in COLOR_SCHEME_ROLES}
@@ -910,7 +910,7 @@ def python_theme(roles, presets)
         return PRESET_COLOR_SCHEMES[material_preset]["dark" if dark else "light"]
 
 
-    def preset_key_colors(preset: Union[MaterialThemePreset, str]) -> Dict[str, MaterialColor]:
+    def preset_key_colors(preset: Union[MaterialThemePreset, str]) -> dict[str, MaterialColor]:
         return dict(PRESET_KEY_COLORS[_coerce_preset(preset)])
 
 

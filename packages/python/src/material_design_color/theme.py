@@ -2,15 +2,16 @@
 # Do not edit by hand.
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 from enum import Enum
 from types import MappingProxyType
-from typing import Dict, Mapping, Optional, Tuple, Union
+from typing import Optional, Union
 
 from .colors import MaterialColor
 
 
-COLOR_SCHEME_ROLES: Tuple[str, ...] = (
+COLOR_SCHEME_ROLES: tuple[str, ...] = (
     "primary",
     "onPrimary",
     "primaryContainer",
@@ -61,7 +62,7 @@ COLOR_SCHEME_ROLES: Tuple[str, ...] = (
     "onTertiaryFixedVariant",
 )
 
-ROLE_FIELDS: Dict[str, str] = {
+ROLE_FIELDS: dict[str, str] = {
     "primary": "primary",
     "onPrimary": "on_primary",
     "primaryContainer": "primary_container",
@@ -180,7 +181,7 @@ class MaterialColorScheme:
     def role_color(self, role: str) -> MaterialColor:
         return getattr(self, ROLE_FIELDS[role])
 
-    def as_hex_map(self) -> Dict[str, str]:
+    def as_hex_map(self) -> dict[str, str]:
         """Map of camelCase role name to ``#RRGGBB`` hex. Not a round-trip
         of the dataclass: fields are snake_case ``MaterialColor`` instances."""
         return {role: self.role_color(role).hex for role in COLOR_SCHEME_ROLES}
@@ -1261,7 +1262,7 @@ def preset_color_scheme(
     return PRESET_COLOR_SCHEMES[material_preset]["dark" if dark else "light"]
 
 
-def preset_key_colors(preset: Union[MaterialThemePreset, str]) -> Dict[str, MaterialColor]:
+def preset_key_colors(preset: Union[MaterialThemePreset, str]) -> dict[str, MaterialColor]:
     return dict(PRESET_KEY_COLORS[_coerce_preset(preset)])
 
 
