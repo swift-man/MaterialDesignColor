@@ -49,7 +49,9 @@ rainbow
 fruitSalad
 ```
 
-Swift API documentation is published with DocC at [docs.gorani.me/MaterialDesignColor/documentation/materialdesigncolorcore](https://docs.gorani.me/MaterialDesignColor/documentation/materialdesigncolorcore/).
+## API Documentation
+
+Swift DocC API documentation for `MaterialDesignColorCore` is available at [docs.gorani.me/MaterialDesignColor/documentation/materialdesigncolorcore](https://docs.gorani.me/MaterialDesignColor/documentation/materialdesigncolorcore/).
 
 ## Installation
 
