@@ -604,6 +604,14 @@ def react_native_color_scheme(roles, presets)
       return Object.freeze(value) as DeepReadonly<T>;
     }
 
+    function validateHexColor(value: string): string {
+      if (!/^#[0-9a-fA-F]{6}$/.test(value)) {
+        throw new RangeError(`expected #RRGGBB hex color, got ${JSON.stringify(value)}`);
+      }
+
+      return value;
+    }
+
     export const materialColorSchemeRoles = deepFreeze([
     #{role_values}
     ] as const);
@@ -676,7 +684,7 @@ def react_native_color_scheme(roles, presets)
         const value = overrides[role];
 
         if (value !== undefined) {
-          colorScheme[role] = value;
+          colorScheme[role] = validateHexColor(value);
         }
       }
 

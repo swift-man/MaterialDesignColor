@@ -14,6 +14,14 @@ function deepFreeze<T extends object>(value: T): DeepReadonly<T> {
   return Object.freeze(value) as DeepReadonly<T>;
 }
 
+function validateHexColor(value: string): string {
+  if (!/^#[0-9a-fA-F]{6}$/.test(value)) {
+    throw new RangeError(`expected #RRGGBB hex color, got ${JSON.stringify(value)}`);
+  }
+
+  return value;
+}
+
 export const materialColorSchemeRoles = deepFreeze([
   "primary",
   "onPrimary",
@@ -1134,7 +1142,7 @@ function mergeMaterialColorScheme(
     const value = overrides[role];
 
     if (value !== undefined) {
-      colorScheme[role] = value;
+      colorScheme[role] = validateHexColor(value);
     }
   }
 

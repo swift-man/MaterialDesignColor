@@ -66,6 +66,21 @@ attemptFrozenMutation(() => {
   darkColorScheme.primary = "#777777";
 });
 
+let invalidHexRejected = false;
+try {
+  createMaterialTheme({ colorScheme: { primary: "not-a-hex" } });
+} catch (error) {
+  if (!(error instanceof RangeError) || !String(error.message).includes("#RRGGBB")) {
+    throw error;
+  }
+
+  invalidHexRejected = true;
+}
+
+if (!invalidHexRejected) {
+  throw new Error("createMaterialTheme accepted an invalid hex override");
+}
+
 const checks = [
   ["colors.pink400", colors.pink400, "#EC407A"],
   ["lightColorScheme.primary", lightColorScheme.primary, "#65558F"],
