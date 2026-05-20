@@ -33,7 +33,23 @@ MaterialTheme
 
 Android apps should use the official Compose Material 3 APIs directly, including `dynamicLightColorScheme()`, `dynamicDarkColorScheme()`, and `MaterialTheme.colorScheme`: [Android Developers - Material 3 in Compose](https://developer.android.com/develop/ui/compose/designsystems/material3?hl=ko#dynamic_color_schemes).
 
-The default light/dark Material 3 schemes in this repository were generated from source color `#6750A4` with Google Material Color Utilities tonal spot behavior: [material-foundation/material-color-utilities](https://github.com/material-foundation/material-color-utilities).
+The default light/dark Material 3 schemes in this repository are the `tonalSpot` preset generated from source color `#6750A4` with Google Material Color Utilities: [material-foundation/material-color-utilities](https://github.com/material-foundation/material-color-utilities).
+
+Official Material 3 dynamic scheme variants are also provided as fixed presets:
+
+```text
+tonalSpot
+fidelity
+content
+monochrome
+neutral
+vibrant
+expressive
+rainbow
+fruitSalad
+```
+
+Swift API documentation is published with DocC at [docs.gorani.me/MaterialDesignColor/documentation/materialdesigncolorcore](https://docs.gorani.me/MaterialDesignColor/documentation/materialdesigncolorcore/).
 
 ## Installation
 
@@ -81,6 +97,29 @@ Text("Hello")
   .background(theme.colorScheme.surface.color)
 ```
 
+Choose an official Material 3 preset when you want a different scheme variant:
+
+```swift
+let theme = MaterialTheme.preset(.expressive, appearance: .light)
+let keyPrimary = MaterialThemePreset.expressive.keyColors.primary
+```
+
+Material Theme Builder role colors can be injected with type-safe role keys. Missing roles fall back to the selected preset.
+
+```swift
+let theme = try MaterialTheme.custom(
+  appearance: .light,
+  overrides: [
+    .primary: "#6750A4",
+    .onPrimary: "#FFFFFF",
+    .primaryContainer: "#EADDFF",
+    .onPrimaryContainer: "#21005D",
+    .surface: "#FFFBFE",
+    .onSurface: "#1C1B1F"
+  ]
+)
+```
+
 You can also place a theme in the SwiftUI environment:
 
 ```swift
@@ -119,9 +158,24 @@ npm install @swift-man/material-design-color
 ```ts
 import { createMaterialTheme } from "@swift-man/material-design-color";
 
-const theme = createMaterialTheme({ dark: false });
+const theme = createMaterialTheme({ preset: "expressive", dark: false });
 
 const color = theme.colorScheme.primary;
+```
+
+Inject Material Theme Builder role colors with `colorScheme`:
+
+```ts
+const theme = createMaterialTheme({
+  colorScheme: {
+    primary: "#6750A4",
+    onPrimary: "#FFFFFF",
+    primaryContainer: "#EADDFF",
+    onPrimaryContainer: "#21005D",
+    surface: "#FFFBFE",
+    onSurface: "#1C1B1F",
+  },
+});
 ```
 
 ```tsx
@@ -153,11 +207,26 @@ Python exposes the same Material 3 roles with Python-style field names.
 ```python
 from material_design_color import create_theme
 
-theme = create_theme(dark=True)
+theme = create_theme(preset="expressive", dark=True)
 
 primary = theme.color_scheme.primary.hex
 surface = theme.color_scheme.surface.hex
 on_surface = theme.color_scheme.on_surface.hex
+```
+
+Material Theme Builder role colors can be injected as camelCase role keys:
+
+```python
+theme = create_theme(
+    color_scheme={
+        "primary": "#6750A4",
+        "onPrimary": "#FFFFFF",
+        "primaryContainer": "#EADDFF",
+        "onPrimaryContainer": "#21005D",
+        "surface": "#FFFBFE",
+        "onSurface": "#1C1B1F",
+    }
+)
 ```
 
 Legacy palette constants are also available:
@@ -182,6 +251,7 @@ MaterialDesignColor/
     material3/
       color-scheme-roles.json           # Compose-style role names
       baseline-color-schemes.json       # Light/dark baseline schemes
+      theme-presets.json                # Official M3 preset schemes and key colors
     schema.json
 
   packages/

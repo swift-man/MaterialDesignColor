@@ -4,5 +4,8 @@ export type {
   MaterialColorScheme,
   MaterialColorSchemeInput,
   MaterialTheme,
+  MaterialThemeKeyColorRole,
+  MaterialThemeKeyColors,
   MaterialThemeOptions,
+  MaterialThemePreset,
 } from "./colorScheme.js";

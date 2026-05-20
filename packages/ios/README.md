@@ -35,6 +35,32 @@ Text("Hello")
   .background(theme.colorScheme.surface.color)
 ```
 
+Official Material 3 preset variants are available without creating a custom theme:
+
+```swift
+let expressive = MaterialTheme.preset(.expressive, appearance: .light)
+let fruitSaladDark = MaterialColorScheme.preset(.fruitSalad, appearance: .dark)
+let primaryKeyColor = MaterialThemePreset.vibrant.keyColors.primary
+```
+
+Available presets: `tonalSpot`, `fidelity`, `content`, `monochrome`, `neutral`, `vibrant`, `expressive`, `rainbow`, `fruitSalad`.
+
+Material Theme Builder role colors can be injected with type-safe role keys. Missing roles fall back to the selected preset.
+
+```swift
+let builderTheme = try MaterialTheme.custom(
+  appearance: .light,
+  overrides: [
+    .primary: "#6750A4",
+    .onPrimary: "#FFFFFF",
+    .primaryContainer: "#EADDFF",
+    .onPrimaryContainer: "#21005D",
+    .surface: "#FFFBFE",
+    .onSurface: "#1C1B1F"
+  ]
+)
+```
+
 ```swift
 import MaterialDesignColorUIKit
 

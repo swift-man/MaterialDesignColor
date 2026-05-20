@@ -47,6 +47,8 @@ playground.xcworkspace
 .swiftpm/
 
 .build/
+*.doccarchive
+docs/
 
 # Build outputs
 **/build/

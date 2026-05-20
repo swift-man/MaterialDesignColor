@@ -1,0 +1,39 @@
+name: Deploy DocC
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-docc-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy-docs:
+    runs-on: macos-latest
+
+    steps:
+      # actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+
+      - name: Build DocC
+        run: |
+          ./GeneratingDocumentationSite
+          touch ./docs/.nojekyll
+
+      - name: Deploy to swift-man/docs
+        # peaceiris/actions-gh-pages@v4
+        uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e
+        with:
+          deploy_key: ${{ secrets.DOCS_DEPLOY_KEY }}
+          external_repository: swift-man/docs
+          publish_branch: main
+          publish_dir: ./docs
+          destination_dir: MaterialDesignColor
+          keep_files: true
+          full_commit_message: Deploy MaterialDesignColor DocC from ${{ github.repository }}@${{ github.sha }}
