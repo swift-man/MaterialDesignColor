@@ -73,6 +73,20 @@ def test_material_theme_builder_custom_color_schemes():
     assert complete_scheme.surface.hex == LIGHT_COLOR_SCHEME.surface.hex
 
 
+def test_invalid_hex_inputs_raise_immediately():
+    with pytest.raises(ValueError, match="#RRGGBB"):
+        MaterialColor("bad", "not-a-hex")
+
+    with pytest.raises(ValueError, match="#RRGGBB"):
+        create_theme(color_scheme={"primary": "not-a-hex"})
+
+    roles = LIGHT_COLOR_SCHEME.as_hex_map()
+    roles["primary"] = "nope"
+
+    with pytest.raises(ValueError, match="#RRGGBB"):
+        material_theme_builder_color_scheme("light", roles)
+
+
 def test_material3_source_color():
     assert MATERIAL_SOURCE_COLOR.hex == "#6750A4"
     assert create_theme().source_color is MATERIAL_SOURCE_COLOR

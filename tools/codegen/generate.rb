@@ -738,6 +738,15 @@ def python_colors(material2_tokens)
         name: str
         hex: str
 
+        def __post_init__(self) -> None:
+            if len(self.hex) != 7 or not self.hex.startswith("#"):
+                raise ValueError(f"expected #RRGGBB hex color, got {self.hex!r}")
+
+            try:
+                int(self.hex[1:], 16)
+            except ValueError as error:
+                raise ValueError(f"expected #RRGGBB hex color, got {self.hex!r}") from error
+
         @property
         def rgb(self) -> Tuple[int, int, int]:
             value = self.hex.lstrip("#")
