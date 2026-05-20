@@ -9,7 +9,7 @@ Material color tokens and Material 3 style color schemes for multiple platforms.
 ![Badge](https://img.shields.io/badge/SwiftUI-001b87.svg?style=flat-square&logo=Swift&logoColor=black)
 ![Badge](https://img.shields.io/badge/React_Native-20232A.svg?style=flat-square&logo=react&logoColor=61DAFB)
 ![Badge](https://img.shields.io/badge/Python-3776AB.svg?style=flat-square&logo=python&logoColor=white)
-![Badge - Version](https://img.shields.io/badge/Version-2.0.0-1177AA?style=flat-square)
+![Badge - Version](https://img.shields.io/badge/Version-2.1.0-1177AA?style=flat-square)
 ![Badge - Swift Package Manager](https://img.shields.io/badge/SPM-compatible-orange?style=flat-square)
 ![Badge - Platform](https://img.shields.io/badge/iOS-v13.0-yellow?style=flat-square)
 ![Badge - License](https://img.shields.io/badge/license-MIT-black?style=flat-square)
@@ -57,7 +57,7 @@ Swift API documentation is published with DocC at [docs.gorani.me/MaterialDesign
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/swift-man/MaterialDesignColor.git", from: "2.0.0")
+  .package(url: "https://github.com/swift-man/MaterialDesignColor.git", from: "2.1.0")
 ]
 ```
 
@@ -318,7 +318,7 @@ This keeps Android aligned with platform dynamic color behavior instead of shipp
 Recommended initial strategy: one repository tag for all non-Android packages.
 
 ```text
-v2.0.0
+v2.1.0
 ```
 
 Each package can publish its own artifact from that same tag:
