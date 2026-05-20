@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
+from types import MappingProxyType
 from typing import Dict, Mapping, Optional, Tuple, Union
 
 from .colors import MaterialColor
@@ -1139,7 +1140,7 @@ FRUIT_SALAD_DARK_COLOR_SCHEME = MaterialColorScheme(
 )
 
 
-PRESET_SOURCE_COLORS: Dict[MaterialThemePreset, MaterialColor] = {
+PRESET_SOURCE_COLORS: Mapping[MaterialThemePreset, MaterialColor] = MappingProxyType({
     MaterialThemePreset.TONAL_SPOT: MaterialColor("sourceColor", "#6750A4"),
     MaterialThemePreset.FIDELITY: MaterialColor("sourceColor", "#6750A4"),
     MaterialThemePreset.CONTENT: MaterialColor("sourceColor", "#6750A4"),
@@ -1149,87 +1150,87 @@ PRESET_SOURCE_COLORS: Dict[MaterialThemePreset, MaterialColor] = {
     MaterialThemePreset.EXPRESSIVE: MaterialColor("sourceColor", "#6750A4"),
     MaterialThemePreset.RAINBOW: MaterialColor("sourceColor", "#6750A4"),
     MaterialThemePreset.FRUIT_SALAD: MaterialColor("sourceColor", "#6750A4"),
-}
+})
 
 
-PRESET_KEY_COLORS: Dict[MaterialThemePreset, Dict[str, MaterialColor]] = {
-    MaterialThemePreset.TONAL_SPOT: {
+PRESET_KEY_COLORS: Mapping[MaterialThemePreset, Mapping[str, MaterialColor]] = MappingProxyType({
+    MaterialThemePreset.TONAL_SPOT: MappingProxyType({
         "primary": MaterialColor("primary", "#7E6EA9"),
         "secondary": MaterialColor("secondary", "#7B748A"),
         "tertiary": MaterialColor("tertiary", "#996A79"),
         "neutral": MaterialColor("neutral", "#7A767D"),
         "neutralVariant": MaterialColor("neutralVariant", "#7A757F"),
-    },
-    MaterialThemePreset.FIDELITY: {
+    }),
+    MaterialThemePreset.FIDELITY: MappingProxyType({
         "primary": MaterialColor("primary", "#8069BF"),
         "secondary": MaterialColor("secondary", "#7C7296"),
         "tertiary": MaterialColor("tertiary", "#C9A74D"),
         "neutral": MaterialColor("neutral", "#7A767D"),
         "neutralVariant": MaterialColor("neutralVariant", "#7A7582"),
-    },
-    MaterialThemePreset.CONTENT: {
+    }),
+    MaterialThemePreset.CONTENT: MappingProxyType({
         "primary": MaterialColor("primary", "#8069BF"),
         "secondary": MaterialColor("secondary", "#7C7296"),
         "tertiary": MaterialColor("tertiary", "#924274"),
         "neutral": MaterialColor("neutral", "#7A767D"),
         "neutralVariant": MaterialColor("neutralVariant", "#7A7582"),
-    },
-    MaterialThemePreset.MONOCHROME: {
+    }),
+    MaterialThemePreset.MONOCHROME: MappingProxyType({
         "primary": MaterialColor("primary", "#777777"),
         "secondary": MaterialColor("secondary", "#777777"),
         "tertiary": MaterialColor("tertiary", "#777777"),
         "neutral": MaterialColor("neutral", "#777777"),
         "neutralVariant": MaterialColor("neutralVariant", "#777777"),
-    },
-    MaterialThemePreset.NEUTRAL: {
+    }),
+    MaterialThemePreset.NEUTRAL: MappingProxyType({
         "primary": MaterialColor("primary", "#7A7484"),
         "secondary": MaterialColor("secondary", "#7A757F"),
         "tertiary": MaterialColor("tertiary", "#7B748A"),
         "neutral": MaterialColor("neutral", "#797678"),
         "neutralVariant": MaterialColor("neutralVariant", "#797678"),
-    },
-    MaterialThemePreset.VIBRANT: {
+    }),
+    MaterialThemePreset.VIBRANT: MappingProxyType({
         "primary": MaterialColor("primary", "#6C0BFF"),
         "secondary": MaterialColor("secondary", "#856F92"),
         "tertiary": MaterialColor("tertiary", "#946994"),
         "neutral": MaterialColor("neutral", "#7A7582"),
         "neutralVariant": MaterialColor("neutralVariant", "#7A7484"),
-    },
-    MaterialThemePreset.EXPRESSIVE: {
+    }),
+    MaterialThemePreset.EXPRESSIVE: MappingProxyType({
         "primary": MaterialColor("primary", "#1B8672"),
         "secondary": MaterialColor("secondary", "#936B83"),
         "tertiary": MaterialColor("tertiary", "#8D6B9B"),
         "neutral": MaterialColor("neutral", "#7C757E"),
         "neutralVariant": MaterialColor("neutralVariant", "#7E7382"),
-    },
-    MaterialThemePreset.RAINBOW: {
+    }),
+    MaterialThemePreset.RAINBOW: MappingProxyType({
         "primary": MaterialColor("primary", "#8069BF"),
         "secondary": MaterialColor("secondary", "#7B748A"),
         "tertiary": MaterialColor("tertiary", "#996A79"),
         "neutral": MaterialColor("neutral", "#777777"),
         "neutralVariant": MaterialColor("neutralVariant", "#777777"),
-    },
-    MaterialThemePreset.FRUIT_SALAD: {
+    }),
+    MaterialThemePreset.FRUIT_SALAD: MappingProxyType({
         "primary": MaterialColor("primary", "#247CBB"),
         "secondary": MaterialColor("secondary", "#4B7BA7"),
         "tertiary": MaterialColor("tertiary", "#7E6EA9"),
         "neutral": MaterialColor("neutral", "#7A7582"),
         "neutralVariant": MaterialColor("neutralVariant", "#7B748A"),
-    },
-}
+    }),
+})
 
 
-PRESET_COLOR_SCHEMES: Dict[MaterialThemePreset, Dict[str, MaterialColorScheme]] = {
-    MaterialThemePreset.TONAL_SPOT: {"light": TONAL_SPOT_LIGHT_COLOR_SCHEME, "dark": TONAL_SPOT_DARK_COLOR_SCHEME},
-    MaterialThemePreset.FIDELITY: {"light": FIDELITY_LIGHT_COLOR_SCHEME, "dark": FIDELITY_DARK_COLOR_SCHEME},
-    MaterialThemePreset.CONTENT: {"light": CONTENT_LIGHT_COLOR_SCHEME, "dark": CONTENT_DARK_COLOR_SCHEME},
-    MaterialThemePreset.MONOCHROME: {"light": MONOCHROME_LIGHT_COLOR_SCHEME, "dark": MONOCHROME_DARK_COLOR_SCHEME},
-    MaterialThemePreset.NEUTRAL: {"light": NEUTRAL_LIGHT_COLOR_SCHEME, "dark": NEUTRAL_DARK_COLOR_SCHEME},
-    MaterialThemePreset.VIBRANT: {"light": VIBRANT_LIGHT_COLOR_SCHEME, "dark": VIBRANT_DARK_COLOR_SCHEME},
-    MaterialThemePreset.EXPRESSIVE: {"light": EXPRESSIVE_LIGHT_COLOR_SCHEME, "dark": EXPRESSIVE_DARK_COLOR_SCHEME},
-    MaterialThemePreset.RAINBOW: {"light": RAINBOW_LIGHT_COLOR_SCHEME, "dark": RAINBOW_DARK_COLOR_SCHEME},
-    MaterialThemePreset.FRUIT_SALAD: {"light": FRUIT_SALAD_LIGHT_COLOR_SCHEME, "dark": FRUIT_SALAD_DARK_COLOR_SCHEME},
-}
+PRESET_COLOR_SCHEMES: Mapping[MaterialThemePreset, Mapping[str, MaterialColorScheme]] = MappingProxyType({
+    MaterialThemePreset.TONAL_SPOT: MappingProxyType({"light": TONAL_SPOT_LIGHT_COLOR_SCHEME, "dark": TONAL_SPOT_DARK_COLOR_SCHEME}),
+    MaterialThemePreset.FIDELITY: MappingProxyType({"light": FIDELITY_LIGHT_COLOR_SCHEME, "dark": FIDELITY_DARK_COLOR_SCHEME}),
+    MaterialThemePreset.CONTENT: MappingProxyType({"light": CONTENT_LIGHT_COLOR_SCHEME, "dark": CONTENT_DARK_COLOR_SCHEME}),
+    MaterialThemePreset.MONOCHROME: MappingProxyType({"light": MONOCHROME_LIGHT_COLOR_SCHEME, "dark": MONOCHROME_DARK_COLOR_SCHEME}),
+    MaterialThemePreset.NEUTRAL: MappingProxyType({"light": NEUTRAL_LIGHT_COLOR_SCHEME, "dark": NEUTRAL_DARK_COLOR_SCHEME}),
+    MaterialThemePreset.VIBRANT: MappingProxyType({"light": VIBRANT_LIGHT_COLOR_SCHEME, "dark": VIBRANT_DARK_COLOR_SCHEME}),
+    MaterialThemePreset.EXPRESSIVE: MappingProxyType({"light": EXPRESSIVE_LIGHT_COLOR_SCHEME, "dark": EXPRESSIVE_DARK_COLOR_SCHEME}),
+    MaterialThemePreset.RAINBOW: MappingProxyType({"light": RAINBOW_LIGHT_COLOR_SCHEME, "dark": RAINBOW_DARK_COLOR_SCHEME}),
+    MaterialThemePreset.FRUIT_SALAD: MappingProxyType({"light": FRUIT_SALAD_LIGHT_COLOR_SCHEME, "dark": FRUIT_SALAD_DARK_COLOR_SCHEME}),
+})
 
 
 MATERIAL_SOURCE_COLOR = PRESET_SOURCE_COLORS[MaterialThemePreset.TONAL_SPOT]

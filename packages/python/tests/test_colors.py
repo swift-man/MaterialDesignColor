@@ -1,7 +1,13 @@
+import pytest
+
 from material_design_color import (
     DARK_COLOR_SCHEME,
     LIGHT_COLOR_SCHEME,
     MATERIAL_SOURCE_COLOR,
+    PRESET_COLOR_SCHEMES,
+    PRESET_KEY_COLORS,
+    PRESET_SOURCE_COLORS,
+    MaterialColor,
     MaterialThemePreset,
     MaterialColors,
     colors,
@@ -71,3 +77,18 @@ def test_material3_source_color():
     assert MATERIAL_SOURCE_COLOR.hex == "#6750A4"
     assert create_theme().source_color is MATERIAL_SOURCE_COLOR
     assert create_theme(dark=True).source_color.hex == "#6750A4"
+
+
+def test_preset_exports_are_immutable():
+    with pytest.raises(TypeError):
+        PRESET_SOURCE_COLORS[MaterialThemePreset.TONAL_SPOT] = MaterialColor("sourceColor", "#000000")
+
+    with pytest.raises(TypeError):
+        PRESET_KEY_COLORS[MaterialThemePreset.VIBRANT]["primary"] = MaterialColor("primary", "#111111")
+
+    with pytest.raises(TypeError):
+        PRESET_COLOR_SCHEMES[MaterialThemePreset.TONAL_SPOT]["light"] = DARK_COLOR_SCHEME
+
+    assert preset_key_colors("vibrant")["primary"].hex == "#6C0BFF"
+    assert create_theme().source_color.hex == "#6750A4"
+    assert preset_color_scheme(MaterialThemePreset.TONAL_SPOT).primary.hex == LIGHT_COLOR_SCHEME.primary.hex

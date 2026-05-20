@@ -590,16 +590,6 @@ def react_native_color_scheme(roles, presets)
 
   <<~TS
     #{generated_header("//").rstrip}
-    export const materialColorSchemeRoles = [
-    #{role_values}
-    ] as const;
-
-    export const materialThemePresets = [
-    #{preset_values}
-    ] as const;
-
-    export const materialSourceColor = #{tonal_spot.fetch("sourceColor").inspect};
-
     type DeepReadonly<T> = T extends object
       ? { readonly [Key in keyof T]: DeepReadonly<T[Key]> }
       : T;
@@ -614,15 +604,25 @@ def react_native_color_scheme(roles, presets)
       return Object.freeze(value) as DeepReadonly<T>;
     }
 
+    export const materialColorSchemeRoles = deepFreeze([
+    #{role_values}
+    ] as const);
+
+    export const materialThemePresets = deepFreeze([
+    #{preset_values}
+    ] as const);
+
+    export const materialSourceColor = #{tonal_spot.fetch("sourceColor").inspect};
+
     export const materialThemePresetSourceColors = deepFreeze(#{ts_literal(preset_source_colors)} as const);
 
     export const materialThemePresetKeyColors = deepFreeze(#{ts_literal(preset_key_colors)} as const);
 
     export const materialThemePresetSchemes = deepFreeze(#{ts_literal(preset_schemes)} as const);
 
-    export const lightColorScheme = { ...materialThemePresetSchemes.tonalSpot.light };
+    export const lightColorScheme = deepFreeze({ ...materialThemePresetSchemes.tonalSpot.light });
 
-    export const darkColorScheme = { ...materialThemePresetSchemes.tonalSpot.dark };
+    export const darkColorScheme = deepFreeze({ ...materialThemePresetSchemes.tonalSpot.dark });
 
     export type MaterialColorRole = (typeof materialColorSchemeRoles)[number];
     export type MaterialThemePreset = (typeof materialThemePresets)[number];
@@ -802,18 +802,18 @@ def python_theme(roles, presets)
   key_color_values = presets.map do |preset, data|
     key_colors = data.fetch("keyColors")
     [
-      "    MaterialThemePreset.#{python_const_name_from_camel(preset)}: {",
+      "    MaterialThemePreset.#{python_const_name_from_camel(preset)}: MappingProxyType({",
       "        \"primary\": MaterialColor(\"primary\", #{key_colors.fetch("primary").inspect}),",
       "        \"secondary\": MaterialColor(\"secondary\", #{key_colors.fetch("secondary").inspect}),",
       "        \"tertiary\": MaterialColor(\"tertiary\", #{key_colors.fetch("tertiary").inspect}),",
       "        \"neutral\": MaterialColor(\"neutral\", #{key_colors.fetch("neutral").inspect}),",
       "        \"neutralVariant\": MaterialColor(\"neutralVariant\", #{key_colors.fetch("neutralVariant").inspect}),",
-      "    },"
+      "    }),"
     ].join("\n")
   end.join("\n")
   preset_scheme_values = presets.map do |preset, _data|
     const_name = "MaterialThemePreset.#{python_const_name_from_camel(preset)}"
-    "    #{const_name}: {\"light\": #{python_scheme_name(preset, "light")}, \"dark\": #{python_scheme_name(preset, "dark")}},"
+    "    #{const_name}: MappingProxyType({\"light\": #{python_scheme_name(preset, "light")}, \"dark\": #{python_scheme_name(preset, "dark")}}),"
   end.join("\n")
 
   <<~PYTHON
@@ -822,6 +822,7 @@ def python_theme(roles, presets)
 
     from dataclasses import dataclass
     from enum import Enum
+    from types import MappingProxyType
     from typing import Dict, Mapping, Optional, Tuple, Union
 
     from .colors import MaterialColor
@@ -857,19 +858,19 @@ def python_theme(roles, presets)
     #{preset_schemes}
 
 
-    PRESET_SOURCE_COLORS: Dict[MaterialThemePreset, MaterialColor] = {
+    PRESET_SOURCE_COLORS: Mapping[MaterialThemePreset, MaterialColor] = MappingProxyType({
     #{source_color_values}
-    }
+    })
 
 
-    PRESET_KEY_COLORS: Dict[MaterialThemePreset, Dict[str, MaterialColor]] = {
+    PRESET_KEY_COLORS: Mapping[MaterialThemePreset, Mapping[str, MaterialColor]] = MappingProxyType({
     #{key_color_values}
-    }
+    })
 
 
-    PRESET_COLOR_SCHEMES: Dict[MaterialThemePreset, Dict[str, MaterialColorScheme]] = {
+    PRESET_COLOR_SCHEMES: Mapping[MaterialThemePreset, Mapping[str, MaterialColorScheme]] = MappingProxyType({
     #{preset_scheme_values}
-    }
+    })
 
 
     MATERIAL_SOURCE_COLOR = PRESET_SOURCE_COLORS[MaterialThemePreset.TONAL_SPOT]
@@ -983,7 +984,7 @@ check = ARGV.include?("--check")
 material2_tokens = load_tokens(MATERIAL2_TOKENS_PATH)
 material3_roles = JSON.parse(File.read(MATERIAL3_ROLES_PATH))
 material3_baseline = JSON.parse(File.read(MATERIAL3_BASELINE_PATH))
-material3_presets = JSON.parse(File.read(MATERIAL3_PRESETS_PATH))
+material3_presets = JSON.parse(File.read(MATERIAL3_PRESETS_PATH)).reject { |key, _| key.start_with?("$") }
 
 validate_material2_tokens(material2_tokens)
 validate_material3_tokens(material3_roles, material3_baseline, material3_presets)

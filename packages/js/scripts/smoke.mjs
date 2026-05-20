@@ -6,10 +6,12 @@
 import {
   colors,
   createMaterialTheme,
+  darkColorScheme,
   getMaterialTheme,
   getMaterialThemeColorScheme,
   getMaterialThemeKeyColors,
   lightColorScheme,
+  materialColorSchemeRoles,
   materialSourceColor,
   materialThemePresetKeyColors,
   materialThemePresetSchemes,
@@ -48,9 +50,26 @@ attemptFrozenMutation(() => {
   materialThemePresetSourceColors.tonalSpot = "#555555";
 });
 
+attemptFrozenMutation(() => {
+  materialColorSchemeRoles[0] = "surface";
+});
+
+attemptFrozenMutation(() => {
+  materialThemePresets.push("bogus");
+});
+
+attemptFrozenMutation(() => {
+  lightColorScheme.primary = "#666666";
+});
+
+attemptFrozenMutation(() => {
+  darkColorScheme.primary = "#777777";
+});
+
 const checks = [
   ["colors.pink400", colors.pink400, "#EC407A"],
   ["lightColorScheme.primary", lightColorScheme.primary, "#65558F"],
+  ["darkColorScheme.primary", darkColorScheme.primary, "#CFBDFE"],
   ["materialSourceColor", materialSourceColor, "#6750A4"],
   ["materialThemePresets.length", String(materialThemePresets.length), "9"],
   ["getMaterialTheme(expressive).primary", getMaterialTheme("expressive").colorScheme.primary, "#006B5A"],
@@ -64,6 +83,10 @@ const checks = [
   ["materialThemePresetSchemes freeze isolation", getMaterialThemeColorScheme("tonalSpot").primary, "#65558F"],
   ["materialThemePresetKeyColors freeze isolation", getMaterialThemeKeyColors("vibrant").primary, "#6C0BFF"],
   ["materialThemePresetSourceColors freeze isolation", createMaterialTheme().sourceColor, "#6750A4"],
+  ["materialColorSchemeRoles freeze isolation", createMaterialTheme({ colorScheme: { primary: "#000000" } }).colorScheme.primary, "#000000"],
+  ["materialThemePresets freeze isolation", String(materialThemePresets.length), "9"],
+  ["lightColorScheme freeze isolation", lightColorScheme.primary, "#65558F"],
+  ["darkColorScheme freeze isolation", darkColorScheme.primary, "#CFBDFE"],
 ];
 
 for (const [label, actual, expected] of checks) {

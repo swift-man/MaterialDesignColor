@@ -1,6 +1,20 @@
 // Generated from tokens/ by tools/codegen/generate.rb.
 // Do not edit by hand.
-export const materialColorSchemeRoles = [
+type DeepReadonly<T> = T extends object
+  ? { readonly [Key in keyof T]: DeepReadonly<T[Key]> }
+  : T;
+
+function deepFreeze<T extends object>(value: T): DeepReadonly<T> {
+  for (const nestedValue of Object.values(value)) {
+    if (nestedValue !== null && typeof nestedValue === "object") {
+      deepFreeze(nestedValue);
+    }
+  }
+
+  return Object.freeze(value) as DeepReadonly<T>;
+}
+
+export const materialColorSchemeRoles = deepFreeze([
   "primary",
   "onPrimary",
   "primaryContainer",
@@ -49,9 +63,9 @@ export const materialColorSchemeRoles = [
   "tertiaryFixedDim",
   "onTertiaryFixed",
   "onTertiaryFixedVariant",
-] as const;
+] as const);
 
-export const materialThemePresets = [
+export const materialThemePresets = deepFreeze([
   "tonalSpot",
   "fidelity",
   "content",
@@ -61,23 +75,9 @@ export const materialThemePresets = [
   "expressive",
   "rainbow",
   "fruitSalad",
-] as const;
+] as const);
 
 export const materialSourceColor = "#6750A4";
-
-type DeepReadonly<T> = T extends object
-  ? { readonly [Key in keyof T]: DeepReadonly<T[Key]> }
-  : T;
-
-function deepFreeze<T extends object>(value: T): DeepReadonly<T> {
-  for (const nestedValue of Object.values(value)) {
-    if (nestedValue !== null && typeof nestedValue === "object") {
-      deepFreeze(nestedValue);
-    }
-  }
-
-  return Object.freeze(value) as DeepReadonly<T>;
-}
 
 export const materialThemePresetSourceColors = deepFreeze({
       "tonalSpot": "#6750A4",
@@ -1078,9 +1078,9 @@ export const materialThemePresetSchemes = deepFreeze({
       }
     } as const);
 
-export const lightColorScheme = { ...materialThemePresetSchemes.tonalSpot.light };
+export const lightColorScheme = deepFreeze({ ...materialThemePresetSchemes.tonalSpot.light });
 
-export const darkColorScheme = { ...materialThemePresetSchemes.tonalSpot.dark };
+export const darkColorScheme = deepFreeze({ ...materialThemePresetSchemes.tonalSpot.dark });
 
 export type MaterialColorRole = (typeof materialColorSchemeRoles)[number];
 export type MaterialThemePreset = (typeof materialThemePresets)[number];
