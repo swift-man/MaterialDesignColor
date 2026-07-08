@@ -10,6 +10,7 @@
 - Added Material Theme Builder role-color injection APIs for Swift, JavaScript / TypeScript, and Python.
 - Added preset key colors generated from Material Color Utilities 0.4.0.
 - Added DocC generation and GitHub Actions deployment to `swift-man/docs`.
+- Added a README API Documentation section linking to the `MaterialDesignColorCore` DocC site.
 - Added repository agent guidance for SOLID design and PR review bot triage.
 
 ## 2.0.0

@@ -31,6 +31,8 @@ MaterialTheme
     outline
 ```
 
+For the meaning and usage of each Material 3 color role, see the official [Material Design 3 color roles](https://m3.material.io/styles/color/roles) guide.
+
 Android apps should use the official Compose Material 3 APIs directly, including `dynamicLightColorScheme()`, `dynamicDarkColorScheme()`, and `MaterialTheme.colorScheme`: [Android Developers - Material 3 in Compose](https://developer.android.com/develop/ui/compose/designsystems/material3?hl=ko#dynamic_color_schemes).
 
 The default light/dark Material 3 schemes in this repository are the `tonalSpot` preset generated from source color `#6750A4` with Google Material Color Utilities: [material-foundation/material-color-utilities](https://github.com/material-foundation/material-color-utilities).
