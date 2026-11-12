@@ -1100,6 +1100,8 @@ validate_extended_tokens(EXTENDED)
 EXTENDED_ROLES = EXTENDED.fetch("light").keys
 validate_material2_tokens(material2_tokens)
 validate_material3_tokens(material3_roles, material3_baseline, material3_presets)
+clashes = EXTENDED_ROLES & material3_roles
+abort("extended roles collide with standard roles: #{clashes.join(", ")}") unless clashes.empty?
 
 write_file(
   "packages/ios/Sources/MaterialDesignColorCore/MaterialDesignColor.swift",

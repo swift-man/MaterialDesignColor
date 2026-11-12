@@ -47,3 +47,14 @@ def test_single_role_still_generates_python_tuple(tmp_path):
     assignment = next(node for node in module.body if isinstance(node, ast.AnnAssign)
                       and node.target.id == "EXTENDED_COLOR_ROLES")
     assert ast.literal_eval(assignment.value) == ("success",)
+
+
+@pytest.mark.parametrize("role", ["primary", "error"])
+def test_extended_roles_cannot_shadow_standard_roles(tmp_path, role):
+    def collide(data):
+        for mode in ("light", "dark"):
+            data[mode][role] = "#123456"
+    result = generate(tmp_path, collide)
+    assert result.returncode != 0
+    assert f"extended roles collide with standard roles: {role}" in result.stderr
+    assert not (tmp_path / "packages").exists()
