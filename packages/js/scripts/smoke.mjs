@@ -111,8 +111,6 @@ for (const [label, actual, expected] of checks) {
   }
 }
 
-
-
 // Extended status colors do not change the standard role contract.
 const extended = await import('@swift-man/material-design-color');
 assert.equal(extended.materialColorSchemeRoles.length, 48);

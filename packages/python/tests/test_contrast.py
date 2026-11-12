@@ -15,7 +15,7 @@ def test_reference_ratios():
     assert red.contrast_ratio(white) == white.contrast_ratio(red)
 
 
-@pytest.mark.parametrize('minimum', [math.nan, math.inf, -math.inf, 0.99, 21.01])
+@pytest.mark.parametrize('minimum', [math.nan, math.inf, -math.inf, 0.99, 21.01, 10**1000, -(10**1000)])
 def test_external_threshold(minimum):
     with pytest.raises(ValueError):
         LIGHT_COLOR_SCHEME.contrast_issues(minimum)
@@ -35,3 +35,8 @@ def test_final_values_and_pair_coverage():
     assert len(pairs) == 35
     assert any(x.color_role == 'primaryFixedDim' and x.on_role == 'onPrimaryFixedVariant' for x in pairs)
     assert any(x.color_role == 'surfaceContainerHighest' and x.on_role == 'onSurface' for x in pairs)
+
+
+@pytest.mark.parametrize('minimum', [1, 4, 21])
+def test_integer_thresholds_match_float_thresholds(minimum):
+    assert LIGHT_COLOR_SCHEME.contrast_issues(minimum) == LIGHT_COLOR_SCHEME.contrast_issues(float(minimum))

@@ -141,7 +141,7 @@ const theme = createMaterialTheme({colorScheme: {warning: '#804000', onWarning: 
 const warning = getSchemeColor(theme.colorScheme, 'warning');
 ```
 
-See the [shared responsibility guide](../../README.md#템플릿-값과-앱-확정-값). The new contrast validation API is currently in Swift Core.
+See the [shared responsibility guide](../../README.md#템플릿-값과-앱-확정-값). Contrast validation is available in Swift Core, JavaScript/TypeScript, and Python starting with 2.4.0; see the examples below.
 
 ### 앱 최종 색상 대비 검증 (2.4.0)
 

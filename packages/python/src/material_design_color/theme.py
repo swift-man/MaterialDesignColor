@@ -306,7 +306,8 @@ class MaterialColorScheme:
 
         Raises ValueError unless minimum is finite and in 1...21. No clamping.
         """
-        if not isfinite(minimum) or not 1 <= minimum <= 21:
+        # Compare before float conversion: Python integers may exceed float range.
+        if not 1 <= minimum <= 21 or not isfinite(minimum):
             raise ValueError("minimum must be finite and in 1...21")
         issues = []
         for color_role, on_role in _CONTRAST_PAIRS:

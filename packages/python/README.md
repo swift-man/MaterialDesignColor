@@ -92,7 +92,7 @@ restored = material_theme_builder_color_scheme("dark", scheme.as_extended_hex_ma
 assert restored == scheme
 ```
 
-The exported dictionary is independent of the immutable scheme. Appearance must be supplied separately. See the [shared responsibility guide](../../README.md#템플릿-값과-앱-확정-값). The new contrast validation API is currently in Swift Core.
+The exported dictionary is independent of the immutable scheme. Appearance must be supplied separately. See the [shared responsibility guide](../../README.md#템플릿-값과-앱-확정-값). Contrast validation is available in Swift Core, JavaScript/TypeScript, and Python starting with 2.4.0; see the examples below.
 
 ### 앱 최종 색상 대비 검증 (2.4.0)
 
