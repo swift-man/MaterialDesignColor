@@ -11,8 +11,7 @@ public extension UIColor {
   /// ```
   ///
   /// 베이스라인이 아닌 커스텀 `MaterialColorScheme` 쌍을 쓰려면
-  /// `UIColor(dynamicProvider:)` 와 `MaterialColor` 기반의
-  /// `UIColor(materialColor:)` 이니셜라이저를 직접 조합하면 된다.
+  /// `UIColor.material(light:dark:_:)`에 앱 테마 쌍과 역할 KeyPath를 전달한다.
   @available(iOS 13.0, tvOS 13.0, watchOS 6.0, *)
   static func materialBaseline(_ role: KeyPath<MaterialColorScheme, MaterialColor>) -> UIColor {
     UIColor { trait in

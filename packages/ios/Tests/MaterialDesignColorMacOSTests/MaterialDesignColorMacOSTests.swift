@@ -25,8 +25,11 @@ final class MaterialDesignColorMacOSTests: XCTestCase {
   }
   func testAdaptiveThemeUpdatesInHostingView() throws {
     let mode = Mode()
-    let light = try MaterialTheme.custom(appearance: .light, overrides: [.primary: "#123456"])
-    let dark = try MaterialTheme.custom(appearance: .dark, overrides: [.primary: "#ABCDEF"])
+    let pair = MaterialTheme.pair(
+      extendedLight: [.warning: MaterialColor(name: "appWarningLight", red: 128, green: 64, blue: 0)],
+      extendedDark: [.warning: MaterialColor(name: "appWarningDark", red: 255, green: 192, blue: 128)])
+    let light = pair.light
+    let dark = pair.dark
     var observed: MaterialTheme?
     let host = NSHostingView(rootView: Root(mode: mode, light: light, dark: dark) { observed = $0 })
     let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 100, height: 100), styleMask: [.borderless], backing: .buffered, defer: false)
@@ -63,6 +66,30 @@ final class MaterialDesignColorMacOSTests: XCTestCase {
     XCTAssertEqual(GeneratedMaterialTheme.light.colorScheme.primary.hex, "#405F90")
     XCTAssertNotEqual(GeneratedMaterialTheme.light.colorScheme.success, GeneratedMaterialTheme.dark.colorScheme.success)
   }
+  func testDynamicAppKitColorsResolveBothAppearances() throws {
+    let pair = MaterialTheme.pair(
+      extendedLight: [.warning: MaterialColor(name: "light", red: 128, green: 64, blue: 0)],
+      extendedDark: [.warning: MaterialColor(name: "dark", red: 255, green: 192, blue: 128)])
+    let dynamic = NSColor.material(light: pair.light, dark: pair.dark, \.warning)
+    let baseline = NSColor.materialBaseline(\.warning)
+    for (name, theme, template) in [(NSAppearance.Name.aqua, pair.light, MaterialTheme.light),
+                                    (.darkAqua, pair.dark, MaterialTheme.dark)] {
+      let appearance = try XCTUnwrap(NSAppearance(named: name))
+      appearance.performAsCurrentDrawingAppearance {
+        let resolved = dynamic.usingColorSpace(.sRGB)!
+        let expected = theme.colorScheme.warning.nsColor.usingColorSpace(.sRGB)!
+        XCTAssertEqual(resolved.redComponent, expected.redComponent, accuracy: 0.00001)
+        XCTAssertEqual(resolved.greenComponent, expected.greenComponent, accuracy: 0.00001)
+        XCTAssertEqual(resolved.blueComponent, expected.blueComponent, accuracy: 0.00001)
+        XCTAssertEqual(baseline.usingColorSpace(.sRGB), template.colorScheme.warning.nsColor.usingColorSpace(.sRGB))
+      }
+    }
+  }
+
+  func testUnmodifiedSceneDefaultsToLight() {
+    XCTAssertEqual(EnvironmentValues().materialTheme, MaterialTheme.light)
+  }
+
   func testAppKitSRGBConversion() throws {
     let material = try MaterialColor(name: "sample", hex: "#0A84FF")
     let color = try XCTUnwrap(material.nsColor.usingColorSpace(.sRGB))

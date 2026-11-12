@@ -33,9 +33,23 @@ def swift_extended
     public enum MaterialExtendedColorRole: String, CaseIterable, Hashable, Sendable {
     #{cases}
     }
-    /// Immutable harmonized custom colors. Override individual roles with validated hex values.
+    /// Immutable custom colors. Templates are harmonized; final app values are preserved.
     public struct MaterialExtendedColors: Hashable, Sendable {
       private let values: [MaterialExtendedColorRole: MaterialColor]
+      private init(values: [MaterialExtendedColorRole: MaterialColor]) { self.values = values }
+      /// Constructs all custom roles from final app-owned colors without harmonization.
+      public init(
+    #{EXTENDED_ROLES.map { |r| "    #{r}: MaterialColor" }.join(",\n")}
+      ) {
+        self.values = [
+    #{EXTENDED_ROLES.map { |r| "      .#{r}: #{r}" }.join(",\n")}
+        ]
+      }
+      /// Returns a copy with final app-owned colors, preserving omitted roles.
+      @_disfavoredOverload
+      public func overriding(_ overrides: [MaterialExtendedColorRole: MaterialColor]) -> Self {
+        Self(values: values.merging(overrides) { _, appColor in appColor })
+      }
       /// Returns a status color; every instance contains every extended role.
       public subscript(role: MaterialExtendedColorRole) -> MaterialColor { values[role]! }
       /// Returns a copy with validated #RRGGBB overrides.
@@ -238,10 +252,26 @@ def swift_core(material2_tokens, material3_roles, material3_presets)
       "      )"
     ].join("\n")
   end.join("\n")
+  contrast_pairs = %w[primary secondary tertiary error].flat_map do |r|
+    cap = r[0].upcase + r[1..]
+    [[r, "on#{cap}"], ["#{r}Container", "on#{cap}Container"]]
+  end
+  contrast_pairs += [["background", "onBackground"], ["surface", "onSurface"], ["surfaceVariant", "onSurfaceVariant"], ["inverseSurface", "inverseOnSurface"]]
+  contrast_pairs += %w[surfaceBright surfaceContainer surfaceContainerHigh surfaceContainerHighest surfaceContainerLow surfaceContainerLowest surfaceDim].map { |r| [r, "onSurface"] }
+  contrast_pairs += %w[primary secondary tertiary].flat_map do |r|
+    cap = r[0].upcase + r[1..]
+    ["#{r}Fixed", "#{r}FixedDim"].product(["on#{cap}Fixed", "on#{cap}FixedVariant"])
+  end
+  contrast_pairs += EXTENDED_ROLES.filter_map do |r|
+    on = "on#{r[0].upcase}#{r[1..]}"
+    [r, on] if EXTENDED_ROLES.include?(on)
+  end
   tonal_spot = material3_presets.fetch("tonalSpot")
 
   <<~SWIFT
     #{generated_header("//").rstrip}
+    import Foundation
+
     public enum MaterialColorRole: String, CaseIterable, Hashable, Sendable {
     #{role_cases}
     }
@@ -261,6 +291,33 @@ def swift_core(material2_tokens, material3_roles, material3_presets)
       public let green: UInt8
       public let blue: UInt8
       public let alpha: UInt8
+
+      /// Creates an opaque sRGB color from byte components (0...255).
+      /// No hex parsing, harmonization, or gamut conversion is performed.
+      public init(name: String, red: UInt8, green: UInt8, blue: UInt8) {
+        let value = (UInt32(red) << 16) | (UInt32(green) << 8) | UInt32(blue)
+        let digits = String(value, radix: 16, uppercase: true)
+        self.init(name: name, normalizedHex: "#" + String(repeating: "0", count: 6 - digits.count) + digits, value: value)
+      }
+
+      /// Creates an opaque sRGB color named for a standard role from byte components.
+      public init(role: MaterialColorRole, red: UInt8, green: UInt8, blue: UInt8) {
+        self.init(name: role.rawValue, red: red, green: green, blue: blue)
+      }
+
+      /// WCAG 2.x contrast ratio of two opaque sRGB colors, from 1 to 21.
+      /// Compare the actual adjacent colors; translucent UI must be composited first.
+      public func contrastRatio(with other: MaterialColor) -> Double {
+        func luminance(_ color: MaterialColor) -> Double {
+          func linear(_ byte: UInt8) -> Double {
+            let c = Double(byte) / 255
+            return c <= 0.04045 ? c / 12.92 : pow((c + 0.055) / 1.055, 2.4)
+          }
+          return 0.2126 * linear(color.red) + 0.7152 * linear(color.green) + 0.0722 * linear(color.blue)
+        }
+        let a = luminance(self), b = luminance(other)
+        return (max(a, b) + 0.05) / (min(a, b) + 0.05)
+      }
 
       public init(name: String, hex: String) throws {
         guard let parsed = Self.parseHex(hex) else {
@@ -371,11 +428,21 @@ def swift_core(material2_tokens, material3_roles, material3_presets)
       }
     }
 
+    /// A failing semantic fill/content pair in an app's final scheme.
+    public struct MaterialContrastIssue: Hashable, Sendable {
+      /// Camel-case standard or extended background role name.
+      public let colorRole: String
+      /// Camel-case standard or extended foreground role name.
+      public let onRole: String
+      /// WCAG 2.x contrast ratio, without rounding.
+      public let ratio: Double
+    }
+
     #{swift_extended}
     public struct MaterialColorScheme: Hashable, Sendable {
       /// Custom status colors, separate from the standard M3 role collection.
       public let extendedColors: MaterialExtendedColors
-    #{EXTENDED_ROLES.map { |r| "  /// Harmonized custom status color `#{r}`.\n  public var #{r}: MaterialColor { extendedColors[.#{r}] }" }.join("\n")}
+    #{EXTENDED_ROLES.map { |r| "  /// Custom status color `#{r}`: template default or final app-owned value.\n  public var #{r}: MaterialColor { extendedColors[.#{r}] }" }.join("\n")}
 
       /// Returns a copy with validated custom status color overrides.
       public func overridingExtended(_ overrides: [MaterialExtendedColorRole: String]) throws -> Self {
@@ -383,6 +450,44 @@ def swift_core(material2_tokens, material3_roles, material3_presets)
     #{material3_roles.map { |r| "      #{r}: #{r}," }.join("\n")}
           extendedColors: try extendedColors.overriding(overrides))
       }
+      /// Overrides custom roles with app-owned colors; omitted roles are preserved.
+      @_disfavoredOverload
+      public func overridingExtended(_ overrides: [MaterialExtendedColorRole: MaterialColor]) -> Self {
+        Self(appearance: appearance,
+    #{material3_roles.map { |r| "      #{r}: #{r}," }.join("\n")}
+          extendedColors: extendedColors.overriding(overrides))
+      }
+
+      /// Overrides standard roles with app-owned colors, preserving all other values.
+      @_disfavoredOverload
+      public func overriding(_ overrides: [MaterialColorRole: MaterialColor]) -> Self {
+        Self(appearance: appearance,
+    #{material3_roles.map { |r| "      #{r}: overrides[.#{r}] ?? #{r}," }.join("\n")}
+          extendedColors: extendedColors)
+      }
+
+      /// Applies final app colors over a preset, without hex parsing or harmonization.
+      @_disfavoredOverload
+      public static func custom(base: MaterialThemePreset = .tonalSpot,
+                                appearance: MaterialAppearance,
+                                overrides: [MaterialColorRole: MaterialColor]) -> Self {
+        preset(base, appearance: appearance).overriding(overrides)
+      }
+
+      /// Reports semantic fill/on-fill pairs below the threshold (default 4.5).
+      /// Includes standard, surface, inverse, fixed/dim, and custom status pairs.
+      /// This does not infer arbitrary UI adjacency. Minimum must be finite and in 1...21.
+      public func contrastIssues(minimum: Double = 4.5) -> [MaterialContrastIssue] {
+        precondition(minimum.isFinite && (1...21).contains(minimum), "minimum must be in 1...21")
+        let pairs: [(String, String, MaterialColor, MaterialColor)] = [
+    #{contrast_pairs.map { |a,b| "      (\"#{a}\", \"#{b}\", #{a}, #{b})" }.join(",\n")}
+        ]
+        return pairs.compactMap { colorRole, onRole, color, onColor in
+          let ratio = color.contrastRatio(with: onColor)
+          return ratio < minimum ? MaterialContrastIssue(colorRole: colorRole, onRole: onRole, ratio: ratio) : nil
+        }
+      }
+
       public let appearance: MaterialAppearance
     #{scheme_properties}
 
@@ -459,6 +564,14 @@ def swift_core(material2_tokens, material3_roles, material3_presets)
       }
     }
 
+    /// Immutable app-owned light/dark themes for SwiftUI, UIKit, or AppKit injection.
+    public struct MaterialThemePair: Hashable, Sendable {
+      /// Final light theme.
+      public let light: MaterialTheme
+      /// Final dark theme.
+      public let dark: MaterialTheme
+    }
+
     public struct MaterialTheme: Hashable, Sendable {
       public let sourceColor: MaterialColor
       public let colorScheme: MaterialColorScheme
@@ -472,6 +585,33 @@ def swift_core(material2_tokens, material3_roles, material3_presets)
         self.sourceColor = sourceColor
         self.colorScheme = colorScheme
         self.themePreset = themePreset
+      }
+
+      /// Creates both appearances by overlaying final app values on template defaults.
+      /// Omitted roles retain their preset/template value; no input is harmonized.
+      public static func pair(
+        preset: MaterialThemePreset = .tonalSpot,
+        light: [MaterialColorRole: MaterialColor] = [:],
+        dark: [MaterialColorRole: MaterialColor] = [:],
+        extendedLight: [MaterialExtendedColorRole: MaterialColor] = [:],
+        extendedDark: [MaterialExtendedColorRole: MaterialColor] = [:]
+      ) -> MaterialThemePair {
+        func make(_ appearance: MaterialAppearance, _ roles: [MaterialColorRole: MaterialColor],
+                  _ extended: [MaterialExtendedColorRole: MaterialColor]) -> MaterialTheme {
+          MaterialTheme(colorScheme: MaterialColorScheme.preset(preset, appearance: appearance)
+            .overriding(roles).overridingExtended(extended), sourceColor: preset.sourceColor)
+        }
+        return MaterialThemePair(light: make(.light, light, extendedLight), dark: make(.dark, dark, extendedDark))
+      }
+
+      /// Applies final app colors over one preset appearance; sourceColor is metadata only.
+      @_disfavoredOverload
+      public static func custom(base: MaterialThemePreset = .tonalSpot,
+                                appearance: MaterialAppearance,
+                                overrides: [MaterialColorRole: MaterialColor],
+                                sourceColor: MaterialColor? = nil) -> MaterialTheme {
+        MaterialTheme(colorScheme: .custom(base: base, appearance: appearance, overrides: overrides),
+                      sourceColor: sourceColor ?? base.sourceColor)
       }
 
       public static let materialSourceColor = MaterialColor(uncheckedName: "sourceColor", hex: #{swift_string(tonal_spot.fetch("sourceColor"))})
@@ -775,11 +915,16 @@ def react_native_color_scheme(roles, presets)
       return createMaterialTheme({ ...options, preset });
     }
 
+    /** Looks up a standard role without requiring custom roles on legacy schemes. */
+    export function getSchemeColor(colorScheme: MaterialColorScheme, role: MaterialColorRole): string;
+    /** Looks up a standard or custom role on a complete factory scheme. */
+    export function getSchemeColor(colorScheme: MaterialColorSchemeWithExtended, role: MaterialColorRole | MaterialExtendedColorRole): string;
     export function getSchemeColor(
-      colorScheme: MaterialColorScheme,
-      role: MaterialColorRole,
+      colorScheme: MaterialColorScheme & Partial<MaterialExtendedColors>,
+      role: MaterialColorRole | MaterialExtendedColorRole,
     ): string {
-      return colorScheme[role];
+      // Preserve legacy undefined results for unchecked JavaScript inputs.
+      return colorScheme[role] as string;
     }
   TS
 end
@@ -958,6 +1103,10 @@ def python_theme(roles, presets)
             of the dataclass: fields are snake_case ``MaterialColor`` instances."""
             return {role: self.role_color(role).hex for role in COLOR_SCHEME_ROLES}
 
+        def as_extended_hex_map(self) -> dict[str, str]:
+            """Export all standard AND custom roles for a lossless color-value round trip."""
+            return {role: self.role_color(role).hex for role in (*COLOR_SCHEME_ROLES, *EXTENDED_COLOR_ROLES)}
+
 
     #{preset_schemes}
 
@@ -1081,6 +1230,34 @@ def python_theme(roles, presets)
   PYTHON
 end
 
+def dynamic_theme_adapter(platform)
+  appkit = platform == "AppKit"
+  color = appkit ? "NSColor" : "UIColor"
+  native_property = appkit ? "nsColor" : "uiColor"
+  condition = appkit ? 'appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua' : 'trait.userInterfaceStyle == .dark'
+  provider = appkit ? 'NSColor(name: nil) { appearance in' : 'UIColor { trait in'
+  <<~SWIFT
+    #{generated_header("//").rstrip}
+    #if canImport(#{platform})
+    import #{platform}
+    import MaterialDesignColorCore
+
+    public extension #{color} {
+      /// Resolves a role from final app-owned light/dark themes for the native appearance.
+      /// Both standard and extended roles are supported via a scheme key path.
+      /// Example: `#{color}.material(light: pair.light, dark: pair.dark, \\.warning)`.
+      static func material(light: MaterialTheme, dark: MaterialTheme,
+                           _ role: KeyPath<MaterialColorScheme, MaterialColor>) -> #{color} {
+        #{provider}
+          let isDark = #{condition}
+          return (isDark ? dark : light).colorScheme[keyPath: role].#{native_property}
+        }
+      }
+    }
+    #endif
+  SWIFT
+end
+
 def load_tokens(path)
   # JSON-Schema 메타 키($schema 등)를 제거해 토큰으로 순회되지 않도록 한다.
   # 평면 구조의 토큰 파일에만 적용한다. M3 파일은 구조가 고정되어 있고
@@ -1102,6 +1279,24 @@ validate_material2_tokens(material2_tokens)
 validate_material3_tokens(material3_roles, material3_baseline, material3_presets)
 clashes = EXTENDED_ROLES & material3_roles
 abort("extended roles collide with standard roles: #{clashes.join(", ")}") unless clashes.empty?
+# These names occupy generated enum/scheme namespaces, including Python normalization.
+reserved_members = %w[appearance extendedColors overridingExtended overriding color roleColor asHexMap asExtendedHexMap
+  contrastIssues custom preset baseline baselineLight baselineDark values rawValue allCases hash hashValue
+  description init deinit self super Self Type Protocol get set willSet didSet subscript
+  associatedtype class enum extension fileprivate func import inout internal let open operator private
+  precedencegroup protocol public rethrows static struct typealias var break case catch continue default
+  defer do else fallthrough for guard if in repeat return throw switch where while as any false is nil
+  some throws true try async await actor nonisolated isolated borrowing consuming consume copy sending
+  package final override required convenience lazy weak unowned mutating nonmutating dynamic indirect
+  and assert def del elif except finally from global lambda nonlocal not or pass raise with yield match]
+reserved_members += material3_presets.keys.flat_map { |preset| %w[light dark].map { |mode| swift_static_name(preset, mode) } }
+reserved_normalized = reserved_members.map { |name| python_role_name(name) }
+reserved = EXTENDED_ROLES.select { |role| reserved_members.include?(role) || reserved_normalized.include?(python_role_name(role)) }
+abort("extended roles collide with reserved members: #{reserved.join(', ')}") unless reserved.empty?
+normalized = (material3_roles + EXTENDED_ROLES).group_by { |role| python_role_name(role) }
+duplicates = normalized.select { |_name, roles| roles.size > 1 }
+abort("role names collide after Python normalization: #{duplicates.values.flatten.join(', ')}") unless duplicates.empty?
+
 
 write_file(
   "packages/ios/Sources/MaterialDesignColorCore/MaterialDesignColor.swift",
@@ -1138,5 +1333,11 @@ write_file(
   python_theme(material3_roles, material3_presets),
   check: check
 )
+
+%w[AppKit UIKit].each do |platform|
+  color = platform == "AppKit" ? "NSColor" : "UIColor"
+  write_file("packages/ios/Sources/MaterialDesignColor#{platform}/#{color}+MaterialTheme.swift",
+             dynamic_theme_adapter(platform), check: check)
+end
 
 exit(1) if check && $out_of_date

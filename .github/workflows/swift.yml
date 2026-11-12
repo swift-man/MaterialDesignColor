@@ -36,6 +36,11 @@ jobs:
         swift build --target MaterialDesignColorAppKit
     - name: Test Swift package (including macOS hosting view appearance changes)
       run: swift test -v
+    - name: Test UIKit dynamic app themes on iOS Simulator
+      run: |
+        set -euo pipefail
+        material_simulator_id=$(xcrun simctl list devices available -j | python3 tools/ci/select_simulator.py)
+        xcodebuild test -scheme MaterialDesignColor-Package -destination "platform=iOS Simulator,id=$material_simulator_id" -only-testing:MaterialDesignColorUIKitTests -parallel-testing-enabled NO
     - name: Build and smoke-test JS package
       # Mirror the publish workflow's check + build + ESM smoke so that
       # packaging regressions (exports map, type: module, import paths)
@@ -49,4 +54,4 @@ jobs:
     - name: Test Python package
       run: |
         python3 -m pip install --upgrade pip pytest
-        PYTHONPATH=packages/python/src python3 -m pytest packages/python/tests tools/codegen/tests -v
+        PYTHONPATH=packages/python/src python3 -m pytest packages/python/tests tools/codegen/tests tools/ci -v

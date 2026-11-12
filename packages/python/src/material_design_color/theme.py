@@ -256,6 +256,10 @@ class MaterialColorScheme:
         of the dataclass: fields are snake_case ``MaterialColor`` instances."""
         return {role: self.role_color(role).hex for role in COLOR_SCHEME_ROLES}
 
+    def as_extended_hex_map(self) -> dict[str, str]:
+        """Export all standard AND custom roles for a lossless color-value round trip."""
+        return {role: self.role_color(role).hex for role in (*COLOR_SCHEME_ROLES, *EXTENDED_COLOR_ROLES)}
+
 
 TONAL_SPOT_LIGHT_COLOR_SCHEME = MaterialColorScheme(
     appearance="light",

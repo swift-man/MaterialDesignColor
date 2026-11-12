@@ -1324,9 +1324,14 @@ export function getMaterialTheme(
   return createMaterialTheme({ ...options, preset });
 }
 
+/** Looks up a standard role without requiring custom roles on legacy schemes. */
+export function getSchemeColor(colorScheme: MaterialColorScheme, role: MaterialColorRole): string;
+/** Looks up a standard or custom role on a complete factory scheme. */
+export function getSchemeColor(colorScheme: MaterialColorSchemeWithExtended, role: MaterialColorRole | MaterialExtendedColorRole): string;
 export function getSchemeColor(
-  colorScheme: MaterialColorScheme,
-  role: MaterialColorRole,
+  colorScheme: MaterialColorScheme & Partial<MaterialExtendedColors>,
+  role: MaterialColorRole | MaterialExtendedColorRole,
 ): string {
-  return colorScheme[role];
+  // Preserve legacy undefined results for unchecked JavaScript inputs.
+  return colorScheme[role] as string;
 }

@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 2.3.0
+
+- 앱이 확정한 MaterialColor 값으로 확장 색상 전체 구성, 역할 override, light/dark 테마 쌍을 만들 수 있습니다.
+- UInt8 sRGB 색상 생성과 WCAG 대비 계산 및 스킴의 기본·확장 역할 대비 검사를 Core에 추가했습니다.
+- 임의 앱 테마에 대한 AppKit/UIKit 동적 색상 API와 appearance 회귀 테스트를 추가했습니다.
+- 생성기 예약 이름·정규화 충돌 검증, JS 확장 역할 조회, Python 전체 색상 직렬화 헬퍼를 보완했습니다.
+- 템플릿 제공과 앱 최종 색상 확정의 책임 경계를 문서화했습니다. 기존 hex API와 기본 토큰 값은 유지합니다.
+
 ## 2.2.0
 
 - 기본 48개 M3 롤을 유지하고 harmonized success/warning 확장 롤 8개를 Swift, JS, Python에 추가했습니다.

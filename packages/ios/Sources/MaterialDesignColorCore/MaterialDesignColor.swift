@@ -1,5 +1,7 @@
 // Generated from tokens/ by tools/codegen/generate.rb.
 // Do not edit by hand.
+import Foundation
+
 public enum MaterialColorRole: String, CaseIterable, Hashable, Sendable {
   case primary
   case onPrimary
@@ -66,6 +68,33 @@ public struct MaterialColor: Hashable, Sendable {
   public let green: UInt8
   public let blue: UInt8
   public let alpha: UInt8
+
+  /// Creates an opaque sRGB color from byte components (0...255).
+  /// No hex parsing, harmonization, or gamut conversion is performed.
+  public init(name: String, red: UInt8, green: UInt8, blue: UInt8) {
+    let value = (UInt32(red) << 16) | (UInt32(green) << 8) | UInt32(blue)
+    let digits = String(value, radix: 16, uppercase: true)
+    self.init(name: name, normalizedHex: "#" + String(repeating: "0", count: 6 - digits.count) + digits, value: value)
+  }
+
+  /// Creates an opaque sRGB color named for a standard role from byte components.
+  public init(role: MaterialColorRole, red: UInt8, green: UInt8, blue: UInt8) {
+    self.init(name: role.rawValue, red: red, green: green, blue: blue)
+  }
+
+  /// WCAG 2.x contrast ratio of two opaque sRGB colors, from 1 to 21.
+  /// Compare the actual adjacent colors; translucent UI must be composited first.
+  public func contrastRatio(with other: MaterialColor) -> Double {
+    func luminance(_ color: MaterialColor) -> Double {
+      func linear(_ byte: UInt8) -> Double {
+        let c = Double(byte) / 255
+        return c <= 0.04045 ? c / 12.92 : pow((c + 0.055) / 1.055, 2.4)
+      }
+      return 0.2126 * linear(color.red) + 0.7152 * linear(color.green) + 0.0722 * linear(color.blue)
+    }
+    let a = luminance(self), b = luminance(other)
+    return (max(a, b) + 0.05) / (min(a, b) + 0.05)
+  }
 
   public init(name: String, hex: String) throws {
     guard let parsed = Self.parseHex(hex) else {
@@ -778,6 +807,16 @@ public enum MaterialThemePreset: String, CaseIterable, Hashable, Sendable {
   }
 }
 
+/// A failing semantic fill/content pair in an app's final scheme.
+public struct MaterialContrastIssue: Hashable, Sendable {
+  /// Camel-case standard or extended background role name.
+  public let colorRole: String
+  /// Camel-case standard or extended foreground role name.
+  public let onRole: String
+  /// WCAG 2.x contrast ratio, without rounding.
+  public let ratio: Double
+}
+
 /// Custom status roles, separate from Google's 48 Material 3 roles.
 public enum MaterialExtendedColorRole: String, CaseIterable, Hashable, Sendable {
   /// Custom status role `success` (outside the 48 M3 roles).
@@ -797,9 +836,37 @@ public enum MaterialExtendedColorRole: String, CaseIterable, Hashable, Sendable 
   /// Custom status role `onWarningContainer` (outside the 48 M3 roles).
   case onWarningContainer
 }
-/// Immutable harmonized custom colors. Override individual roles with validated hex values.
+/// Immutable custom colors. Templates are harmonized; final app values are preserved.
 public struct MaterialExtendedColors: Hashable, Sendable {
   private let values: [MaterialExtendedColorRole: MaterialColor]
+  private init(values: [MaterialExtendedColorRole: MaterialColor]) { self.values = values }
+  /// Constructs all custom roles from final app-owned colors without harmonization.
+  public init(
+    success: MaterialColor,
+    onSuccess: MaterialColor,
+    successContainer: MaterialColor,
+    onSuccessContainer: MaterialColor,
+    warning: MaterialColor,
+    onWarning: MaterialColor,
+    warningContainer: MaterialColor,
+    onWarningContainer: MaterialColor
+  ) {
+    self.values = [
+      .success: success,
+      .onSuccess: onSuccess,
+      .successContainer: successContainer,
+      .onSuccessContainer: onSuccessContainer,
+      .warning: warning,
+      .onWarning: onWarning,
+      .warningContainer: warningContainer,
+      .onWarningContainer: onWarningContainer
+    ]
+  }
+  /// Returns a copy with final app-owned colors, preserving omitted roles.
+  @_disfavoredOverload
+  public func overriding(_ overrides: [MaterialExtendedColorRole: MaterialColor]) -> Self {
+    Self(values: values.merging(overrides) { _, appColor in appColor })
+  }
   /// Returns a status color; every instance contains every extended role.
   public subscript(role: MaterialExtendedColorRole) -> MaterialColor { values[role]! }
   /// Returns a copy with validated #RRGGBB overrides.
@@ -835,21 +902,21 @@ public struct MaterialExtendedColors: Hashable, Sendable {
 public struct MaterialColorScheme: Hashable, Sendable {
   /// Custom status colors, separate from the standard M3 role collection.
   public let extendedColors: MaterialExtendedColors
-  /// Harmonized custom status color `success`.
+  /// Custom status color `success`: template default or final app-owned value.
   public var success: MaterialColor { extendedColors[.success] }
-  /// Harmonized custom status color `onSuccess`.
+  /// Custom status color `onSuccess`: template default or final app-owned value.
   public var onSuccess: MaterialColor { extendedColors[.onSuccess] }
-  /// Harmonized custom status color `successContainer`.
+  /// Custom status color `successContainer`: template default or final app-owned value.
   public var successContainer: MaterialColor { extendedColors[.successContainer] }
-  /// Harmonized custom status color `onSuccessContainer`.
+  /// Custom status color `onSuccessContainer`: template default or final app-owned value.
   public var onSuccessContainer: MaterialColor { extendedColors[.onSuccessContainer] }
-  /// Harmonized custom status color `warning`.
+  /// Custom status color `warning`: template default or final app-owned value.
   public var warning: MaterialColor { extendedColors[.warning] }
-  /// Harmonized custom status color `onWarning`.
+  /// Custom status color `onWarning`: template default or final app-owned value.
   public var onWarning: MaterialColor { extendedColors[.onWarning] }
-  /// Harmonized custom status color `warningContainer`.
+  /// Custom status color `warningContainer`: template default or final app-owned value.
   public var warningContainer: MaterialColor { extendedColors[.warningContainer] }
-  /// Harmonized custom status color `onWarningContainer`.
+  /// Custom status color `onWarningContainer`: template default or final app-owned value.
   public var onWarningContainer: MaterialColor { extendedColors[.onWarningContainer] }
 
   /// Returns a copy with validated custom status color overrides.
@@ -905,6 +972,172 @@ public struct MaterialColorScheme: Hashable, Sendable {
       onTertiaryFixedVariant: onTertiaryFixedVariant,
       extendedColors: try extendedColors.overriding(overrides))
   }
+  /// Overrides custom roles with app-owned colors; omitted roles are preserved.
+  @_disfavoredOverload
+  public func overridingExtended(_ overrides: [MaterialExtendedColorRole: MaterialColor]) -> Self {
+    Self(appearance: appearance,
+      primary: primary,
+      onPrimary: onPrimary,
+      primaryContainer: primaryContainer,
+      onPrimaryContainer: onPrimaryContainer,
+      inversePrimary: inversePrimary,
+      secondary: secondary,
+      onSecondary: onSecondary,
+      secondaryContainer: secondaryContainer,
+      onSecondaryContainer: onSecondaryContainer,
+      tertiary: tertiary,
+      onTertiary: onTertiary,
+      tertiaryContainer: tertiaryContainer,
+      onTertiaryContainer: onTertiaryContainer,
+      background: background,
+      onBackground: onBackground,
+      surface: surface,
+      onSurface: onSurface,
+      surfaceVariant: surfaceVariant,
+      onSurfaceVariant: onSurfaceVariant,
+      surfaceTint: surfaceTint,
+      inverseSurface: inverseSurface,
+      inverseOnSurface: inverseOnSurface,
+      error: error,
+      onError: onError,
+      errorContainer: errorContainer,
+      onErrorContainer: onErrorContainer,
+      outline: outline,
+      outlineVariant: outlineVariant,
+      scrim: scrim,
+      surfaceBright: surfaceBright,
+      surfaceContainer: surfaceContainer,
+      surfaceContainerHigh: surfaceContainerHigh,
+      surfaceContainerHighest: surfaceContainerHighest,
+      surfaceContainerLow: surfaceContainerLow,
+      surfaceContainerLowest: surfaceContainerLowest,
+      surfaceDim: surfaceDim,
+      primaryFixed: primaryFixed,
+      primaryFixedDim: primaryFixedDim,
+      onPrimaryFixed: onPrimaryFixed,
+      onPrimaryFixedVariant: onPrimaryFixedVariant,
+      secondaryFixed: secondaryFixed,
+      secondaryFixedDim: secondaryFixedDim,
+      onSecondaryFixed: onSecondaryFixed,
+      onSecondaryFixedVariant: onSecondaryFixedVariant,
+      tertiaryFixed: tertiaryFixed,
+      tertiaryFixedDim: tertiaryFixedDim,
+      onTertiaryFixed: onTertiaryFixed,
+      onTertiaryFixedVariant: onTertiaryFixedVariant,
+      extendedColors: extendedColors.overriding(overrides))
+  }
+
+  /// Overrides standard roles with app-owned colors, preserving all other values.
+  @_disfavoredOverload
+  public func overriding(_ overrides: [MaterialColorRole: MaterialColor]) -> Self {
+    Self(appearance: appearance,
+      primary: overrides[.primary] ?? primary,
+      onPrimary: overrides[.onPrimary] ?? onPrimary,
+      primaryContainer: overrides[.primaryContainer] ?? primaryContainer,
+      onPrimaryContainer: overrides[.onPrimaryContainer] ?? onPrimaryContainer,
+      inversePrimary: overrides[.inversePrimary] ?? inversePrimary,
+      secondary: overrides[.secondary] ?? secondary,
+      onSecondary: overrides[.onSecondary] ?? onSecondary,
+      secondaryContainer: overrides[.secondaryContainer] ?? secondaryContainer,
+      onSecondaryContainer: overrides[.onSecondaryContainer] ?? onSecondaryContainer,
+      tertiary: overrides[.tertiary] ?? tertiary,
+      onTertiary: overrides[.onTertiary] ?? onTertiary,
+      tertiaryContainer: overrides[.tertiaryContainer] ?? tertiaryContainer,
+      onTertiaryContainer: overrides[.onTertiaryContainer] ?? onTertiaryContainer,
+      background: overrides[.background] ?? background,
+      onBackground: overrides[.onBackground] ?? onBackground,
+      surface: overrides[.surface] ?? surface,
+      onSurface: overrides[.onSurface] ?? onSurface,
+      surfaceVariant: overrides[.surfaceVariant] ?? surfaceVariant,
+      onSurfaceVariant: overrides[.onSurfaceVariant] ?? onSurfaceVariant,
+      surfaceTint: overrides[.surfaceTint] ?? surfaceTint,
+      inverseSurface: overrides[.inverseSurface] ?? inverseSurface,
+      inverseOnSurface: overrides[.inverseOnSurface] ?? inverseOnSurface,
+      error: overrides[.error] ?? error,
+      onError: overrides[.onError] ?? onError,
+      errorContainer: overrides[.errorContainer] ?? errorContainer,
+      onErrorContainer: overrides[.onErrorContainer] ?? onErrorContainer,
+      outline: overrides[.outline] ?? outline,
+      outlineVariant: overrides[.outlineVariant] ?? outlineVariant,
+      scrim: overrides[.scrim] ?? scrim,
+      surfaceBright: overrides[.surfaceBright] ?? surfaceBright,
+      surfaceContainer: overrides[.surfaceContainer] ?? surfaceContainer,
+      surfaceContainerHigh: overrides[.surfaceContainerHigh] ?? surfaceContainerHigh,
+      surfaceContainerHighest: overrides[.surfaceContainerHighest] ?? surfaceContainerHighest,
+      surfaceContainerLow: overrides[.surfaceContainerLow] ?? surfaceContainerLow,
+      surfaceContainerLowest: overrides[.surfaceContainerLowest] ?? surfaceContainerLowest,
+      surfaceDim: overrides[.surfaceDim] ?? surfaceDim,
+      primaryFixed: overrides[.primaryFixed] ?? primaryFixed,
+      primaryFixedDim: overrides[.primaryFixedDim] ?? primaryFixedDim,
+      onPrimaryFixed: overrides[.onPrimaryFixed] ?? onPrimaryFixed,
+      onPrimaryFixedVariant: overrides[.onPrimaryFixedVariant] ?? onPrimaryFixedVariant,
+      secondaryFixed: overrides[.secondaryFixed] ?? secondaryFixed,
+      secondaryFixedDim: overrides[.secondaryFixedDim] ?? secondaryFixedDim,
+      onSecondaryFixed: overrides[.onSecondaryFixed] ?? onSecondaryFixed,
+      onSecondaryFixedVariant: overrides[.onSecondaryFixedVariant] ?? onSecondaryFixedVariant,
+      tertiaryFixed: overrides[.tertiaryFixed] ?? tertiaryFixed,
+      tertiaryFixedDim: overrides[.tertiaryFixedDim] ?? tertiaryFixedDim,
+      onTertiaryFixed: overrides[.onTertiaryFixed] ?? onTertiaryFixed,
+      onTertiaryFixedVariant: overrides[.onTertiaryFixedVariant] ?? onTertiaryFixedVariant,
+      extendedColors: extendedColors)
+  }
+
+  /// Applies final app colors over a preset, without hex parsing or harmonization.
+  @_disfavoredOverload
+  public static func custom(base: MaterialThemePreset = .tonalSpot,
+                            appearance: MaterialAppearance,
+                            overrides: [MaterialColorRole: MaterialColor]) -> Self {
+    preset(base, appearance: appearance).overriding(overrides)
+  }
+
+  /// Reports semantic fill/on-fill pairs below the threshold (default 4.5).
+  /// Includes standard, surface, inverse, fixed/dim, and custom status pairs.
+  /// This does not infer arbitrary UI adjacency. Minimum must be finite and in 1...21.
+  public func contrastIssues(minimum: Double = 4.5) -> [MaterialContrastIssue] {
+    precondition(minimum.isFinite && (1...21).contains(minimum), "minimum must be in 1...21")
+    let pairs: [(String, String, MaterialColor, MaterialColor)] = [
+      ("primary", "onPrimary", primary, onPrimary),
+      ("primaryContainer", "onPrimaryContainer", primaryContainer, onPrimaryContainer),
+      ("secondary", "onSecondary", secondary, onSecondary),
+      ("secondaryContainer", "onSecondaryContainer", secondaryContainer, onSecondaryContainer),
+      ("tertiary", "onTertiary", tertiary, onTertiary),
+      ("tertiaryContainer", "onTertiaryContainer", tertiaryContainer, onTertiaryContainer),
+      ("error", "onError", error, onError),
+      ("errorContainer", "onErrorContainer", errorContainer, onErrorContainer),
+      ("background", "onBackground", background, onBackground),
+      ("surface", "onSurface", surface, onSurface),
+      ("surfaceVariant", "onSurfaceVariant", surfaceVariant, onSurfaceVariant),
+      ("inverseSurface", "inverseOnSurface", inverseSurface, inverseOnSurface),
+      ("surfaceBright", "onSurface", surfaceBright, onSurface),
+      ("surfaceContainer", "onSurface", surfaceContainer, onSurface),
+      ("surfaceContainerHigh", "onSurface", surfaceContainerHigh, onSurface),
+      ("surfaceContainerHighest", "onSurface", surfaceContainerHighest, onSurface),
+      ("surfaceContainerLow", "onSurface", surfaceContainerLow, onSurface),
+      ("surfaceContainerLowest", "onSurface", surfaceContainerLowest, onSurface),
+      ("surfaceDim", "onSurface", surfaceDim, onSurface),
+      ("primaryFixed", "onPrimaryFixed", primaryFixed, onPrimaryFixed),
+      ("primaryFixed", "onPrimaryFixedVariant", primaryFixed, onPrimaryFixedVariant),
+      ("primaryFixedDim", "onPrimaryFixed", primaryFixedDim, onPrimaryFixed),
+      ("primaryFixedDim", "onPrimaryFixedVariant", primaryFixedDim, onPrimaryFixedVariant),
+      ("secondaryFixed", "onSecondaryFixed", secondaryFixed, onSecondaryFixed),
+      ("secondaryFixed", "onSecondaryFixedVariant", secondaryFixed, onSecondaryFixedVariant),
+      ("secondaryFixedDim", "onSecondaryFixed", secondaryFixedDim, onSecondaryFixed),
+      ("secondaryFixedDim", "onSecondaryFixedVariant", secondaryFixedDim, onSecondaryFixedVariant),
+      ("tertiaryFixed", "onTertiaryFixed", tertiaryFixed, onTertiaryFixed),
+      ("tertiaryFixed", "onTertiaryFixedVariant", tertiaryFixed, onTertiaryFixedVariant),
+      ("tertiaryFixedDim", "onTertiaryFixed", tertiaryFixedDim, onTertiaryFixed),
+      ("tertiaryFixedDim", "onTertiaryFixedVariant", tertiaryFixedDim, onTertiaryFixedVariant),
+      ("success", "onSuccess", success, onSuccess),
+      ("successContainer", "onSuccessContainer", successContainer, onSuccessContainer),
+      ("warning", "onWarning", warning, onWarning),
+      ("warningContainer", "onWarningContainer", warningContainer, onWarningContainer)
+    ]
+    return pairs.compactMap { colorRole, onRole, color, onColor in
+      let ratio = color.contrastRatio(with: onColor)
+      return ratio < minimum ? MaterialContrastIssue(colorRole: colorRole, onRole: onRole, ratio: ratio) : nil
+    }
+  }
+
   public let appearance: MaterialAppearance
   public let primary: MaterialColor
   public let onPrimary: MaterialColor
@@ -2280,6 +2513,14 @@ public struct MaterialColorScheme: Hashable, Sendable {
   }
 }
 
+/// Immutable app-owned light/dark themes for SwiftUI, UIKit, or AppKit injection.
+public struct MaterialThemePair: Hashable, Sendable {
+  /// Final light theme.
+  public let light: MaterialTheme
+  /// Final dark theme.
+  public let dark: MaterialTheme
+}
+
 public struct MaterialTheme: Hashable, Sendable {
   public let sourceColor: MaterialColor
   public let colorScheme: MaterialColorScheme
@@ -2293,6 +2534,33 @@ public struct MaterialTheme: Hashable, Sendable {
     self.sourceColor = sourceColor
     self.colorScheme = colorScheme
     self.themePreset = themePreset
+  }
+
+  /// Creates both appearances by overlaying final app values on template defaults.
+  /// Omitted roles retain their preset/template value; no input is harmonized.
+  public static func pair(
+    preset: MaterialThemePreset = .tonalSpot,
+    light: [MaterialColorRole: MaterialColor] = [:],
+    dark: [MaterialColorRole: MaterialColor] = [:],
+    extendedLight: [MaterialExtendedColorRole: MaterialColor] = [:],
+    extendedDark: [MaterialExtendedColorRole: MaterialColor] = [:]
+  ) -> MaterialThemePair {
+    func make(_ appearance: MaterialAppearance, _ roles: [MaterialColorRole: MaterialColor],
+              _ extended: [MaterialExtendedColorRole: MaterialColor]) -> MaterialTheme {
+      MaterialTheme(colorScheme: MaterialColorScheme.preset(preset, appearance: appearance)
+        .overriding(roles).overridingExtended(extended), sourceColor: preset.sourceColor)
+    }
+    return MaterialThemePair(light: make(.light, light, extendedLight), dark: make(.dark, dark, extendedDark))
+  }
+
+  /// Applies final app colors over one preset appearance; sourceColor is metadata only.
+  @_disfavoredOverload
+  public static func custom(base: MaterialThemePreset = .tonalSpot,
+                            appearance: MaterialAppearance,
+                            overrides: [MaterialColorRole: MaterialColor],
+                            sourceColor: MaterialColor? = nil) -> MaterialTheme {
+    MaterialTheme(colorScheme: .custom(base: base, appearance: appearance, overrides: overrides),
+                  sourceColor: sourceColor ?? base.sourceColor)
   }
 
   public static let materialSourceColor = MaterialColor(uncheckedName: "sourceColor", hex: "#6750A4")
