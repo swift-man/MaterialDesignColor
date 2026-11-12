@@ -111,8 +111,6 @@ for (const [label, actual, expected] of checks) {
   }
 }
 
-console.log("ESM smoke test passed.");
-
 // Extended status colors do not change the standard role contract.
 const extended = await import('@swift-man/material-design-color');
 assert.equal(extended.materialColorSchemeRoles.length, 48);
@@ -132,3 +130,31 @@ assert.equal(extended.getSchemeColor(extended.lightColorScheme, 'warning'), exte
 assert.equal(extended.getSchemeColor(extended.createMaterialTheme({colorScheme: {success: '#123456'}}).colorScheme, 'success'), '#123456');
 assert.equal(extended.getSchemeColor({}, 'warning'), undefined);
 assert.equal(extended.getSchemeColor({}, 'primary'), undefined);
+
+// Public WCAG API: independent reference values and invalid external inputs.
+const { contrastRatio, contrastIssues } = await import('@swift-man/material-design-color');
+assert.equal(contrastRatio('#000000', '#FFFFFF'), 21);
+assert.equal(contrastRatio('#abcdef', '#ABCDEF'), 1);
+assert.ok(Math.abs(contrastRatio('#FF0000', '#FFFFFF') - 3.9984767707539985) < 1e-10);
+assert.equal(contrastRatio('#123456', '#abcdef'), contrastRatio('#abcdef', '#123456'));
+for (const invalid of ['', '#fff', '#GG0000', '#FFFFFF\n', null, 123]) {
+  assert.throws(() => contrastRatio(invalid, '#FFFFFF'), TypeError);
+  assert.throws(() => contrastRatio('#FFFFFF', invalid), TypeError);
+}
+for (const minimum of [NaN, Infinity, -Infinity, 0.99, 21.01, '4.5']) {
+  assert.throws(() => contrastIssues(lightColorScheme, minimum), RangeError);
+}
+const finalScheme = createMaterialTheme({ colorScheme: { primary: '#FFFFFF', onPrimary: '#FFFFFF', warning: '#000000', onWarning: '#000000' } }).colorScheme;
+const diagnostics = contrastIssues(finalScheme);
+assert.ok(diagnostics.some(x => x.colorRole === 'primary' && x.onRole === 'onPrimary' && x.ratio === 1));
+assert.ok(diagnostics.some(x => x.colorRole === 'warning' && x.onRole === 'onWarning' && x.ratio === 1));
+assert.ok(Object.isFrozen(diagnostics) && diagnostics.every(Object.isFrozen));
+assert.equal(contrastIssues(finalScheme, 1).length, 0);
+assert.equal(contrastIssues(lightColorScheme, 21).length, 35);
+const legacy = Object.fromEntries(materialColorSchemeRoles.map(role => [role, lightColorScheme[role]]));
+assert.equal(contrastIssues(legacy, 21).length, 31);
+assert.throws(() => contrastIssues({ ...legacy, warning: '#000000' }), TypeError);
+assert.ok(contrastIssues(lightColorScheme, 21).some(x => x.colorRole === 'primaryFixedDim' && x.onRole === 'onPrimaryFixedVariant'));
+assert.ok(contrastIssues(lightColorScheme, 21).some(x => x.colorRole === 'surfaceContainerHighest' && x.onRole === 'onSurface'));
+
+console.log("ESM smoke test passed.");

@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 2.4.0
+
+- 이미 생성된 앱 테마를 묶는 MaterialThemePair 공개 생성자와 테스트 기대값용 MaterialContrastIssue 공개 생성자를 추가했습니다. 입력 값은 그대로 보존합니다.
+- 외부 대비 기준 입력을 오류로 반환하는 Swift validatedContrastIssues와 MaterialContrastError를 추가했습니다. 기존 precondition API는 유지합니다.
+- JS contrastRatio/contrastIssues 및 Python contrast_ratio/contrast_issues를 추가하고 35개 의미상 대비 쌍을 생성기에서 공유합니다.
+- Swift·JS·Python README에 최종 색상 검증과 오류 처리 예제를 추가하고 DocC Topics에 테마 쌍·확장 색·대비 진단을 정리했습니다.
+
 ## 2.3.0
 
 - 앱이 확정한 MaterialColor 값으로 확장 색상 전체 구성, 역할 override, light/dark 테마 쌍을 만들 수 있습니다.

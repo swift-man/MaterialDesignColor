@@ -807,6 +807,12 @@ public enum MaterialThemePreset: String, CaseIterable, Hashable, Sendable {
   }
 }
 
+/// Invalid external input to contrast validation.
+public enum MaterialContrastError: Error, Sendable {
+  /// The requested threshold is not finite or is outside 1...21.
+  case invalidMinimum(Double)
+}
+
 /// A failing semantic fill/content pair in an app's final scheme.
 public struct MaterialContrastIssue: Hashable, Sendable {
   /// Camel-case standard or extended background role name.
@@ -815,6 +821,14 @@ public struct MaterialContrastIssue: Hashable, Sendable {
   public let onRole: String
   /// WCAG 2.x contrast ratio, without rounding.
   public let ratio: Double
+
+  /// Creates a diagnostic value, for example an expected result in an app test.
+  /// Fields are stored verbatim; this initializer does not measure colors or validate roles.
+  public init(colorRole: String, onRole: String, ratio: Double) {
+    self.colorRole = colorRole
+    self.onRole = onRole
+    self.ratio = ratio
+  }
 }
 
 /// Custom status roles, separate from Google's 48 Material 3 roles.
@@ -1136,6 +1150,16 @@ public struct MaterialColorScheme: Hashable, Sendable {
       let ratio = color.contrastRatio(with: onColor)
       return ratio < minimum ? MaterialContrastIssue(colorRole: colorRole, onRole: onRole, ratio: ratio) : nil
     }
+  }
+
+  /// Checks an external threshold without trapping or silently clamping it.
+  /// - Throws: `MaterialContrastError.invalidMinimum` unless minimum is finite and in 1...21.
+  /// - Returns: The same semantic pair diagnostics as `contrastIssues(minimum:)`.
+  public func validatedContrastIssues(minimum: Double = 4.5) throws -> [MaterialContrastIssue] {
+    guard minimum.isFinite && (1...21).contains(minimum) else {
+      throw MaterialContrastError.invalidMinimum(minimum)
+    }
+    return contrastIssues(minimum: minimum)
   }
 
   public let appearance: MaterialAppearance
@@ -2519,6 +2543,14 @@ public struct MaterialThemePair: Hashable, Sendable {
   public let light: MaterialTheme
   /// Final dark theme.
   public let dark: MaterialTheme
+
+  /// Groups existing themes for light and dark presentation without altering their colors.
+  /// Argument labels select their intended UI use; scheme appearance metadata is preserved,
+  /// not validated or rewritten. Supply the appropriate scheme for each appearance.
+  public init(light: MaterialTheme, dark: MaterialTheme) {
+    self.light = light
+    self.dark = dark
+  }
 }
 
 public struct MaterialTheme: Hashable, Sendable {

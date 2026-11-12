@@ -61,7 +61,7 @@ def test_extended_roles_cannot_shadow_standard_roles(tmp_path, role):
 
 
 @pytest.mark.parametrize("role", ["appearance", "extendedColors", "roleColor", "asHexMap",
-                                  "asExtendedHexMap", "contrastIssues", "overridingExtended",
+                                  "asExtendedHexMap", "contrastIssues", "validatedContrastIssues", "overridingExtended",
                                   "tonalSpotLight", "class", "return", "rawValue"])
 def test_extended_roles_cannot_shadow_generated_members(tmp_path, role):
     def collide(data):

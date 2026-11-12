@@ -19,6 +19,17 @@ class MaterialColor:
         except ValueError as error:
             raise ValueError(f"expected #RRGGBB hex color, got {self.hex!r}") from error
 
+    def contrast_ratio(self, other: MaterialColor) -> float:
+        """WCAG 2.x ratio for opaque sRGB colors; composite translucent UI first."""
+        def luminance(color: MaterialColor) -> float:
+            def linear(byte: int) -> float:
+                c = byte / 255
+                return c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
+            r, g, b = (linear(byte) for byte in color.rgb)
+            return 0.2126 * r + 0.7152 * g + 0.0722 * b
+        a, b = luminance(self), luminance(other)
+        return (max(a, b) + 0.05) / (min(a, b) + 0.05)
+
     @property
     def rgb(self) -> tuple[int, int, int]:
         value = self.hex.lstrip("#")

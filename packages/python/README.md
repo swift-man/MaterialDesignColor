@@ -92,4 +92,28 @@ restored = material_theme_builder_color_scheme("dark", scheme.as_extended_hex_ma
 assert restored == scheme
 ```
 
-The exported dictionary is independent of the immutable scheme. Appearance must be supplied separately. See the [shared responsibility guide](../../README.md#템플릿-값과-앱-확정-값). The new contrast validation API is currently in Swift Core.
+The exported dictionary is independent of the immutable scheme. Appearance must be supplied separately. See the [shared responsibility guide](../../README.md#템플릿-값과-앱-확정-값). Contrast validation is available in Swift Core, JavaScript/TypeScript, and Python starting with 2.4.0; see the examples below.
+
+### 앱 최종 색상 대비 검증 (2.4.0)
+
+```python
+from material_design_color import MaterialColor, MaterialContrastIssue, custom_color_scheme
+
+warning = MaterialColor('warning', '#804000')
+white = MaterialColor('onWarning', '#FFFFFF')
+print(warning.contrast_ratio(white))
+scheme = custom_color_scheme({'warning': warning.hex, 'onWarning': white.hex})
+try:
+    issues = scheme.contrast_issues(minimum=4.5)
+    expected = MaterialContrastIssue('warning', 'onWarning', 1.0)
+    assert expected not in issues
+except ValueError:
+    print('대비 기준은 유한한 1...21이어야 합니다.')
+```
+
+`contrast_ratio`는 불투명 sRGB 색의 WCAG 2.x 비율(1...21)을 반환합니다.
+`contrast_issues`는 기본 31개·확장 4개 의미상 대비 쌍을 검사하고 불변 tuple을 반환합니다.
+동결된 `MaterialContrastIssue`의 `color_role`/`on_role` 값은 camelCase 역할 이름이며
+`ratio`는 반올림하지 않습니다. 직접 생성할 때는 입력을 그대로 저장합니다.
+유한하지 않거나 1...21 범위를 벗어난 기준은 `ValueError`로 거부하며 보정하지 않습니다.
+임의 화면 인접 관계는 추론하지 않으며 투명 색은 배경과 합성한 뒤 검사하세요.

@@ -202,6 +202,25 @@ def swift_scheme_static(name, appearance, roles, scheme)
   SWIFT
 end
 
+# One semantic adjacency contract shared by every platform.
+def contrast_pairs
+  pairs = %w[primary secondary tertiary error].flat_map do |r|
+    cap = r[0].upcase + r[1..]
+    [[r, "on#{cap}"], ["#{r}Container", "on#{cap}Container"]]
+  end
+  pairs += [["background", "onBackground"], ["surface", "onSurface"], ["surfaceVariant", "onSurfaceVariant"], ["inverseSurface", "inverseOnSurface"]]
+  pairs += %w[surfaceBright surfaceContainer surfaceContainerHigh surfaceContainerHighest surfaceContainerLow surfaceContainerLowest surfaceDim].map { |r| [r, "onSurface"] }
+  pairs += %w[primary secondary tertiary].flat_map do |r|
+    cap = r[0].upcase + r[1..]
+    ["#{r}Fixed", "#{r}FixedDim"].product(["on#{cap}Fixed", "on#{cap}FixedVariant"])
+  end
+  pairs += EXTENDED_ROLES.filter_map do |r|
+    on = "on#{r[0].upcase}#{r[1..]}"
+    [r, on] if EXTENDED_ROLES.include?(on)
+  end
+  pairs
+end
+
 def swift_core(material2_tokens, material3_roles, material3_presets)
   palette_constants = material2_tokens.map do |name, hex|
     "  public static let #{name} = MaterialColor(uncheckedName: #{swift_string(name)}, hex: #{swift_string(hex)})"
@@ -252,20 +271,6 @@ def swift_core(material2_tokens, material3_roles, material3_presets)
       "      )"
     ].join("\n")
   end.join("\n")
-  contrast_pairs = %w[primary secondary tertiary error].flat_map do |r|
-    cap = r[0].upcase + r[1..]
-    [[r, "on#{cap}"], ["#{r}Container", "on#{cap}Container"]]
-  end
-  contrast_pairs += [["background", "onBackground"], ["surface", "onSurface"], ["surfaceVariant", "onSurfaceVariant"], ["inverseSurface", "inverseOnSurface"]]
-  contrast_pairs += %w[surfaceBright surfaceContainer surfaceContainerHigh surfaceContainerHighest surfaceContainerLow surfaceContainerLowest surfaceDim].map { |r| [r, "onSurface"] }
-  contrast_pairs += %w[primary secondary tertiary].flat_map do |r|
-    cap = r[0].upcase + r[1..]
-    ["#{r}Fixed", "#{r}FixedDim"].product(["on#{cap}Fixed", "on#{cap}FixedVariant"])
-  end
-  contrast_pairs += EXTENDED_ROLES.filter_map do |r|
-    on = "on#{r[0].upcase}#{r[1..]}"
-    [r, on] if EXTENDED_ROLES.include?(on)
-  end
   tonal_spot = material3_presets.fetch("tonalSpot")
 
   <<~SWIFT
@@ -428,6 +433,12 @@ def swift_core(material2_tokens, material3_roles, material3_presets)
       }
     }
 
+    /// Invalid external input to contrast validation.
+    public enum MaterialContrastError: Error, Sendable {
+      /// The requested threshold is not finite or is outside 1...21.
+      case invalidMinimum(Double)
+    }
+
     /// A failing semantic fill/content pair in an app's final scheme.
     public struct MaterialContrastIssue: Hashable, Sendable {
       /// Camel-case standard or extended background role name.
@@ -436,6 +447,14 @@ def swift_core(material2_tokens, material3_roles, material3_presets)
       public let onRole: String
       /// WCAG 2.x contrast ratio, without rounding.
       public let ratio: Double
+
+      /// Creates a diagnostic value, for example an expected result in an app test.
+      /// Fields are stored verbatim; this initializer does not measure colors or validate roles.
+      public init(colorRole: String, onRole: String, ratio: Double) {
+        self.colorRole = colorRole
+        self.onRole = onRole
+        self.ratio = ratio
+      }
     }
 
     #{swift_extended}
@@ -486,6 +505,16 @@ def swift_core(material2_tokens, material3_roles, material3_presets)
           let ratio = color.contrastRatio(with: onColor)
           return ratio < minimum ? MaterialContrastIssue(colorRole: colorRole, onRole: onRole, ratio: ratio) : nil
         }
+      }
+
+      /// Checks an external threshold without trapping or silently clamping it.
+      /// - Throws: `MaterialContrastError.invalidMinimum` unless minimum is finite and in 1...21.
+      /// - Returns: The same semantic pair diagnostics as `contrastIssues(minimum:)`.
+      public func validatedContrastIssues(minimum: Double = 4.5) throws -> [MaterialContrastIssue] {
+        guard minimum.isFinite && (1...21).contains(minimum) else {
+          throw MaterialContrastError.invalidMinimum(minimum)
+        }
+        return contrastIssues(minimum: minimum)
       }
 
       public let appearance: MaterialAppearance
@@ -570,6 +599,14 @@ def swift_core(material2_tokens, material3_roles, material3_presets)
       public let light: MaterialTheme
       /// Final dark theme.
       public let dark: MaterialTheme
+
+      /// Groups existing themes for light and dark presentation without altering their colors.
+      /// Argument labels select their intended UI use; scheme appearance metadata is preserved,
+      /// not validated or rewritten. Supply the appropriate scheme for each appearance.
+      public init(light: MaterialTheme, dark: MaterialTheme) {
+        self.light = light
+        self.dark = dark
+      }
     }
 
     public struct MaterialTheme: Hashable, Sendable {
@@ -929,6 +966,61 @@ def react_native_color_scheme(roles, presets)
   TS
 end
 
+def javascript_contrast
+  <<~TS
+    #{generated_header("//").rstrip}
+    import type { MaterialColorScheme, MaterialExtendedColors } from "./colorScheme.js";
+
+    /** Immutable diagnostic for an actual semantic fill/content pair. Role names are camelCase. */
+    export interface MaterialContrastIssue {
+      readonly colorRole: string;
+      readonly onRole: string;
+      readonly ratio: number;
+    }
+
+    /** WCAG 2.x ratio of opaque #RRGGBB sRGB colors. Composite translucent UI first.
+     * @throws TypeError for malformed hex inputs.
+     */
+    export function contrastRatio(color: string, other: string): number {
+      function luminance(hex: string): number {
+        if (typeof hex !== "string" || hex.length !== 7 || !/^#[0-9a-fA-F]{6}$/.test(hex)) {
+          throw new TypeError("expected #RRGGBB hex color");
+        }
+        const components = [1, 3, 5].map(offset => {
+          const c = parseInt(hex.slice(offset, offset + 2), 16) / 255;
+          return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+        });
+        return 0.2126 * components[0]! + 0.7152 * components[1]! + 0.0722 * components[2]!;
+      }
+      const a = luminance(color), b = luminance(other);
+      return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+    }
+
+    const pairs = #{JSON.generate(contrast_pairs)} as const;
+
+    /** Checks standard and present extended semantic pairs; does not infer arbitrary UI adjacency.
+     * Legacy 48-role schemes omit custom pairs. If either member of a custom pair is present,
+     * both must be valid hex colors. Returns frozen diagnostics without mutating the scheme.
+     * @throws RangeError unless minimum is finite and in 1...21; TypeError for invalid pair colors.
+     */
+    export function contrastIssues(
+      scheme: MaterialColorScheme & Partial<MaterialExtendedColors>, minimum = 4.5,
+    ): readonly MaterialContrastIssue[] {
+      if (!Number.isFinite(minimum) || minimum < 1 || minimum > 21) {
+        throw new RangeError("minimum must be finite and in 1...21");
+      }
+      const issues: MaterialContrastIssue[] = [];
+      for (const [colorRole, onRole] of pairs) {
+        if (#{JSON.generate(EXTENDED_ROLES)}.includes(colorRole) &&
+            !(colorRole in scheme) && !(onRole in scheme)) continue;
+        const ratio = contrastRatio(scheme[colorRole]!, scheme[onRole]!);
+        if (ratio < minimum) issues.push(Object.freeze({ colorRole, onRole, ratio }));
+      }
+      return Object.freeze(issues);
+    }
+  TS
+end
+
 def python_colors(material2_tokens)
   color_attrs = material2_tokens.map do |name, hex|
     "    #{name} = #{hex.inspect}"
@@ -962,6 +1054,17 @@ def python_colors(material2_tokens)
                 int(self.hex[1:], 16)
             except ValueError as error:
                 raise ValueError(f"expected #RRGGBB hex color, got {self.hex!r}") from error
+
+        def contrast_ratio(self, other: MaterialColor) -> float:
+            """WCAG 2.x ratio for opaque sRGB colors; composite translucent UI first."""
+            def luminance(color: MaterialColor) -> float:
+                def linear(byte: int) -> float:
+                    c = byte / 255
+                    return c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
+                r, g, b = (linear(byte) for byte in color.rgb)
+                return 0.2126 * r + 0.7152 * g + 0.0722 * b
+            a, b = luminance(self), luminance(other)
+            return (max(a, b) + 0.05) / (min(a, b) + 0.05)
 
         @property
         def rgb(self) -> tuple[int, int, int]:
@@ -1048,6 +1151,7 @@ def python_theme(roles, presets)
     from collections.abc import Mapping
     from dataclasses import dataclass, field
     from enum import Enum
+    from math import isfinite
     from types import MappingProxyType
     from typing import Optional, Union
 
@@ -1075,6 +1179,21 @@ def python_theme(roles, presets)
     })
 
     @dataclass(frozen=True)
+    class MaterialContrastIssue:
+        """Diagnostic value with camelCase role names and an unrounded ratio.
+
+        Fields are stored verbatim; construction does not measure colors or validate roles.
+        """
+        color_role: str
+        on_role: str
+        ratio: float
+
+
+    _CONTRAST_PAIRS = (
+    #{contrast_pairs.map { |a,b| "    (#{a.inspect}, #{b.inspect})," }.join("\n")}
+    )
+
+    @dataclass(frozen=True)
     class MaterialColorScheme:
         appearance: str
     #{fields}
@@ -1097,6 +1216,21 @@ def python_theme(roles, presets)
 
         def role_color(self, role: str) -> MaterialColor:
             return self.extended_colors[role] if role in EXTENDED_COLOR_ROLES else getattr(self, ROLE_FIELDS[role])
+
+        def contrast_issues(self, minimum: float = 4.5) -> tuple[MaterialContrastIssue, ...]:
+            """Check standard and extended semantic pairs, not arbitrary UI adjacency.
+
+            Raises ValueError unless minimum is finite and in 1...21. No clamping.
+            """
+            # Compare before float conversion: Python integers may exceed float range.
+            if not 1 <= minimum <= 21 or not isfinite(minimum):
+                raise ValueError("minimum must be finite and in 1...21")
+            issues = []
+            for color_role, on_role in _CONTRAST_PAIRS:
+                ratio = self.role_color(color_role).contrast_ratio(self.role_color(on_role))
+                if ratio < minimum:
+                    issues.append(MaterialContrastIssue(color_role, on_role, ratio))
+            return tuple(issues)
 
         def as_hex_map(self) -> dict[str, str]:
             """Map of camelCase role name to ``#RRGGBB`` hex. Not a round-trip
@@ -1281,7 +1415,7 @@ clashes = EXTENDED_ROLES & material3_roles
 abort("extended roles collide with standard roles: #{clashes.join(", ")}") unless clashes.empty?
 # These names occupy generated enum/scheme namespaces, including Python normalization.
 reserved_members = %w[appearance extendedColors overridingExtended overriding color roleColor asHexMap asExtendedHexMap
-  contrastIssues custom preset baseline baselineLight baselineDark values rawValue allCases hash hashValue
+  contrastIssues validatedContrastIssues custom preset baseline baselineLight baselineDark values rawValue allCases hash hashValue
   description init deinit self super Self Type Protocol get set willSet didSet subscript
   associatedtype class enum extension fileprivate func import inout internal let open operator private
   precedencegroup protocol public rethrows static struct typealias var break case catch continue default
@@ -1313,6 +1447,7 @@ write_file(
   uikit_extensions(material2_tokens),
   check: check
 )
+write_file("packages/js/src/contrast.ts", javascript_contrast, check: check)
 write_file(
   "packages/js/src/colors.ts",
   react_native_colors(material2_tokens),

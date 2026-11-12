@@ -9,7 +9,7 @@ Material color tokens and Material 3 style color schemes for multiple platforms.
 ![Badge](https://img.shields.io/badge/SwiftUI-001b87.svg?style=flat-square&logo=Swift&logoColor=black)
 ![Badge](https://img.shields.io/badge/React_Native-20232A.svg?style=flat-square&logo=react&logoColor=61DAFB)
 ![Badge](https://img.shields.io/badge/Python-3776AB.svg?style=flat-square&logo=python&logoColor=white)
-![Badge - Version](https://img.shields.io/badge/Version-2.3.0-1177AA?style=flat-square)
+![Badge - Version](https://img.shields.io/badge/Version-2.4.0-1177AA?style=flat-square)
 ![Badge - Swift Package Manager](https://img.shields.io/badge/SPM-compatible-orange?style=flat-square)
 ![macOS](https://img.shields.io/badge/macOS-10.15%2B-yellow?style=flat-square)
 ![Badge - Platform](https://img.shields.io/badge/iOS-v13.0-yellow?style=flat-square)
@@ -113,7 +113,7 @@ Swift DocC API documentation for `MaterialDesignColorCore` is available at [docs
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/swift-man/MaterialDesignColor.git", from: "2.3.0")
+  .package(url: "https://github.com/swift-man/MaterialDesignColor.git", from: "2.4.0")
 ]
 ```
 
@@ -375,7 +375,7 @@ This keeps Android aligned with platform dynamic color behavior instead of shipp
 Recommended initial strategy: one repository tag for all non-Android packages.
 
 ```text
-v2.3.0
+v2.4.0
 ```
 
 Each package can publish its own artifact from that same tag:
@@ -389,7 +389,7 @@ Each package can publish its own artifact from that same tag:
 If platform release cycles become very different later, use platform-prefixed tags:
 
 ```text
-ios-v2.3.0
+ios-v2.4.0
 js-v1.2.0
 python-v1.0.0
 ```
@@ -611,3 +611,48 @@ outline, scrim, surfaceTint 등 명시적 on 쌍이 없는 역할의 임의 배�
 실제 UI에서 인접한 다른 색은 `contrastRatio(with:)`로 직접 검사하세요.
 opacity가 있는 최종 UI는 먼저 배경과 합성한 불투명 색을 비교해야 합니다.
 4.5:1 충족은 앱의 실제 값·조합으로 판단하며 모든 프리셋 또는 임의 override에 대한 일괄 보장이 아닙니다.
+
+### 기존 테마 재사용과 플랫폼별 대비 검증 (2.4.0)
+
+앱이나 `tools/theme` 생성기로 이미 만든 두 테마도 하나의 값으로 묶을 수 있습니다.
+
+```swift
+let pair = MaterialThemePair(light: .light, dark: .dark)
+// ContentView().materialTheme(light: pair.light, dark: pair.dark)
+let expected = MaterialContrastIssue(colorRole: "warning", onRole: "onWarning", ratio: 1)
+assert(!pair.light.colorScheme.contrastIssues().contains(expected))
+do {
+    let issues = try pair.light.colorScheme.validatedContrastIssues(minimum: 4.5)
+    assert(issues.isEmpty)
+} catch MaterialContrastError.invalidMinimum(let value) {
+    print("잘못된 대비 기준: \(value)")
+}
+```
+
+테마 쌍 생성자는 두 테마의 색·appearance 메타데이터를 바꾸지 않습니다. 앱이 각 표시 모드에
+맞는 테마를 전달합니다. 진단 객체 생성자는 테스트 기대값 등 기록용이며 역할/비율을 검증하지 않습니다.
+외부 설정에서 읽은 기준은 `validatedContrastIssues`로 검사하세요. 유한한 1...21 밖이면
+오류를 던지며 기존 `contrastIssues`의 precondition 계약은 유지합니다.
+
+```ts
+import { createMaterialTheme, contrastRatio, contrastIssues } from '@swift-man/material-design-color';
+const theme = createMaterialTheme({ colorScheme: { warning: '#804000', onWarning: '#FFFFFF' } });
+console.log(contrastRatio('#804000', '#FFFFFF'));
+console.log(contrastIssues(theme.colorScheme, 4.5));
+```
+
+```python
+from material_design_color import MaterialColor, MaterialContrastIssue, custom_color_scheme
+white = MaterialColor('white', '#FFFFFF')
+print(MaterialColor('warning', '#804000').contrast_ratio(white))
+scheme = custom_color_scheme({'warning': '#804000', 'onWarning': white.hex})
+assert MaterialContrastIssue('warning', 'onWarning', 1) not in scheme.contrast_issues(4.5)
+```
+
+세 플랫폼은 생성기의 같은 35개 의미상 대비 쌍(기본 31개·확장 4개)을 검사합니다.
+JS의 기존 48개 역할 스킴에서는 없는 확장 쌍을 생략하며, 한쪽만 있는 확장 쌍은 오류입니다.
+잘못된 기준에는 JS `RangeError`, Python `ValueError`가 발생합니다. JS hex 형식 오류는
+`TypeError`입니다. 결과는 JS의 동결된 배열/객체, Python의 tuple/동결 dataclass로 제공합니다.
+투명도 합성과 실제 화면에서 인접한 색의 선택은 앱이 책임집니다.
+자세한 오류 처리 예제는 [Apple](packages/ios/README.md), [JS](packages/js/README.md),
+[Python](packages/python/README.md) 문서를 참고하세요.

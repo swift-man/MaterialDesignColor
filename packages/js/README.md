@@ -141,4 +141,29 @@ const theme = createMaterialTheme({colorScheme: {warning: '#804000', onWarning: 
 const warning = getSchemeColor(theme.colorScheme, 'warning');
 ```
 
-See the [shared responsibility guide](../../README.md#템플릿-값과-앱-확정-값). The new contrast validation API is currently in Swift Core.
+See the [shared responsibility guide](../../README.md#템플릿-값과-앱-확정-값). Contrast validation is available in Swift Core, JavaScript/TypeScript, and Python starting with 2.4.0; see the examples below.
+
+### 앱 최종 색상 대비 검증 (2.4.0)
+
+```ts
+import { createMaterialTheme, contrastRatio, contrastIssues } from '@swift-man/material-design-color';
+import type { MaterialContrastIssue } from '@swift-man/material-design-color';
+
+const theme = createMaterialTheme({
+  colorScheme: { warning: '#804000', onWarning: '#FFFFFF' },
+});
+console.log(contrastRatio('#804000', '#FFFFFF'));
+try {
+  const issues: readonly MaterialContrastIssue[] = contrastIssues(theme.colorScheme, 4.5);
+  console.log(issues); // { colorRole, onRole, ratio }[], camelCase 역할 이름
+} catch (error) {
+  if (error instanceof RangeError) console.error('대비 기준은 유한한 1...21이어야 합니다.');
+  else throw error;
+}
+```
+
+`contrastRatio`는 불투명 sRGB `#RRGGBB` 두 색의 WCAG 2.x 비율(1...21)을 계산합니다.
+잘못된 hex에는 `TypeError`, `contrastIssues`의 잘못된 기준에는 `RangeError`를 던집니다.
+기본 31개·확장 4개 의미상 대비 쌍을 검사하며 결과 배열과 진단 객체는 동결됩니다.
+기존 48개 역할 스킴은 확장 쌍을 생략합니다. 확장 쌍의 한쪽만 있으면 `TypeError`입니다.
+실제 화면의 임의 인접 관계는 추론하지 않으며 투명 색은 배경과 합성한 뒤 검사하세요.
