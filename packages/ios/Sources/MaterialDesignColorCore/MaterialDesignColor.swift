@@ -778,7 +778,133 @@ public enum MaterialThemePreset: String, CaseIterable, Hashable, Sendable {
   }
 }
 
+/// Custom status roles, separate from Google's 48 Material 3 roles.
+public enum MaterialExtendedColorRole: String, CaseIterable, Hashable, Sendable {
+  /// Custom status role `success` (outside the 48 M3 roles).
+  case success
+  /// Custom status role `onSuccess` (outside the 48 M3 roles).
+  case onSuccess
+  /// Custom status role `successContainer` (outside the 48 M3 roles).
+  case successContainer
+  /// Custom status role `onSuccessContainer` (outside the 48 M3 roles).
+  case onSuccessContainer
+  /// Custom status role `warning` (outside the 48 M3 roles).
+  case warning
+  /// Custom status role `onWarning` (outside the 48 M3 roles).
+  case onWarning
+  /// Custom status role `warningContainer` (outside the 48 M3 roles).
+  case warningContainer
+  /// Custom status role `onWarningContainer` (outside the 48 M3 roles).
+  case onWarningContainer
+}
+/// Immutable harmonized custom colors. Override individual roles with validated hex values.
+public struct MaterialExtendedColors: Hashable, Sendable {
+  private let values: [MaterialExtendedColorRole: MaterialColor]
+  /// Returns a status color; every instance contains every extended role.
+  public subscript(role: MaterialExtendedColorRole) -> MaterialColor { values[role]! }
+  /// Returns a copy with validated #RRGGBB overrides.
+  public func overriding(_ overrides: [MaterialExtendedColorRole: String]) throws -> Self {
+    var result = values
+    for (role, hex) in overrides { result[role] = try MaterialColor(name: role.rawValue, hex: hex) }
+    return Self(values: result)
+  }
+  /// Harmonized light status colors for the default source color.
+  public static let light = MaterialExtendedColors(values: [
+      .success: MaterialColor(uncheckedName: "success", hex: "#006D40"),
+      .onSuccess: MaterialColor(uncheckedName: "onSuccess", hex: "#FFFFFF"),
+      .successContainer: MaterialColor(uncheckedName: "successContainer", hex: "#8BF9B5"),
+      .onSuccessContainer: MaterialColor(uncheckedName: "onSuccessContainer", hex: "#002110"),
+      .warning: MaterialColor(uncheckedName: "warning", hex: "#994704"),
+      .onWarning: MaterialColor(uncheckedName: "onWarning", hex: "#FFFFFF"),
+      .warningContainer: MaterialColor(uncheckedName: "warningContainer", hex: "#FFDBC9"),
+      .onWarningContainer: MaterialColor(uncheckedName: "onWarningContainer", hex: "#321200")
+  ])
+  /// Harmonized dark status colors for the default source color.
+  public static let dark = MaterialExtendedColors(values: [
+      .success: MaterialColor(uncheckedName: "success", hex: "#6EDC9B"),
+      .onSuccess: MaterialColor(uncheckedName: "onSuccess", hex: "#00391F"),
+      .successContainer: MaterialColor(uncheckedName: "successContainer", hex: "#00522F"),
+      .onSuccessContainer: MaterialColor(uncheckedName: "onSuccessContainer", hex: "#8BF9B5"),
+      .warning: MaterialColor(uncheckedName: "warning", hex: "#FFB68C"),
+      .onWarning: MaterialColor(uncheckedName: "onWarning", hex: "#532200"),
+      .warningContainer: MaterialColor(uncheckedName: "warningContainer", hex: "#753400"),
+      .onWarningContainer: MaterialColor(uncheckedName: "onWarningContainer", hex: "#FFDBC9")
+  ])
+}
+
 public struct MaterialColorScheme: Hashable, Sendable {
+  /// Custom status colors, separate from the standard M3 role collection.
+  public let extendedColors: MaterialExtendedColors
+  /// Harmonized custom status color `success`.
+  public var success: MaterialColor { extendedColors[.success] }
+  /// Harmonized custom status color `onSuccess`.
+  public var onSuccess: MaterialColor { extendedColors[.onSuccess] }
+  /// Harmonized custom status color `successContainer`.
+  public var successContainer: MaterialColor { extendedColors[.successContainer] }
+  /// Harmonized custom status color `onSuccessContainer`.
+  public var onSuccessContainer: MaterialColor { extendedColors[.onSuccessContainer] }
+  /// Harmonized custom status color `warning`.
+  public var warning: MaterialColor { extendedColors[.warning] }
+  /// Harmonized custom status color `onWarning`.
+  public var onWarning: MaterialColor { extendedColors[.onWarning] }
+  /// Harmonized custom status color `warningContainer`.
+  public var warningContainer: MaterialColor { extendedColors[.warningContainer] }
+  /// Harmonized custom status color `onWarningContainer`.
+  public var onWarningContainer: MaterialColor { extendedColors[.onWarningContainer] }
+
+  /// Returns a copy with validated custom status color overrides.
+  public func overridingExtended(_ overrides: [MaterialExtendedColorRole: String]) throws -> Self {
+    Self(appearance: appearance,
+      primary: primary,
+      onPrimary: onPrimary,
+      primaryContainer: primaryContainer,
+      onPrimaryContainer: onPrimaryContainer,
+      inversePrimary: inversePrimary,
+      secondary: secondary,
+      onSecondary: onSecondary,
+      secondaryContainer: secondaryContainer,
+      onSecondaryContainer: onSecondaryContainer,
+      tertiary: tertiary,
+      onTertiary: onTertiary,
+      tertiaryContainer: tertiaryContainer,
+      onTertiaryContainer: onTertiaryContainer,
+      background: background,
+      onBackground: onBackground,
+      surface: surface,
+      onSurface: onSurface,
+      surfaceVariant: surfaceVariant,
+      onSurfaceVariant: onSurfaceVariant,
+      surfaceTint: surfaceTint,
+      inverseSurface: inverseSurface,
+      inverseOnSurface: inverseOnSurface,
+      error: error,
+      onError: onError,
+      errorContainer: errorContainer,
+      onErrorContainer: onErrorContainer,
+      outline: outline,
+      outlineVariant: outlineVariant,
+      scrim: scrim,
+      surfaceBright: surfaceBright,
+      surfaceContainer: surfaceContainer,
+      surfaceContainerHigh: surfaceContainerHigh,
+      surfaceContainerHighest: surfaceContainerHighest,
+      surfaceContainerLow: surfaceContainerLow,
+      surfaceContainerLowest: surfaceContainerLowest,
+      surfaceDim: surfaceDim,
+      primaryFixed: primaryFixed,
+      primaryFixedDim: primaryFixedDim,
+      onPrimaryFixed: onPrimaryFixed,
+      onPrimaryFixedVariant: onPrimaryFixedVariant,
+      secondaryFixed: secondaryFixed,
+      secondaryFixedDim: secondaryFixedDim,
+      onSecondaryFixed: onSecondaryFixed,
+      onSecondaryFixedVariant: onSecondaryFixedVariant,
+      tertiaryFixed: tertiaryFixed,
+      tertiaryFixedDim: tertiaryFixedDim,
+      onTertiaryFixed: onTertiaryFixed,
+      onTertiaryFixedVariant: onTertiaryFixedVariant,
+      extendedColors: try extendedColors.overriding(overrides))
+  }
   public let appearance: MaterialAppearance
   public let primary: MaterialColor
   public let onPrimary: MaterialColor
@@ -878,9 +1004,11 @@ public struct MaterialColorScheme: Hashable, Sendable {
     tertiaryFixed: MaterialColor,
     tertiaryFixedDim: MaterialColor,
     onTertiaryFixed: MaterialColor,
-    onTertiaryFixedVariant: MaterialColor
+    onTertiaryFixedVariant: MaterialColor,
+    extendedColors: MaterialExtendedColors? = nil
   ) {
     self.appearance = appearance
+    self.extendedColors = extendedColors ?? (appearance == .dark ? .dark : .light)
     self.primary = primary
     self.onPrimary = onPrimary
     self.primaryContainer = primaryContainer
@@ -1086,7 +1214,8 @@ public struct MaterialColorScheme: Hashable, Sendable {
       tertiaryFixed: try overrides[.tertiaryFixed].map { try MaterialColor(role: .tertiaryFixed, hex: $0) } ?? tertiaryFixed,
       tertiaryFixedDim: try overrides[.tertiaryFixedDim].map { try MaterialColor(role: .tertiaryFixedDim, hex: $0) } ?? tertiaryFixedDim,
       onTertiaryFixed: try overrides[.onTertiaryFixed].map { try MaterialColor(role: .onTertiaryFixed, hex: $0) } ?? onTertiaryFixed,
-      onTertiaryFixedVariant: try overrides[.onTertiaryFixedVariant].map { try MaterialColor(role: .onTertiaryFixedVariant, hex: $0) } ?? onTertiaryFixedVariant
+      onTertiaryFixedVariant: try overrides[.onTertiaryFixedVariant].map { try MaterialColor(role: .onTertiaryFixedVariant, hex: $0) } ?? onTertiaryFixedVariant,
+      extendedColors: extendedColors
     )
   }
 

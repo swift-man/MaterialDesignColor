@@ -106,3 +106,20 @@ struct MaterialDesignColorCoreTests {
     }
   }
 }
+
+struct ExtendedColorTests {
+  @Test func extendedRolesPreserveCoreContract() throws {
+    #expect(MaterialColorRole.allCases.count == 48)
+    #expect(MaterialExtendedColorRole.allCases.count == 8)
+    for preset in MaterialThemePreset.allCases {
+      for appearance in [MaterialAppearance.light, .dark] {
+        let scheme = MaterialColorScheme.preset(preset, appearance: appearance)
+        let changed = try scheme.overridingExtended([.success: "#123456"])
+        #expect(changed.success.hex == "#123456")
+        #expect(scheme.success.hex != changed.success.hex)
+        #expect(try changed.overriding([.primary: "#ABCDEF"]).success == changed.success)
+        #expect(throws: MaterialColorError.self) { try scheme.overridingExtended([.warning: "#bad"]) }
+      }
+    }
+  }
+}

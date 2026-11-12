@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 // Smoke-tests the published entry point by importing through the package
 // name (Node "self-referencing"). This routes through package.json's
 // `exports` map and `type` declaration, so a broken exports map, missing
@@ -111,3 +112,18 @@ for (const [label, actual, expected] of checks) {
 }
 
 console.log("ESM smoke test passed.");
+
+// Extended status colors do not change the standard role contract.
+const extended = await import('@swift-man/material-design-color');
+assert.equal(extended.materialColorSchemeRoles.length, 48);
+assert.equal(extended.materialExtendedColorRoles.length, 8);
+for (const preset of extended.materialThemePresets) {
+  for (const dark of [false, true]) {
+    const theme = extended.createMaterialTheme({preset, dark});
+    assert.equal(theme.colorScheme.success, extended.materialThemePresetSchemes[preset][dark ? 'dark' : 'light'].success);
+    assert.match(theme.colorScheme.onWarningContainer, /^#[0-9A-F]{6}$/);
+  }
+}
+assert.equal(extended.createMaterialTheme({colorScheme: {success: '#123456'}}).colorScheme.success, '#123456');
+assert.throws(() => extended.createMaterialTheme({colorScheme: {warning: '#bad'}}), RangeError);
+assert.notEqual(extended.lightColorScheme.success, '#123456');

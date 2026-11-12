@@ -10,6 +10,45 @@ MATERIAL3_ROLES_PATH = File.join(ROOT, "tokens/material3/color-scheme-roles.json
 MATERIAL3_BASELINE_PATH = File.join(ROOT, "tokens/material3/baseline-color-schemes.json")
 MATERIAL3_PRESETS_PATH = File.join(ROOT, "tokens/material3/theme-presets.json")
 
+def validate_extended_tokens(data)
+  abort("extended color tokens must be an object") unless data.is_a?(Hash)
+  %w[light dark].each do |mode|
+    abort("extended.#{mode} must be a non-empty role map") unless data[mode].is_a?(Hash) && !data[mode].empty?
+  end
+  abort("extended light/dark role names must match") unless data["light"].keys.sort == data["dark"].keys.sort
+  data["light"].keys.each do |role|
+    abort("invalid extended role name: #{role}") unless role.match?(/\A[a-z][A-Za-z0-9]*\z/)
+    %w[light dark].each { |mode| validate_hex!(data[mode][role], "extended.#{mode}.#{role}") }
+  end
+end
+
+def swift_extended
+  cases = EXTENDED_ROLES.map { |r| "  /// Custom status role `#{r}` (outside the 48 M3 roles).\n  case #{r}" }.join("\n")
+  statics = %w[light dark].map do |mode|
+    values = EXTENDED_ROLES.map { |r| "      .#{r}: MaterialColor(uncheckedName: #{r.inspect}, hex: #{EXTENDED.fetch(mode).fetch(r).inspect})" }.join(",\n")
+    "  /// Harmonized #{mode} status colors for the default source color.\n  public static let #{mode} = MaterialExtendedColors(values: [\n#{values}\n  ])"
+  end.join("\n")
+  <<~SWIFT
+    /// Custom status roles, separate from Google's 48 Material 3 roles.
+    public enum MaterialExtendedColorRole: String, CaseIterable, Hashable, Sendable {
+    #{cases}
+    }
+    /// Immutable harmonized custom colors. Override individual roles with validated hex values.
+    public struct MaterialExtendedColors: Hashable, Sendable {
+      private let values: [MaterialExtendedColorRole: MaterialColor]
+      /// Returns a status color; every instance contains every extended role.
+      public subscript(role: MaterialExtendedColorRole) -> MaterialColor { values[role]! }
+      /// Returns a copy with validated #RRGGBB overrides.
+      public func overriding(_ overrides: [MaterialExtendedColorRole: String]) throws -> Self {
+        var result = values
+        for (role, hex) in overrides { result[role] = try MaterialColor(name: role.rawValue, hex: hex) }
+        return Self(values: result)
+      }
+    #{statics}
+    }
+  SWIFT
+end
+
 def generated_header(prefix)
   "#{prefix} Generated from tokens/ by tools/codegen/generate.rb.\n" \
     "#{prefix} Do not edit by hand.\n\n"
@@ -332,15 +371,28 @@ def swift_core(material2_tokens, material3_roles, material3_presets)
       }
     }
 
+    #{swift_extended}
     public struct MaterialColorScheme: Hashable, Sendable {
+      /// Custom status colors, separate from the standard M3 role collection.
+      public let extendedColors: MaterialExtendedColors
+    #{EXTENDED_ROLES.map { |r| "  /// Harmonized custom status color `#{r}`.\n  public var #{r}: MaterialColor { extendedColors[.#{r}] }" }.join("\n")}
+
+      /// Returns a copy with validated custom status color overrides.
+      public func overridingExtended(_ overrides: [MaterialExtendedColorRole: String]) throws -> Self {
+        Self(appearance: appearance,
+    #{material3_roles.map { |r| "      #{r}: #{r}," }.join("\n")}
+          extendedColors: try extendedColors.overriding(overrides))
+      }
       public let appearance: MaterialAppearance
     #{scheme_properties}
 
       public init(
         appearance: MaterialAppearance,
-    #{scheme_init_parameters}
+    #{scheme_init_parameters},
+        extendedColors: MaterialExtendedColors? = nil
       ) {
         self.appearance = appearance
+        self.extendedColors = extendedColors ?? (appearance == .dark ? .dark : .light)
     #{scheme_init_assignments}
       }
 
@@ -357,7 +409,8 @@ def swift_core(material2_tokens, material3_roles, material3_presets)
       public func overriding(_ overrides: [MaterialColorRole: String]) throws -> MaterialColorScheme {
         MaterialColorScheme(
           appearance: appearance,
-    #{scheme_override_parameters}
+    #{scheme_override_parameters},
+          extendedColors: extendedColors
         )
       }
 
@@ -581,8 +634,8 @@ def react_native_color_scheme(roles, presets)
   tonal_spot = presets.fetch("tonalSpot")
   preset_schemes = presets.transform_values do |data|
     {
-      "light" => data.fetch("light"),
-      "dark" => data.fetch("dark")
+      "light" => data.fetch("light").merge(EXTENDED.fetch("light")),
+      "dark" => data.fetch("dark").merge(EXTENDED.fetch("dark"))
     }
   end
   preset_source_colors = presets.transform_values { |data| data.fetch("sourceColor") }
@@ -611,6 +664,12 @@ def react_native_color_scheme(roles, presets)
 
       return value;
     }
+
+    /** Custom status roles, separate from the 48 standard M3 roles. */
+    export const materialExtendedColorRoles = deepFreeze(#{JSON.generate(EXTENDED_ROLES)} as const);
+    export type MaterialExtendedColorRole = (typeof materialExtendedColorRoles)[number];
+    export type MaterialExtendedColors = Readonly<Record<MaterialExtendedColorRole, string>>;
+    export type MaterialColorSchemeWithExtended = MaterialColorScheme & MaterialExtendedColors;
 
     export const materialColorSchemeRoles = deepFreeze([
     #{role_values}
@@ -642,13 +701,18 @@ def react_native_color_scheme(roles, presets)
       readonly [Role in MaterialColorRole]: string;
     };
 
-    export type MaterialColorSchemeInput = Partial<Record<MaterialColorRole, string>>;
+    export type MaterialColorSchemeInput = Partial<Record<MaterialColorRole | MaterialExtendedColorRole, string>>;
 
     export interface MaterialTheme {
       readonly dark: boolean;
       readonly preset: MaterialThemePreset;
       readonly sourceColor: string;
       readonly colorScheme: MaterialColorScheme;
+    }
+
+    /** Factory theme with the eight required custom status colors. */
+    export interface MaterialThemeWithExtended extends MaterialTheme {
+      readonly colorScheme: MaterialColorSchemeWithExtended;
     }
 
     export interface MaterialThemeOptions {
@@ -660,7 +724,7 @@ def react_native_color_scheme(roles, presets)
     export function getMaterialThemeColorScheme(
       preset: MaterialThemePreset,
       dark = false,
-    ): MaterialColorScheme {
+    ): MaterialColorSchemeWithExtended {
       return { ...materialThemePresetSchemes[preset][dark ? "dark" : "light"] };
     }
 
@@ -671,16 +735,16 @@ def react_native_color_scheme(roles, presets)
     }
 
     function mergeMaterialColorScheme(
-      base: MaterialColorScheme,
+      base: MaterialColorSchemeWithExtended,
       overrides?: MaterialColorSchemeInput,
-    ): MaterialColorScheme {
-      const colorScheme: Record<MaterialColorRole, string> = { ...base };
+    ): MaterialColorSchemeWithExtended {
+      const colorScheme = { ...base };
 
       if (!overrides) {
         return colorScheme;
       }
 
-      for (const role of materialColorSchemeRoles) {
+      for (const role of [...materialColorSchemeRoles, ...materialExtendedColorRoles]) {
         const value = overrides[role];
 
         if (value !== undefined) {
@@ -691,7 +755,7 @@ def react_native_color_scheme(roles, presets)
       return colorScheme;
     }
 
-    export function createMaterialTheme(options: MaterialThemeOptions = {}): MaterialTheme {
+    export function createMaterialTheme(options: MaterialThemeOptions = {}): MaterialThemeWithExtended {
       const dark = options.dark ?? false;
       const preset = options.preset ?? "tonalSpot";
       const base = getMaterialThemeColorScheme(preset, dark);
@@ -707,7 +771,7 @@ def react_native_color_scheme(roles, presets)
     export function getMaterialTheme(
       preset: MaterialThemePreset,
       options: Omit<MaterialThemeOptions, "preset"> = {},
-    ): MaterialTheme {
+    ): MaterialThemeWithExtended {
       return createMaterialTheme({ ...options, preset });
     }
 
@@ -837,7 +901,7 @@ def python_theme(roles, presets)
     from __future__ import annotations
 
     from collections.abc import Mapping
-    from dataclasses import dataclass
+    from dataclasses import dataclass, field
     from enum import Enum
     from types import MappingProxyType
     from typing import Optional, Union
@@ -858,13 +922,36 @@ def python_theme(roles, presets)
     #{enum_cases}
 
 
+    EXTENDED_COLOR_ROLES: tuple[str, ...] = (
+    #{EXTENDED_ROLES.map { |role| "    #{role.inspect}," }.join("\n")}
+    )
+    EXTENDED_COLOR_SCHEMES = MappingProxyType({
+    #{%w[light dark].map { |mode| "    #{mode.inspect}: MappingProxyType({" + EXTENDED.fetch(mode).map { |r,h| "#{r.inspect}: MaterialColor(#{r.inspect}, #{h.inspect})" }.join(", ") + "})," }.join("\n")}
+    })
+
     @dataclass(frozen=True)
     class MaterialColorScheme:
         appearance: str
     #{fields}
+        extended_colors: Optional[Mapping[str, MaterialColor]] = field(default=None, hash=False)
+
+        def __post_init__(self) -> None:
+            if self.appearance not in ("light", "dark"):
+                raise ValueError(f"appearance must be 'light' or 'dark', got {self.appearance!r}")
+            base = dict(EXTENDED_COLOR_SCHEMES[self.appearance])
+            if self.extended_colors is not None:
+                for role, color in self.extended_colors.items():
+                    if role not in EXTENDED_COLOR_ROLES:
+                        raise ValueError(f"unknown extended role: {role}")
+                    if not isinstance(color, MaterialColor):
+                        raise TypeError("extended colors must be MaterialColor instances")
+                    base[role] = color
+            object.__setattr__(self, "extended_colors", MappingProxyType(base))
+
+    #{EXTENDED_ROLES.map { |r| "    @property\n    def #{python_role_name(r)}(self) -> MaterialColor:\n        \"\"\"Harmonized custom status color, outside the standard M3 roles.\"\"\"\n        return self.extended_colors[#{r.inspect}]\n" }.join("\n")}
 
         def role_color(self, role: str) -> MaterialColor:
-            return getattr(self, ROLE_FIELDS[role])
+            return self.extended_colors[role] if role in EXTENDED_COLOR_ROLES else getattr(self, ROLE_FIELDS[role])
 
         def as_hex_map(self) -> dict[str, str]:
             """Map of camelCase role name to ``#RRGGBB`` hex. Not a round-trip
@@ -939,7 +1026,11 @@ def python_theme(roles, presets)
             hex_value = overrides.get(role)
             values[field] = MaterialColor(role, hex_value) if hex_value is not None else getattr(base, field)
 
-        return MaterialColorScheme(appearance=base.appearance, **values)
+        extended = {
+            role: MaterialColor(role, overrides[role])
+            for role in EXTENDED_COLOR_ROLES if overrides.get(role) is not None
+        }
+        return MaterialColorScheme(appearance=base.appearance, extended_colors=extended, **values)
 
 
     def material_theme_builder_color_scheme(
@@ -955,7 +1046,8 @@ def python_theme(roles, presets)
             ROLE_FIELDS[role]: MaterialColor(role, roles[role])
             for role in COLOR_SCHEME_ROLES
         }
-        return MaterialColorScheme(appearance=appearance, **values)
+        extended = {role: MaterialColor(role, roles[role]) for role in EXTENDED_COLOR_ROLES if role in roles}
+        return MaterialColorScheme(appearance=appearance, extended_colors=extended, **values)
 
 
     def create_theme(
@@ -1003,8 +1095,13 @@ material3_roles = JSON.parse(File.read(MATERIAL3_ROLES_PATH))
 material3_baseline = JSON.parse(File.read(MATERIAL3_BASELINE_PATH))
 material3_presets = JSON.parse(File.read(MATERIAL3_PRESETS_PATH)).reject { |key, _| key.start_with?("$") }
 
+EXTENDED = JSON.parse(File.read(File.join(ROOT, "tokens/material3/extended-color-schemes.json")))
+validate_extended_tokens(EXTENDED)
+EXTENDED_ROLES = EXTENDED.fetch("light").keys
 validate_material2_tokens(material2_tokens)
 validate_material3_tokens(material3_roles, material3_baseline, material3_presets)
+clashes = EXTENDED_ROLES & material3_roles
+abort("extended roles collide with standard roles: #{clashes.join(", ")}") unless clashes.empty?
 
 write_file(
   "packages/ios/Sources/MaterialDesignColorCore/MaterialDesignColor.swift",

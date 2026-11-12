@@ -25,7 +25,16 @@ jobs:
         python-version: "3.11"
     - name: Verify generated sources
       run: ruby tools/codegen/generate.rb --check
-    - name: Test Swift package
+    - name: Verify MCU generation and contrast snapshots
+      run: |
+        npm --prefix tools/theme ci
+        npm --prefix tools/theme test
+        npm --prefix tools/theme run generate -- "#0A84FF" tonalSpot ../../packages/ios/Tests/MaterialDesignColorMacOSTests/GeneratedMaterialTheme.swift
+    - name: Build macOS SwiftUI and AppKit adapters
+      run: |
+        swift build --target MaterialDesignColorSwiftUI
+        swift build --target MaterialDesignColorAppKit
+    - name: Test Swift package (including macOS hosting view appearance changes)
       run: swift test -v
     - name: Build and smoke-test JS package
       # Mirror the publish workflow's check + build + ESM smoke so that
@@ -40,4 +49,4 @@ jobs:
     - name: Test Python package
       run: |
         python3 -m pip install --upgrade pip pytest
-        PYTHONPATH=packages/python/src python3 -m pytest packages/python/tests -v
+        PYTHONPATH=packages/python/src python3 -m pytest packages/python/tests tools/codegen/tests -v

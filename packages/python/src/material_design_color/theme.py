@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from types import MappingProxyType
 from typing import Optional, Union
@@ -126,6 +126,21 @@ class MaterialThemePreset(str, Enum):
     FRUIT_SALAD = "fruitSalad"
 
 
+EXTENDED_COLOR_ROLES: tuple[str, ...] = (
+    "success",
+    "onSuccess",
+    "successContainer",
+    "onSuccessContainer",
+    "warning",
+    "onWarning",
+    "warningContainer",
+    "onWarningContainer",
+)
+EXTENDED_COLOR_SCHEMES = MappingProxyType({
+    "light": MappingProxyType({"success": MaterialColor("success", "#006D40"), "onSuccess": MaterialColor("onSuccess", "#FFFFFF"), "successContainer": MaterialColor("successContainer", "#8BF9B5"), "onSuccessContainer": MaterialColor("onSuccessContainer", "#002110"), "warning": MaterialColor("warning", "#994704"), "onWarning": MaterialColor("onWarning", "#FFFFFF"), "warningContainer": MaterialColor("warningContainer", "#FFDBC9"), "onWarningContainer": MaterialColor("onWarningContainer", "#321200")}),
+    "dark": MappingProxyType({"success": MaterialColor("success", "#6EDC9B"), "onSuccess": MaterialColor("onSuccess", "#00391F"), "successContainer": MaterialColor("successContainer", "#00522F"), "onSuccessContainer": MaterialColor("onSuccessContainer", "#8BF9B5"), "warning": MaterialColor("warning", "#FFB68C"), "onWarning": MaterialColor("onWarning", "#532200"), "warningContainer": MaterialColor("warningContainer", "#753400"), "onWarningContainer": MaterialColor("onWarningContainer", "#FFDBC9")}),
+})
+
 @dataclass(frozen=True)
 class MaterialColorScheme:
     appearance: str
@@ -177,9 +192,64 @@ class MaterialColorScheme:
     tertiary_fixed_dim: MaterialColor
     on_tertiary_fixed: MaterialColor
     on_tertiary_fixed_variant: MaterialColor
+    extended_colors: Optional[Mapping[str, MaterialColor]] = field(default=None, hash=False)
+
+    def __post_init__(self) -> None:
+        if self.appearance not in ("light", "dark"):
+            raise ValueError(f"appearance must be 'light' or 'dark', got {self.appearance!r}")
+        base = dict(EXTENDED_COLOR_SCHEMES[self.appearance])
+        if self.extended_colors is not None:
+            for role, color in self.extended_colors.items():
+                if role not in EXTENDED_COLOR_ROLES:
+                    raise ValueError(f"unknown extended role: {role}")
+                if not isinstance(color, MaterialColor):
+                    raise TypeError("extended colors must be MaterialColor instances")
+                base[role] = color
+        object.__setattr__(self, "extended_colors", MappingProxyType(base))
+
+    @property
+    def success(self) -> MaterialColor:
+        """Harmonized custom status color, outside the standard M3 roles."""
+        return self.extended_colors["success"]
+
+    @property
+    def on_success(self) -> MaterialColor:
+        """Harmonized custom status color, outside the standard M3 roles."""
+        return self.extended_colors["onSuccess"]
+
+    @property
+    def success_container(self) -> MaterialColor:
+        """Harmonized custom status color, outside the standard M3 roles."""
+        return self.extended_colors["successContainer"]
+
+    @property
+    def on_success_container(self) -> MaterialColor:
+        """Harmonized custom status color, outside the standard M3 roles."""
+        return self.extended_colors["onSuccessContainer"]
+
+    @property
+    def warning(self) -> MaterialColor:
+        """Harmonized custom status color, outside the standard M3 roles."""
+        return self.extended_colors["warning"]
+
+    @property
+    def on_warning(self) -> MaterialColor:
+        """Harmonized custom status color, outside the standard M3 roles."""
+        return self.extended_colors["onWarning"]
+
+    @property
+    def warning_container(self) -> MaterialColor:
+        """Harmonized custom status color, outside the standard M3 roles."""
+        return self.extended_colors["warningContainer"]
+
+    @property
+    def on_warning_container(self) -> MaterialColor:
+        """Harmonized custom status color, outside the standard M3 roles."""
+        return self.extended_colors["onWarningContainer"]
+
 
     def role_color(self, role: str) -> MaterialColor:
-        return getattr(self, ROLE_FIELDS[role])
+        return self.extended_colors[role] if role in EXTENDED_COLOR_ROLES else getattr(self, ROLE_FIELDS[role])
 
     def as_hex_map(self) -> dict[str, str]:
         """Map of camelCase role name to ``#RRGGBB`` hex. Not a round-trip
@@ -1283,7 +1353,11 @@ def custom_color_scheme(
         hex_value = overrides.get(role)
         values[field] = MaterialColor(role, hex_value) if hex_value is not None else getattr(base, field)
 
-    return MaterialColorScheme(appearance=base.appearance, **values)
+    extended = {
+        role: MaterialColor(role, overrides[role])
+        for role in EXTENDED_COLOR_ROLES if overrides.get(role) is not None
+    }
+    return MaterialColorScheme(appearance=base.appearance, extended_colors=extended, **values)
 
 
 def material_theme_builder_color_scheme(
@@ -1299,7 +1373,8 @@ def material_theme_builder_color_scheme(
         ROLE_FIELDS[role]: MaterialColor(role, roles[role])
         for role in COLOR_SCHEME_ROLES
     }
-    return MaterialColorScheme(appearance=appearance, **values)
+    extended = {role: MaterialColor(role, roles[role]) for role in EXTENDED_COLOR_ROLES if role in roles}
+    return MaterialColorScheme(appearance=appearance, extended_colors=extended, **values)
 
 
 def create_theme(

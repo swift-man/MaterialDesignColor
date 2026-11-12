@@ -1,6 +1,8 @@
 from .colors import ALL, BY_NAME, MaterialColor, MaterialColors, colors, get_color
 from .theme import (
     COLOR_SCHEME_ROLES,
+    EXTENDED_COLOR_ROLES,
+    EXTENDED_COLOR_SCHEMES,
     DARK_COLOR_SCHEME,
     LIGHT_COLOR_SCHEME,
     MATERIAL_SOURCE_COLOR,
@@ -23,6 +25,8 @@ __all__ = [
     "ALL",
     "BY_NAME",
     "COLOR_SCHEME_ROLES",
+    "EXTENDED_COLOR_ROLES",
+    "EXTENDED_COLOR_SCHEMES",
     "DARK_COLOR_SCHEME",
     "LIGHT_COLOR_SCHEME",
     "MATERIAL_SOURCE_COLOR",

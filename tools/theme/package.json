@@ -1,0 +1,13 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate": "tsx generate.mjs",
+    "test": "node --import tsx --test test.mjs",
+    "generate:extended": "tsx generate-extended.mjs"
+  },
+  "dependencies": {
+    "@material/material-color-utilities": "0.4.0",
+    "tsx": "4.20.5"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "sourceColor": "#6750A4",
+  "materialColorUtilities": "0.4.0",
+  "seeds": {
+    "success": "#228B22",
+    "warning": "#FF9800"
+  },
+  "light": {
+    "success": "#006D40",
+    "onSuccess": "#FFFFFF",
+    "successContainer": "#8BF9B5",
+    "onSuccessContainer": "#002110",
+    "warning": "#994704",
+    "onWarning": "#FFFFFF",
+    "warningContainer": "#FFDBC9",
+    "onWarningContainer": "#321200"
+  },
+  "dark": {
+    "success": "#6EDC9B",
+    "onSuccess": "#00391F",
+    "successContainer": "#00522F",
+    "onSuccessContainer": "#8BF9B5",
+    "warning": "#FFB68C",
+    "onWarning": "#532200",
+    "warningContainer": "#753400",
+    "onWarningContainer": "#FFDBC9"
+  }
+}

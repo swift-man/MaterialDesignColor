@@ -22,6 +22,12 @@ function validateHexColor(value: string): string {
   return value;
 }
 
+/** Custom status roles, separate from the 48 standard M3 roles. */
+export const materialExtendedColorRoles = deepFreeze(["success","onSuccess","successContainer","onSuccessContainer","warning","onWarning","warningContainer","onWarningContainer"] as const);
+export type MaterialExtendedColorRole = (typeof materialExtendedColorRoles)[number];
+export type MaterialExtendedColors = Readonly<Record<MaterialExtendedColorRole, string>>;
+export type MaterialColorSchemeWithExtended = MaterialColorScheme & MaterialExtendedColors;
+
 export const materialColorSchemeRoles = deepFreeze([
   "primary",
   "onPrimary",
@@ -215,7 +221,15 @@ export const materialThemePresetSchemes = deepFreeze({
           "tertiaryFixed": "#FFD9E3",
           "tertiaryFixedDim": "#EFB8C8",
           "onTertiaryFixed": "#31101D",
-          "onTertiaryFixedVariant": "#633B48"
+          "onTertiaryFixedVariant": "#633B48",
+          "success": "#006D40",
+          "onSuccess": "#FFFFFF",
+          "successContainer": "#8BF9B5",
+          "onSuccessContainer": "#002110",
+          "warning": "#994704",
+          "onWarning": "#FFFFFF",
+          "warningContainer": "#FFDBC9",
+          "onWarningContainer": "#321200"
         },
         "dark": {
           "primary": "#CFBDFE",
@@ -265,7 +279,15 @@ export const materialThemePresetSchemes = deepFreeze({
           "tertiaryFixed": "#FFD9E3",
           "tertiaryFixedDim": "#EFB8C8",
           "onTertiaryFixed": "#31101D",
-          "onTertiaryFixedVariant": "#633B48"
+          "onTertiaryFixedVariant": "#633B48",
+          "success": "#6EDC9B",
+          "onSuccess": "#00391F",
+          "successContainer": "#00522F",
+          "onSuccessContainer": "#8BF9B5",
+          "warning": "#FFB68C",
+          "onWarning": "#532200",
+          "warningContainer": "#753400",
+          "onWarningContainer": "#FFDBC9"
         }
       },
       "fidelity": {
@@ -317,7 +339,15 @@ export const materialThemePresetSchemes = deepFreeze({
           "tertiaryFixed": "#FFDF93",
           "tertiaryFixedDim": "#E7C365",
           "onTertiaryFixed": "#241A00",
-          "onTertiaryFixedVariant": "#594400"
+          "onTertiaryFixedVariant": "#594400",
+          "success": "#006D40",
+          "onSuccess": "#FFFFFF",
+          "successContainer": "#8BF9B5",
+          "onSuccessContainer": "#002110",
+          "warning": "#994704",
+          "onWarning": "#FFFFFF",
+          "warningContainer": "#FFDBC9",
+          "onWarningContainer": "#321200"
         },
         "dark": {
           "primary": "#CFBCFF",
@@ -367,7 +397,15 @@ export const materialThemePresetSchemes = deepFreeze({
           "tertiaryFixed": "#FFDF93",
           "tertiaryFixedDim": "#E7C365",
           "onTertiaryFixed": "#241A00",
-          "onTertiaryFixedVariant": "#594400"
+          "onTertiaryFixedVariant": "#594400",
+          "success": "#6EDC9B",
+          "onSuccess": "#00391F",
+          "successContainer": "#00522F",
+          "onSuccessContainer": "#8BF9B5",
+          "warning": "#FFB68C",
+          "onWarning": "#532200",
+          "warningContainer": "#753400",
+          "onWarningContainer": "#FFDBC9"
         }
       },
       "content": {
@@ -419,7 +457,15 @@ export const materialThemePresetSchemes = deepFreeze({
           "tertiaryFixed": "#FFD8EA",
           "tertiaryFixedDim": "#FFAEDB",
           "onTertiaryFixed": "#3C002B",
-          "onTertiaryFixedVariant": "#752A5B"
+          "onTertiaryFixedVariant": "#752A5B",
+          "success": "#006D40",
+          "onSuccess": "#FFFFFF",
+          "successContainer": "#8BF9B5",
+          "onSuccessContainer": "#002110",
+          "warning": "#994704",
+          "onWarning": "#FFFFFF",
+          "warningContainer": "#FFDBC9",
+          "onWarningContainer": "#321200"
         },
         "dark": {
           "primary": "#CFBCFF",
@@ -469,7 +515,15 @@ export const materialThemePresetSchemes = deepFreeze({
           "tertiaryFixed": "#FFD8EA",
           "tertiaryFixedDim": "#FFAEDB",
           "onTertiaryFixed": "#3C002B",
-          "onTertiaryFixedVariant": "#752A5B"
+          "onTertiaryFixedVariant": "#752A5B",
+          "success": "#6EDC9B",
+          "onSuccess": "#00391F",
+          "successContainer": "#00522F",
+          "onSuccessContainer": "#8BF9B5",
+          "warning": "#FFB68C",
+          "onWarning": "#532200",
+          "warningContainer": "#753400",
+          "onWarningContainer": "#FFDBC9"
         }
       },
       "monochrome": {
@@ -521,7 +575,15 @@ export const materialThemePresetSchemes = deepFreeze({
           "tertiaryFixed": "#5E5E5E",
           "tertiaryFixedDim": "#474747",
           "onTertiaryFixed": "#FFFFFF",
-          "onTertiaryFixedVariant": "#E2E2E2"
+          "onTertiaryFixedVariant": "#E2E2E2",
+          "success": "#006D40",
+          "onSuccess": "#FFFFFF",
+          "successContainer": "#8BF9B5",
+          "onSuccessContainer": "#002110",
+          "warning": "#994704",
+          "onWarning": "#FFFFFF",
+          "warningContainer": "#FFDBC9",
+          "onWarningContainer": "#321200"
         },
         "dark": {
           "primary": "#FFFFFF",
@@ -571,7 +633,15 @@ export const materialThemePresetSchemes = deepFreeze({
           "tertiaryFixed": "#5E5E5E",
           "tertiaryFixedDim": "#474747",
           "onTertiaryFixed": "#FFFFFF",
-          "onTertiaryFixedVariant": "#E2E2E2"
+          "onTertiaryFixedVariant": "#E2E2E2",
+          "success": "#6EDC9B",
+          "onSuccess": "#00391F",
+          "successContainer": "#00522F",
+          "onSuccessContainer": "#8BF9B5",
+          "warning": "#FFB68C",
+          "onWarning": "#532200",
+          "warningContainer": "#753400",
+          "onWarningContainer": "#FFDBC9"
         }
       },
       "neutral": {
@@ -623,7 +693,15 @@ export const materialThemePresetSchemes = deepFreeze({
           "tertiaryFixed": "#E8DEF8",
           "tertiaryFixedDim": "#CBC2DB",
           "onTertiaryFixed": "#1E192B",
-          "onTertiaryFixedVariant": "#4A4458"
+          "onTertiaryFixedVariant": "#4A4458",
+          "success": "#006D40",
+          "onSuccess": "#FFFFFF",
+          "successContainer": "#8BF9B5",
+          "onSuccessContainer": "#002110",
+          "warning": "#994704",
+          "onWarning": "#FFFFFF",
+          "warningContainer": "#FFDBC9",
+          "onWarningContainer": "#321200"
         },
         "dark": {
           "primary": "#CBC3D5",
@@ -673,7 +751,15 @@ export const materialThemePresetSchemes = deepFreeze({
           "tertiaryFixed": "#E8DEF8",
           "tertiaryFixedDim": "#CBC2DB",
           "onTertiaryFixed": "#1E192B",
-          "onTertiaryFixedVariant": "#4A4458"
+          "onTertiaryFixedVariant": "#4A4458",
+          "success": "#6EDC9B",
+          "onSuccess": "#00391F",
+          "successContainer": "#00522F",
+          "onSuccessContainer": "#8BF9B5",
+          "warning": "#FFB68C",
+          "onWarning": "#532200",
+          "warningContainer": "#753400",
+          "onWarningContainer": "#FFDBC9"
         }
       },
       "vibrant": {
@@ -725,7 +811,15 @@ export const materialThemePresetSchemes = deepFreeze({
           "tertiaryFixed": "#FFD6FC",
           "tertiaryFixedDim": "#E8B7E7",
           "onTertiaryFixed": "#2F0D33",
-          "onTertiaryFixedVariant": "#5F3961"
+          "onTertiaryFixedVariant": "#5F3961",
+          "success": "#006D40",
+          "onSuccess": "#FFFFFF",
+          "successContainer": "#8BF9B5",
+          "onSuccessContainer": "#002110",
+          "warning": "#994704",
+          "onWarning": "#FFFFFF",
+          "warningContainer": "#FFDBC9",
+          "onWarningContainer": "#321200"
         },
         "dark": {
           "primary": "#CFBCFF",
@@ -775,7 +869,15 @@ export const materialThemePresetSchemes = deepFreeze({
           "tertiaryFixed": "#FFD6FC",
           "tertiaryFixedDim": "#E8B7E7",
           "onTertiaryFixed": "#2F0D33",
-          "onTertiaryFixedVariant": "#5F3961"
+          "onTertiaryFixedVariant": "#5F3961",
+          "success": "#6EDC9B",
+          "onSuccess": "#00391F",
+          "successContainer": "#00522F",
+          "onSuccessContainer": "#8BF9B5",
+          "warning": "#FFB68C",
+          "onWarning": "#532200",
+          "warningContainer": "#753400",
+          "onWarningContainer": "#FFDBC9"
         }
       },
       "expressive": {
@@ -827,7 +929,15 @@ export const materialThemePresetSchemes = deepFreeze({
           "tertiaryFixed": "#F7D8FF",
           "tertiaryFixedDim": "#E0B9EE",
           "onTertiaryFixed": "#2B0E39",
-          "onTertiaryFixedVariant": "#593B67"
+          "onTertiaryFixedVariant": "#593B67",
+          "success": "#006D40",
+          "onSuccess": "#FFFFFF",
+          "successContainer": "#8BF9B5",
+          "onSuccessContainer": "#002110",
+          "warning": "#994704",
+          "onWarning": "#FFFFFF",
+          "warningContainer": "#FFDBC9",
+          "onWarningContainer": "#321200"
         },
         "dark": {
           "primary": "#79D7C0",
@@ -877,7 +987,15 @@ export const materialThemePresetSchemes = deepFreeze({
           "tertiaryFixed": "#F7D8FF",
           "tertiaryFixedDim": "#E0B9EE",
           "onTertiaryFixed": "#2B0E39",
-          "onTertiaryFixedVariant": "#593B67"
+          "onTertiaryFixedVariant": "#593B67",
+          "success": "#6EDC9B",
+          "onSuccess": "#00391F",
+          "successContainer": "#00522F",
+          "onSuccessContainer": "#8BF9B5",
+          "warning": "#FFB68C",
+          "onWarning": "#532200",
+          "warningContainer": "#753400",
+          "onWarningContainer": "#FFDBC9"
         }
       },
       "rainbow": {
@@ -929,7 +1047,15 @@ export const materialThemePresetSchemes = deepFreeze({
           "tertiaryFixed": "#FFD9E3",
           "tertiaryFixedDim": "#EFB8C8",
           "onTertiaryFixed": "#31101D",
-          "onTertiaryFixedVariant": "#633B48"
+          "onTertiaryFixedVariant": "#633B48",
+          "success": "#006D40",
+          "onSuccess": "#FFFFFF",
+          "successContainer": "#8BF9B5",
+          "onSuccessContainer": "#002110",
+          "warning": "#994704",
+          "onWarning": "#FFFFFF",
+          "warningContainer": "#FFDBC9",
+          "onWarningContainer": "#321200"
         },
         "dark": {
           "primary": "#CFBCFF",
@@ -979,7 +1105,15 @@ export const materialThemePresetSchemes = deepFreeze({
           "tertiaryFixed": "#FFD9E3",
           "tertiaryFixedDim": "#EFB8C8",
           "onTertiaryFixed": "#31101D",
-          "onTertiaryFixedVariant": "#633B48"
+          "onTertiaryFixedVariant": "#633B48",
+          "success": "#6EDC9B",
+          "onSuccess": "#00391F",
+          "successContainer": "#00522F",
+          "onSuccessContainer": "#8BF9B5",
+          "warning": "#FFB68C",
+          "onWarning": "#532200",
+          "warningContainer": "#753400",
+          "onWarningContainer": "#FFDBC9"
         }
       },
       "fruitSalad": {
@@ -1031,7 +1165,15 @@ export const materialThemePresetSchemes = deepFreeze({
           "tertiaryFixed": "#E9DDFF",
           "tertiaryFixedDim": "#CFBDFE",
           "onTertiaryFixed": "#201047",
-          "onTertiaryFixedVariant": "#4D3D75"
+          "onTertiaryFixedVariant": "#4D3D75",
+          "success": "#006D40",
+          "onSuccess": "#FFFFFF",
+          "successContainer": "#8BF9B5",
+          "onSuccessContainer": "#002110",
+          "warning": "#994704",
+          "onWarning": "#FFFFFF",
+          "warningContainer": "#FFDBC9",
+          "onWarningContainer": "#321200"
         },
         "dark": {
           "primary": "#97CBFF",
@@ -1081,7 +1223,15 @@ export const materialThemePresetSchemes = deepFreeze({
           "tertiaryFixed": "#E9DDFF",
           "tertiaryFixedDim": "#CFBDFE",
           "onTertiaryFixed": "#201047",
-          "onTertiaryFixedVariant": "#4D3D75"
+          "onTertiaryFixedVariant": "#4D3D75",
+          "success": "#6EDC9B",
+          "onSuccess": "#00391F",
+          "successContainer": "#00522F",
+          "onSuccessContainer": "#8BF9B5",
+          "warning": "#FFB68C",
+          "onWarning": "#532200",
+          "warningContainer": "#753400",
+          "onWarningContainer": "#FFDBC9"
         }
       }
     } as const);
@@ -1100,13 +1250,18 @@ export type MaterialColorScheme = {
   readonly [Role in MaterialColorRole]: string;
 };
 
-export type MaterialColorSchemeInput = Partial<Record<MaterialColorRole, string>>;
+export type MaterialColorSchemeInput = Partial<Record<MaterialColorRole | MaterialExtendedColorRole, string>>;
 
 export interface MaterialTheme {
   readonly dark: boolean;
   readonly preset: MaterialThemePreset;
   readonly sourceColor: string;
   readonly colorScheme: MaterialColorScheme;
+}
+
+/** Factory theme with the eight required custom status colors. */
+export interface MaterialThemeWithExtended extends MaterialTheme {
+  readonly colorScheme: MaterialColorSchemeWithExtended;
 }
 
 export interface MaterialThemeOptions {
@@ -1118,7 +1273,7 @@ export interface MaterialThemeOptions {
 export function getMaterialThemeColorScheme(
   preset: MaterialThemePreset,
   dark = false,
-): MaterialColorScheme {
+): MaterialColorSchemeWithExtended {
   return { ...materialThemePresetSchemes[preset][dark ? "dark" : "light"] };
 }
 
@@ -1129,16 +1284,16 @@ export function getMaterialThemeKeyColors(
 }
 
 function mergeMaterialColorScheme(
-  base: MaterialColorScheme,
+  base: MaterialColorSchemeWithExtended,
   overrides?: MaterialColorSchemeInput,
-): MaterialColorScheme {
-  const colorScheme: Record<MaterialColorRole, string> = { ...base };
+): MaterialColorSchemeWithExtended {
+  const colorScheme = { ...base };
 
   if (!overrides) {
     return colorScheme;
   }
 
-  for (const role of materialColorSchemeRoles) {
+  for (const role of [...materialColorSchemeRoles, ...materialExtendedColorRoles]) {
     const value = overrides[role];
 
     if (value !== undefined) {
@@ -1149,7 +1304,7 @@ function mergeMaterialColorScheme(
   return colorScheme;
 }
 
-export function createMaterialTheme(options: MaterialThemeOptions = {}): MaterialTheme {
+export function createMaterialTheme(options: MaterialThemeOptions = {}): MaterialThemeWithExtended {
   const dark = options.dark ?? false;
   const preset = options.preset ?? "tonalSpot";
   const base = getMaterialThemeColorScheme(preset, dark);
@@ -1165,7 +1320,7 @@ export function createMaterialTheme(options: MaterialThemeOptions = {}): Materia
 export function getMaterialTheme(
   preset: MaterialThemePreset,
   options: Omit<MaterialThemeOptions, "preset"> = {},
-): MaterialTheme {
+): MaterialThemeWithExtended {
   return createMaterialTheme({ ...options, preset });
 }
 

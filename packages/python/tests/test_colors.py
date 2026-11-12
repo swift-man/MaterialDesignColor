@@ -106,3 +106,32 @@ def test_preset_exports_are_immutable():
     assert preset_key_colors("vibrant")["primary"].hex == "#6C0BFF"
     assert create_theme().source_color.hex == "#6750A4"
     assert preset_color_scheme(MaterialThemePreset.TONAL_SPOT).primary.hex == LIGHT_COLOR_SCHEME.primary.hex
+
+
+def test_extended_colors_are_separate_immutable_and_customizable():
+    from material_design_color import (COLOR_SCHEME_ROLES, EXTENDED_COLOR_ROLES,
+        MaterialThemePreset, preset_color_scheme, custom_color_scheme)
+    assert len(COLOR_SCHEME_ROLES) == 48
+    assert len(EXTENDED_COLOR_ROLES) == 8
+    for preset in MaterialThemePreset:
+        for dark in (False, True):
+            scheme = preset_color_scheme(preset, dark)
+            assert scheme.success == scheme.role_color("success")
+            assert scheme.on_warning_container == scheme.role_color("onWarningContainer")
+            with pytest.raises(TypeError):
+                scheme.extended_colors["success"] = scheme.warning
+    custom = custom_color_scheme({"success": "#123456"})
+    assert custom.success.hex == "#123456"
+    assert preset_color_scheme(MaterialThemePreset.TONAL_SPOT).success.hex != "#123456"
+    with pytest.raises(ValueError):
+        custom_color_scheme({"warning": "not-a-color"})
+
+
+@pytest.mark.parametrize("appearance", ["Light", "", "system", None, []])
+def test_invalid_appearance_raises_value_error(appearance):
+    from dataclasses import replace
+    from material_design_color import material_theme_builder_color_scheme
+    with pytest.raises(ValueError, match="appearance must be 'light' or 'dark'"):
+        material_theme_builder_color_scheme(appearance, LIGHT_COLOR_SCHEME.as_hex_map())
+    with pytest.raises(ValueError, match="appearance must be 'light' or 'dark'"):
+        replace(LIGHT_COLOR_SCHEME, appearance=appearance)

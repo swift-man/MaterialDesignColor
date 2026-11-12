@@ -5,6 +5,7 @@ review:
   - "**/*.swift"
   - "**/*.ts"
   - "**/*.js"
+  - "**/*.mjs"
   - "**/*.py"
   - "**/*.rb"
   - "**/*.json"
@@ -59,6 +60,10 @@ review:
   - "**/*.pb.swift"
   - "**/*.graphql.swift"
   - "**/*+Generated.swift"
+
+  # Generated MCU snapshot data is verified by tools/theme/test.mjs in CI.
+  # Keep the generator and tests in review; omit large deterministic fixture data.
+  - "tools/theme/snapshots.json"
 
   # resources / binary assets
   - "**/*.xcassets/**"

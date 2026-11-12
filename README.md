@@ -9,8 +9,9 @@ Material color tokens and Material 3 style color schemes for multiple platforms.
 ![Badge](https://img.shields.io/badge/SwiftUI-001b87.svg?style=flat-square&logo=Swift&logoColor=black)
 ![Badge](https://img.shields.io/badge/React_Native-20232A.svg?style=flat-square&logo=react&logoColor=61DAFB)
 ![Badge](https://img.shields.io/badge/Python-3776AB.svg?style=flat-square&logo=python&logoColor=white)
-![Badge - Version](https://img.shields.io/badge/Version-2.1.0-1177AA?style=flat-square)
+![Badge - Version](https://img.shields.io/badge/Version-2.2.0-1177AA?style=flat-square)
 ![Badge - Swift Package Manager](https://img.shields.io/badge/SPM-compatible-orange?style=flat-square)
+![macOS](https://img.shields.io/badge/macOS-10.15%2B-yellow?style=flat-square)
 ![Badge - Platform](https://img.shields.io/badge/iOS-v13.0-yellow?style=flat-square)
 ![Badge - License](https://img.shields.io/badge/license-MIT-black?style=flat-square)
 
@@ -90,12 +91,13 @@ Reference: [Google's Compose Material 3 ColorScheme API](https://developer.andro
 
 ### Accessing roles in this repository
 
-The tables cover the **48 roles currently provided by this repository**, defined in [`tokens/material3/color-scheme-roles.json`](tokens/material3/color-scheme-roles.json). This is the package's supported set, not a claim that every Material 3 API has exactly 48 roles.
+The tables above cover the **48 standard M3 roles provided by this repository**, defined in [`tokens/material3/color-scheme-roles.json`](tokens/material3/color-scheme-roles.json). This is the package's supported set, not a claim that every Material 3 API has exactly 48 roles. The 8 separate custom status roles are documented below.
 
 | Platform | Example |
 | --- | --- |
 | SwiftUI | `theme.colorScheme.onPrimaryContainer.color` |
 | UIKit | `theme.colorScheme.onPrimaryContainer.uiColor` |
+| AppKit | `theme.colorScheme.onPrimaryContainer.nsColor` |
 | JavaScript / TypeScript | `theme.colorScheme.onPrimaryContainer` |
 | Python | `theme.color_scheme.on_primary_container.hex` |
 
@@ -111,7 +113,7 @@ Swift DocC API documentation for `MaterialDesignColorCore` is available at [docs
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/swift-man/MaterialDesignColor.git", from: "2.1.0")
+  .package(url: "https://github.com/swift-man/MaterialDesignColor.git", from: "2.2.0")
 ]
 ```
 
@@ -123,6 +125,7 @@ Products:
 | `MaterialDesignColorCore` | Pure Swift palette and Material 3 theme model |
 | `MaterialDesignColorSwiftUI` | `SwiftUI.Color` extensions and `Environment` theme support |
 | `MaterialDesignColorUIKit` | `UIKit.UIColor` extensions |
+| `MaterialDesignColorAppKit` | macOS `NSColor` conversion and adaptive colors |
 
 ## Usage
 
@@ -372,7 +375,7 @@ This keeps Android aligned with platform dynamic color behavior instead of shipp
 Recommended initial strategy: one repository tag for all non-Android packages.
 
 ```text
-v2.1.0
+v2.2.0
 ```
 
 Each package can publish its own artifact from that same tag:
@@ -386,7 +389,7 @@ Each package can publish its own artifact from that same tag:
 If platform release cycles become very different later, use platform-prefixed tags:
 
 ```text
-ios-v2.1.0
+ios-v2.2.0
 js-v1.2.0
 python-v1.0.0
 ```
@@ -396,3 +399,99 @@ python-v1.0.0
 * [COLOR TOOL](https://m2.material.io/resources/color/#!/?view.left=0&view.right=0)
 
 ![Image](assets/1.png)
+
+## macOS SwiftUI and extended status colors (2.2)
+
+Supports macOS 10.15+ (including macOS 14+) and iOS 13+; `foregroundStyle` in this example requires macOS 12+/iOS 15+. Add the `MaterialDesignColorSwiftUI` product to the app target.
+
+```swift
+import SwiftUI
+import MaterialDesignColorSwiftUI
+
+struct ContentView: View {
+  @Environment(\.materialTheme) private var theme
+
+  var body: some View {
+    VStack {
+      Text("안전")
+        .foregroundStyle(theme.colorScheme.onSuccess.color)
+        .padding().background(theme.colorScheme.success.color)
+      Text("주의")
+        .foregroundStyle(theme.colorScheme.onWarningContainer.color)
+        .padding().background(theme.colorScheme.warningContainer.color)
+    }
+  }
+}
+
+// At the root, inside WindowGroup:
+ContentView().materialTheme(preset: .tonalSpot)
+// Or supply any custom light/dark pair:
+ContentView().materialTheme(light: .light, dark: .dark)
+```
+
+The modifier reads SwiftUI's `colorScheme` environment and updates `materialTheme` when the system appearance (or an ancestor's color scheme override) changes. The existing `.materialTheme(theme)` still injects a fixed theme. Set the modifier above views that read `@Environment(\.materialTheme)`.
+
+There are **48 standard M3 roles + 8 custom extended roles**. Standard role enumerations remain at 48 for compatibility. The extensions are not official M3 status roles. They use Google's MCU `customColor(..., blend: true)` (HCT harmonization) with success seed `#228B22`, warning seed `#FF9800`, and default theme source `#6750A4`. All built-in presets share that source, so they share the status colors. Light/dark values live in `tokens/material3/extended-color-schemes.json`.
+
+| Custom fill | Matching content | Meaning |
+| --- | --- | --- |
+| `success` | `onSuccess` | Safe/successful operation |
+| `successContainer` | `onSuccessContainer` | Low-emphasis success surface |
+| `warning` | `onWarning` | Caution |
+| `warningContainer` | `onWarningContainer` | Low-emphasis warning surface |
+
+All four fill/content pairs are tested at WCAG contrast **≥ 4.5:1 in both modes**. This guarantee applies to the generated pairs, not arbitrary overrides or a status color used as text on an unrelated background. Do not rely on color alone: include text or an icon.
+
+```swift
+// Separate custom role enum; standard MaterialColorRole.allCases remains 48.
+let scheme = try MaterialColorScheme.tonalSpotLight.overridingExtended([
+  .success: "#006D37", .onSuccess: "#FFFFFF"
+])
+let customLight = MaterialTheme(colorScheme: scheme)
+let status = scheme.extendedColors[.success] // also scheme.success
+let defaults = MaterialExtendedColors.light // .dark is also available
+let customStatus = try defaults.overriding([.warning: "#805600"])
+```
+
+### AppKit
+
+Add the `MaterialDesignColorAppKit` product; it depends only on Core and AppKit.
+
+```swift
+import MaterialDesignColorAppKit
+
+let native = MaterialTheme.light.colorScheme.success.nsColor
+let explicit = NSColor(materialColor: MaterialTheme.dark.colorScheme.warning)
+let adaptive = NSColor.materialBaseline(\.success)
+```
+
+### Generate a brand theme at build time
+
+Seed generation is a **build-time tool**, not a Swift runtime `MaterialTheme.generated` API. It uses the official `@material/material-color-utilities` **0.4.0**, pinned in `tools/theme/package-lock.json`, at contrast level 0. It generates all 48 standard roles and harmonizes the 8 status roles against the supplied seed. Available variants: `tonalSpot`, `fidelity`, `content`, `monochrome`, `neutral`, `vibrant`, `expressive`, `rainbow`, `fruitSalad`.
+
+From the repository root (Node 20+):
+
+```bash
+npm --prefix tools/theme ci
+npm --prefix tools/theme run generate -- '#0A84FF' tonalSpot /absolute/path/to/GeneratedMaterialTheme.swift
+# JSON for JS/Python or inspection:
+npm --prefix tools/theme run generate -- '#0A84FF' tonalSpot /absolute/path/to/brand.json
+npm --prefix tools/theme test
+```
+
+Add the generated Swift file to your app target, then use:
+
+```swift
+ContentView().materialTheme(light: GeneratedMaterialTheme.light,
+                            dark: GeneratedMaterialTheme.dark)
+```
+
+The tool accepts only `#RRGGBB` seeds. Output paths are resolved from `tools/theme` when invoked through npm, so use absolute paths. No MCU dependency is added to the app or any platform runtime package. `tsx` handles the extensionless ESM imports in MCU 0.4.0. Checked-in snapshots cover all roles in both modes for `#6750A4`, `#0A84FF`, and `#FF0000` across all nine variants. The generated Swift fixture is compiled in macOS CI.
+
+Reference: [Google Material Color Utilities](https://github.com/material-foundation/material-color-utilities/tree/main/typescript).
+
+
+Maintainers: status seed definitions are in `tokens/material3/extended-color-schemes.json`.
+After intentionally changing them, run `npm --prefix tools/theme run generate:extended`
+and `ruby tools/codegen/generate.rb`. Review and refresh MCU snapshots when changing
+seed definitions or the pinned MCU version; do not edit generated platform files.
