@@ -79,3 +79,17 @@ light = create_theme(color_scheme={**brand["light"], **brand["extended"]["light"
 dark = create_theme(dark=True, color_scheme={**brand["dark"], **brand["extended"]["dark"]})
 # Custom Python themes have source_color=None; the seed remains in brand["sourceColor"].
 ```
+
+
+## App-owned final colors (2.3)
+
+Preset and status colors are templates; the app chooses the final product colors. Export all 48 standard and 8 custom role values with `as_extended_hex_map()` for a lossless color-value round trip. `as_hex_map()` continues to export only the standard 48 roles.
+
+```python
+from material_design_color import custom_color_scheme, material_theme_builder_color_scheme
+scheme = custom_color_scheme({"warning": "#804000", "onWarning": "#FFFFFF"}, dark=True)
+restored = material_theme_builder_color_scheme("dark", scheme.as_extended_hex_map())
+assert restored == scheme
+```
+
+The exported dictionary is independent of the immutable scheme. Appearance must be supplied separately. See the [shared responsibility guide](../../README.md#템플릿-값과-앱-확정-값). The new contrast validation API is currently in Swift Core.

@@ -30,6 +30,10 @@ let package = Package(
   ],
   dependencies: [],
   targets: [
+    .testTarget(
+      name: "MaterialDesignColorUIKitTests",
+      dependencies: ["MaterialDesignColorUIKit"],
+      path: "packages/ios/Tests/MaterialDesignColorUIKitTests"),
     .target(
       name: "MaterialDesignColorAppKit",
       dependencies: ["MaterialDesignColorCore"],

@@ -135,3 +135,15 @@ def test_invalid_appearance_raises_value_error(appearance):
         material_theme_builder_color_scheme(appearance, LIGHT_COLOR_SCHEME.as_hex_map())
     with pytest.raises(ValueError, match="appearance must be 'light' or 'dark'"):
         replace(LIGHT_COLOR_SCHEME, appearance=appearance)
+
+
+def test_extended_hex_map_round_trips_final_app_values():
+    from material_design_color import custom_color_scheme, material_theme_builder_color_scheme
+    original = custom_color_scheme({"primary": "#123456", "warning": "#654321"}, dark=True)
+    exported = original.as_extended_hex_map()
+    assert len(exported) == 56
+    assert len(original.as_hex_map()) == 48
+    restored = material_theme_builder_color_scheme("dark", exported)
+    assert restored == original
+    exported["warning"] = "#000000"
+    assert original.warning.hex == "#654321"

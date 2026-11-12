@@ -75,98 +75,26 @@ view.backgroundColor = scheme.surface.uiColor
 
 See the [shared color role guide](../../README.md#material-3-color-roles) for Google-defined role meanings, fill/content pairings, surface and fixed roles, and platform naming conventions. All platforms use the same 48 standard role tokens plus 8 separate custom status roles.
 
-## macOS SwiftUI and extended status colors (2.2)
+## 템플릿 값과 앱 확정 값
 
-Supports macOS 10.15+ (including macOS 14+) and iOS 13+; `foregroundStyle` in this example requires macOS 12+/iOS 15+. Add the `MaterialDesignColorSwiftUI` product to the app target.
+패키지는 롤 구조·템플릿·주입 API·검증 도구를 제공합니다. 제품의 최종 색은 앱이 확정합니다.
+success/warning 기본값은 기본 seed #6750A4에 조화시킨 템플릿이며 앱에서 최종 값을 덮어쓰는 것을 전제로 합니다.
 
 ```swift
-import SwiftUI
 import MaterialDesignColorSwiftUI
 
-struct ContentView: View {
-  @Environment(\.materialTheme) private var theme
-
-  var body: some View {
-    VStack {
-      Text("안전")
-        .foregroundStyle(theme.colorScheme.onSuccess.color)
-        .padding().background(theme.colorScheme.success.color)
-      Text("주의")
-        .foregroundStyle(theme.colorScheme.onWarningContainer.color)
-        .padding().background(theme.colorScheme.warningContainer.color)
-    }
-  }
-}
-
-// At the root, inside WindowGroup:
-ContentView().materialTheme(preset: .tonalSpot)
-// Or supply any custom light/dark pair:
-ContentView().materialTheme(light: .light, dark: .dark)
+let warning = MaterialColor(name: "appWarning", red: 128, green: 64, blue: 0)
+let onWarning = MaterialColor(name: "appOnWarning", red: 255, green: 255, blue: 255)
+let pair = MaterialTheme.pair(extendedLight: [.warning: warning, .onWarning: onWarning])
+ContentView().materialTheme(light: pair.light, dark: pair.dark)
+assert(pair.light.colorScheme.contrastIssues().isEmpty)
 ```
 
-The modifier reads SwiftUI's `colorScheme` environment and updates `materialTheme` when the system appearance (or an ancestor's color scheme override) changes. The existing `.materialTheme(theme)` still injects a fixed theme. Set the modifier above views that read `@Environment(\.materialTheme)`.
+[전체 API 예제·프리셋/생성기/런타임 선택 표·대비 검사 범위](../../README.md#템플릿-값과-앱-확정-값)를 참고하세요.
+MaterialExtendedColors의 전체 생성자, 값 기반 overriding/custom, AppKit/UIKit 동적 색상 예제도 같은 절에 있습니다.
+공통 설명은 루트 README에서 관리합니다.
 
-There are **48 standard M3 roles + 8 custom extended roles**. Standard role enumerations remain at 48 for compatibility. The extensions are not official M3 status roles. They use Google's MCU `customColor(..., blend: true)` (HCT harmonization) with success seed `#228B22`, warning seed `#FF9800`, and default theme source `#6750A4`. All built-in presets share that source, so they share the status colors. Light/dark values live in `tokens/material3/extended-color-schemes.json`.
+`\.materialTheme` 환경 기본값은 `MaterialTheme.light`입니다. 모디파이어가 없는 별도 창이나 설정 창은 자동 전환되지 않으므로 각 Scene 루트에 주입하세요.
 
-| Custom fill | Matching content | Meaning |
-| --- | --- | --- |
-| `success` | `onSuccess` | Safe/successful operation |
-| `successContainer` | `onSuccessContainer` | Low-emphasis success surface |
-| `warning` | `onWarning` | Caution |
-| `warningContainer` | `onWarningContainer` | Low-emphasis warning surface |
-
-All four fill/content pairs are tested at WCAG contrast **≥ 4.5:1 in both modes**. This guarantee applies to the generated pairs, not arbitrary overrides or a status color used as text on an unrelated background. Do not rely on color alone: include text or an icon.
-
-```swift
-// Separate custom role enum; standard MaterialColorRole.allCases remains 48.
-let scheme = try MaterialColorScheme.tonalSpotLight.overridingExtended([
-  .success: "#006D37", .onSuccess: "#FFFFFF"
-])
-let customLight = MaterialTheme(colorScheme: scheme)
-let status = scheme.extendedColors[.success] // also scheme.success
-let defaults = MaterialExtendedColors.light // .dark is also available
-let customStatus = try defaults.overriding([.warning: "#805600"])
-```
-
-### AppKit
-
-Add the `MaterialDesignColorAppKit` product; it depends only on Core and AppKit.
-
-```swift
-import MaterialDesignColorAppKit
-
-let native = MaterialTheme.light.colorScheme.success.nsColor
-let explicit = NSColor(materialColor: MaterialTheme.dark.colorScheme.warning)
-let adaptive = NSColor.materialBaseline(\.success)
-```
-
-### Generate a brand theme at build time
-
-Seed generation is a **build-time tool**, not a Swift runtime `MaterialTheme.generated` API. It uses the official `@material/material-color-utilities` **0.4.0**, pinned in `tools/theme/package-lock.json`, at contrast level 0. It generates all 48 standard roles and harmonizes the 8 status roles against the supplied seed. Available variants: `tonalSpot`, `fidelity`, `content`, `monochrome`, `neutral`, `vibrant`, `expressive`, `rainbow`, `fruitSalad`.
-
-From the repository root (Node 20+):
-
-```bash
-npm --prefix tools/theme ci
-npm --prefix tools/theme run generate -- '#0A84FF' tonalSpot /absolute/path/to/GeneratedMaterialTheme.swift
-# JSON for JS/Python or inspection:
-npm --prefix tools/theme run generate -- '#0A84FF' tonalSpot /absolute/path/to/brand.json
-npm --prefix tools/theme test
-```
-
-Add the generated Swift file to your app target, then use:
-
-```swift
-ContentView().materialTheme(light: GeneratedMaterialTheme.light,
-                            dark: GeneratedMaterialTheme.dark)
-```
-
-The tool accepts only `#RRGGBB` seeds. Output paths are resolved from `tools/theme` when invoked through npm, so use absolute paths. No MCU dependency is added to the app or any platform runtime package. `tsx` handles the extensionless ESM imports in MCU 0.4.0. Checked-in snapshots cover all roles in both modes for `#6750A4`, `#0A84FF`, and `#FF0000` across all nine variants. The generated Swift fixture is compiled in macOS CI.
-
-Reference: [Google Material Color Utilities](https://github.com/material-foundation/material-color-utilities/tree/main/typescript).
-
-
-Maintainers: status seed definitions are in `tokens/material3/extended-color-schemes.json`.
-After intentionally changing them, run `npm --prefix tools/theme run generate:extended`
-and `ruby tools/codegen/generate.rb`. Review and refresh MCU snapshots when changing
-seed definitions or the pinned MCU version; do not edit generated platform files.
+macOS 10.15+/iOS 13+를 지원하며 새 Swift API는 2.3.0부터 제공합니다.
+[macOS SwiftUI, AppKit 및 seed 생성 도구](../../README.md#macos-swiftui-and-extended-status-colors-22)의 설치·사용법도 확인하세요.

@@ -58,3 +58,26 @@ def test_extended_roles_cannot_shadow_standard_roles(tmp_path, role):
     assert result.returncode != 0
     assert f"extended roles collide with standard roles: {role}" in result.stderr
     assert not (tmp_path / "packages").exists()
+
+
+@pytest.mark.parametrize("role", ["appearance", "extendedColors", "roleColor", "asHexMap",
+                                  "asExtendedHexMap", "contrastIssues", "overridingExtended",
+                                  "tonalSpotLight", "class", "return", "rawValue"])
+def test_extended_roles_cannot_shadow_generated_members(tmp_path, role):
+    def collide(data):
+        for mode in ("light", "dark"):
+            data[mode][role] = "#123456"
+    result = generate(tmp_path, collide)
+    assert result.returncode != 0
+    assert f"extended roles collide with reserved members: {role}" in result.stderr
+    assert not (tmp_path / "packages").exists()
+
+
+def test_python_normalized_names_cannot_collide(tmp_path):
+    def collide(data):
+        for mode in ("light", "dark"):
+            data[mode].update(fooBar="#123456", fooBAR="#123456")
+    result = generate(tmp_path, collide)
+    assert result.returncode != 0
+    assert "role names collide after Python normalization" in result.stderr
+    assert not (tmp_path / "packages").exists()

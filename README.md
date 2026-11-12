@@ -9,7 +9,7 @@ Material color tokens and Material 3 style color schemes for multiple platforms.
 ![Badge](https://img.shields.io/badge/SwiftUI-001b87.svg?style=flat-square&logo=Swift&logoColor=black)
 ![Badge](https://img.shields.io/badge/React_Native-20232A.svg?style=flat-square&logo=react&logoColor=61DAFB)
 ![Badge](https://img.shields.io/badge/Python-3776AB.svg?style=flat-square&logo=python&logoColor=white)
-![Badge - Version](https://img.shields.io/badge/Version-2.2.0-1177AA?style=flat-square)
+![Badge - Version](https://img.shields.io/badge/Version-2.3.0-1177AA?style=flat-square)
 ![Badge - Swift Package Manager](https://img.shields.io/badge/SPM-compatible-orange?style=flat-square)
 ![macOS](https://img.shields.io/badge/macOS-10.15%2B-yellow?style=flat-square)
 ![Badge - Platform](https://img.shields.io/badge/iOS-v13.0-yellow?style=flat-square)
@@ -113,7 +113,7 @@ Swift DocC API documentation for `MaterialDesignColorCore` is available at [docs
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/swift-man/MaterialDesignColor.git", from: "2.2.0")
+  .package(url: "https://github.com/swift-man/MaterialDesignColor.git", from: "2.3.0")
 ]
 ```
 
@@ -495,3 +495,119 @@ Maintainers: status seed definitions are in `tokens/material3/extended-color-sch
 After intentionally changing them, run `npm --prefix tools/theme run generate:extended`
 and `ruby tools/codegen/generate.rb`. Review and refresh MCU snapshots when changing
 seed definitions or the pinned MCU version; do not edit generated platform files.
+
+
+## 템플릿 값과 앱 확정 값
+
+**패키지는 롤 구조와 템플릿을 제공하고, 최종 제품 색은 앱이 확정합니다.**
+패키지는 앱의 값을 주입하는 API와 대비 검증 도구를 제공합니다. 특정 제품의 브랜드·상태 색을 토큰에 추가하지 않습니다.
+`success`/`warning` 기본값은 기본 seed `#6750A4`에 조화시킨 **템플릿**입니다.
+제품에서는 앱이 의미·브랜드·접근성 기준에 따라 값을 확정해 덮어쓰는 것을 전제로 합니다.
+값 기반 override는 앱 색상을 재조화하거나 변경하지 않습니다. 생략한 역할만 템플릿 기본값을 유지합니다.
+
+| 경로 | 언제 사용하나 | 최종 값의 책임 |
+| --- | --- | --- |
+| 기본 프리셋 | 초기 화면, 프로토타입, 기본 역할 값을 출발점으로 사용 | 앱이 검토한 뒤 채택하거나 override |
+| `tools/theme` 빌드 시 생성기 | 브랜드 seed에서 MCU 스킴 후보를 만들어 앱 소스로 보관 | 출력은 앱 프로젝트가 소유·검토하며 패키지 토큰에 편입하지 않음 |
+| 런타임 `MaterialColor` override / `MaterialTheme.pair` | 앱 디자인 값, 사용자 설정, 시스템에서 얻은 색 주입 | 앱이 최종 값을 확정하고 실제 조합의 대비 검증 |
+
+### Hex와 try 없이 앱 테마 구성 (2.3)
+
+`MaterialColor(name:red:green:blue:)`는 **UInt8, 0…255 sRGB** 성분을 받습니다.
+`MaterialColor(role:red:green:blue:)`는 표준 역할 이름으로 색상을 만듭니다.
+두 생성자는 불투명 색상(alpha 255)을 만들고, 범위는 타입으로 제한합니다.
+Display P3나 선형 RGB 값은 sRGB로 변환한 후 전달하세요. 시스템 강조색 변경도 앱이 관찰해 pair를 다시 만들어 주입합니다.
+
+```swift
+import MaterialDesignColorSwiftUI
+
+// 설명용 값입니다. 실제 제품에서는 앱 디자인 값으로 교체합니다.
+let appWarningLight = MaterialColor(name: "appWarningLight", red: 128, green: 64, blue: 0)
+let appWarningDark = MaterialColor(name: "appWarningDark", red: 255, green: 192, blue: 128)
+let appSuccessLight = MaterialColor(name: "appSuccessLight", red: 0, green: 96, blue: 48)
+let appSuccessDark = MaterialColor(name: "appSuccessDark", red: 128, green: 224, blue: 160)
+let white = MaterialColor(name: "white", red: 255, green: 255, blue: 255)
+let black = MaterialColor(name: "black", red: 0, green: 0, blue: 0)
+let appPrimary = MaterialColor(role: .primary, red: 32, green: 64, blue: 128)
+
+let pair = MaterialTheme.pair(
+  preset: .tonalSpot,
+  light: [.primary: appPrimary],
+  dark: [:],
+  extendedLight: [.warning: appWarningLight, .onWarning: white,
+                  .success: appSuccessLight, .onSuccess: white],
+  extendedDark: [.warning: appWarningDark, .onWarning: black,
+                 .success: appSuccessDark, .onSuccess: black]
+)
+// pair is an immutable MaterialThemePair with .light and .dark.
+ContentView().materialTheme(light: pair.light, dark: pair.dark)
+```
+
+pair는 앱 값을 적용한 custom 테마입니다. `themePreset`은 nil이며 `sourceColor`는 출발 템플릿의 메타데이터일 뿐, 주입한 색을 재생성하지 않습니다.
+
+
+확장 8개 역할을 모두 앱이 지정하려면 공개 생성자를 사용합니다. 모든 인수가 필수이므로 누락이 컴파일 시 드러납니다.
+
+```swift
+let status = MaterialExtendedColors(
+  success: appSuccessLight, onSuccess: white,
+  successContainer: appSuccessLight, onSuccessContainer: white,
+  warning: appWarningLight, onWarning: white,
+  warningContainer: appWarningLight, onWarningContainer: white
+)
+let changedStatus = status.overriding([.warning: appWarningDark])
+let appStatusValues = Dictionary(uniqueKeysWithValues:
+  MaterialExtendedColorRole.allCases.map { ($0, status[$0]) })
+let scheme = MaterialColorScheme.custom(appearance: .light, overrides: [.primary: appPrimary])
+  .overridingExtended(appStatusValues)
+let changedScheme = scheme.overriding([.primary: appPrimary])
+let oneTheme = MaterialTheme.custom(appearance: .light, overrides: [.primary: appPrimary])
+```
+
+기존 문자열 hex + `throws` 오버로드도 유지합니다. 타입 없는 빈 `[:]` 호출은 기존 hex API로 해석됩니다.
+값 기반 빈 override를 단독 호출하려면 `[:] as [MaterialColorRole: MaterialColor]` 등으로 타입을 지정하세요.
+모든 기본 역할을 요구하는 기존 `custom(appearance:roles:)`는 누락 검증을 유지합니다.
+non-throwing `custom(base:appearance:overrides:)`는 명시적으로 프리셋을 출발점으로 사용합니다.
+
+### 창별 SwiftUI 환경과 네이티브 동적 색상
+
+`\.materialTheme`의 환경 기본값은 **`MaterialTheme.light`**입니다.
+모디파이어를 붙이지 않은 장면은 시스템 다크 모드에 자동 반응하지 않습니다.
+별도 창·설정 창 등 각 Scene의 루트에 `.materialTheme(light: pair.light, dark: pair.dark)`를 붙이세요.
+모디파이어는 시스템 또는 조상 뷰의 `\.colorScheme`을 따라가며, `.materialTheme(theme)`는 고정 테마 주입입니다.
+
+```swift
+// AppKit: MaterialDesignColorAppKit 제품을 import
+let nativeWarning = NSColor.material(light: pair.light, dark: pair.dark, \.warning)
+// UIKit: MaterialDesignColorUIKit 제품을 import
+let nativePrimary = UIColor.material(light: pair.light, dark: pair.dark, \.primary)
+```
+
+이 동적 색상은 주어진 두 테마의 값을 캡처합니다. 앱 색상 값 자체가 변경되면 다시 만드세요.
+기존 `.materialBaseline(\.warning)`도 그대로 지원하며 기본 템플릿에 고정됩니다.
+
+### 앱 테스트에서 최종 대비 검증
+
+```swift
+let ratio = appWarningLight.contrastRatio(with: white)
+let issues = pair.light.colorScheme.contrastIssues(minimum: 4.5)
+for issue in issues {
+  print(issue.colorRole, issue.onRole, issue.ratio)
+}
+// 앱의 XCTest/Swift Testing에서 검사:
+assert(pair.light.colorScheme.contrastIssues().isEmpty)
+assert(pair.dark.colorScheme.contrastIssues().isEmpty)
+```
+
+`MaterialContrastIssue`는 camelCase `colorRole`, `onRole`, 반올림하지 않은 `ratio`를 제공합니다.
+[WCAG 2.x의 sRGB 상대 휘도와 대비 공식](https://www.w3.org/TR/WCAG22/#dfn-contrast-ratio)을 사용합니다.
+기본 `minimum`은 4.5이며 유한한 1…21 범위만 허용합니다(위반 시 precondition 실패).
+
+검사에는 primary/secondary/tertiary/error의 기본·container 쌍, background/onBackground,
+surface 및 모든 surface container/bright/dim과 onSurface, surfaceVariant/onSurfaceVariant,
+inverseSurface/inverseOnSurface, fixed와 fixedDim 각각의 onFixed/onFixedVariant,
+success/warning 기본·container 쌍이 포함됩니다(현재 35개 조합).
+outline, scrim, surfaceTint 등 명시적 on 쌍이 없는 역할의 임의 배경 조합은 추론하지 않습니다.
+실제 UI에서 인접한 다른 색은 `contrastRatio(with:)`로 직접 검사하세요.
+opacity가 있는 최종 UI는 먼저 배경과 합성한 불투명 색을 비교해야 합니다.
+4.5:1 충족은 앱의 실제 값·조합으로 판단하며 모든 프리셋 또는 임의 override에 대한 일괄 보장이 아닙니다.

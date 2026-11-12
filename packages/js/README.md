@@ -129,3 +129,16 @@ const scheme = {...brand.light, ...brand.extended.light};
 const brandTheme = createMaterialTheme({colorScheme: scheme});
 // createMaterialTheme sourceColor remains preset metadata; brand.sourceColor is the generated seed.
 ```
+
+
+## App-owned final colors (2.3)
+
+Presets and success/warning values are templates. The app owns final product values and supplies them through `createMaterialTheme({colorScheme: ...})`. Runtime overrides do not harmonize or modify the supplied hex. `getSchemeColor` now supports extended roles on a complete factory scheme while preserving the standard-only overload:
+
+```ts
+import {createMaterialTheme, getSchemeColor} from '@swift-man/material-design-color';
+const theme = createMaterialTheme({colorScheme: {warning: '#804000', onWarning: '#FFFFFF'}});
+const warning = getSchemeColor(theme.colorScheme, 'warning');
+```
+
+See the [shared responsibility guide](../../README.md#템플릿-값과-앱-확정-값). The new contrast validation API is currently in Swift Core.
