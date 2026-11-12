@@ -656,3 +656,40 @@ JS의 기존 48개 역할 스킴에서는 없는 확장 쌍을 생략하며, 한
 투명도 합성과 실제 화면에서 인접한 색의 선택은 앱이 책임집니다.
 자세한 오류 처리 예제는 [Apple](packages/ios/README.md), [JS](packages/js/README.md),
 [Python](packages/python/README.md) 문서를 참고하세요.
+
+### 대비 오류 비교
+
+`MaterialContrastError`는 `Equatable`을 지원합니다. 같은 숫자 기준은 같고, 모든 NaN은
+같은 잘못된 입력 범주로 비교합니다. +∞와 −∞는 다르고, +0과 −0은 같습니다.
+비교 정책은 원래 연관값을 바꾸지 않아 패턴 매칭으로 NaN의 원래 비트도 읽을 수 있습니다.
+
+```swift
+let first = MaterialContrastError.invalidMinimum(.nan)
+let second = MaterialContrastError.invalidMinimum(-Double.nan)
+assert(first == second)
+assert(MaterialContrastError.invalidMinimum(22) != .invalidMinimum(23))
+```
+
+### JS 확장 키 생략과 undefined
+
+`contrastIssues`는 최종 스킴을 검사합니다. 확장 쌍의 두 키가 모두 없을 때만 그 쌍을
+생략합니다. 키 존재 여부는 `in` 기준(상속된 키 포함)이며, 키가 있으면 양쪽 모두 유효한
+`#RRGGBB`여야 합니다. 두 값이 모두 `undefined`여도 `TypeError`입니다.
+반면 `createMaterialTheme`의 override에서 `undefined`는 템플릿 기본값 유지라는 뜻입니다.
+
+```ts
+import { contrastIssues, createMaterialTheme, lightColorScheme,
+         materialColorSchemeRoles } from '@swift-man/material-design-color';
+import type { MaterialColorScheme } from '@swift-man/material-design-color';
+const legacy = Object.fromEntries(
+  materialColorSchemeRoles.map(role => [role, lightColorScheme[role]])
+) as MaterialColorScheme; // 기본 48개 키만 복사
+contrastIssues(legacy); // 확장 쌍 생략
+try {
+  contrastIssues({ ...legacy, warning: undefined, onWarning: undefined });
+} catch (error) {
+  if (!(error instanceof TypeError)) throw error;
+}
+const theme = createMaterialTheme({ colorScheme: { warning: undefined } });
+contrastIssues(theme.colorScheme); // 기본 warning이 채워진 최종 스킴 검사
+```

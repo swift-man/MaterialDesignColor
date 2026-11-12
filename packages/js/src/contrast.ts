@@ -31,7 +31,10 @@ const pairs = [["primary","onPrimary"],["primaryContainer","onPrimaryContainer"]
 
 /** Checks standard and present extended semantic pairs; does not infer arbitrary UI adjacency.
  * Legacy 48-role schemes omit custom pairs. If either member of a custom pair is present,
- * both must be valid hex colors. Returns frozen diagnostics without mutating the scheme.
+ * both must be valid hex colors. Presence uses the `in` operator, including inherited keys;
+ * explicit undefined values are invalid, even when both members are undefined.
+ * Unlike createMaterialTheme overrides, this validates a final scheme, not an override map.
+ * Returns frozen diagnostics without mutating the scheme.
  * @throws RangeError unless minimum is finite and in 1...21; TypeError for invalid pair colors.
  */
 export function contrastIssues(

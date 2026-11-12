@@ -808,9 +808,20 @@ public enum MaterialThemePreset: String, CaseIterable, Hashable, Sendable {
 }
 
 /// Invalid external input to contrast validation.
-public enum MaterialContrastError: Error, Sendable {
+/// Equality compares thresholds numerically, treating all NaN thresholds as equal.
+/// The original threshold remains available through pattern matching.
+public enum MaterialContrastError: Error, Equatable, Sendable {
   /// The requested threshold is not finite or is outside 1...21.
   case invalidMinimum(Double)
+
+  /// Compares diagnostic values; all NaNs represent the same invalid-input category.
+  /// Other values use Double equality, including signed zero and infinity.
+  public static func == (lhs: Self, rhs: Self) -> Bool {
+    switch (lhs, rhs) {
+    case let (.invalidMinimum(a), .invalidMinimum(b)):
+      return a == b || (a.isNaN && b.isNaN)
+    }
+  }
 }
 
 /// A failing semantic fill/content pair in an app's final scheme.

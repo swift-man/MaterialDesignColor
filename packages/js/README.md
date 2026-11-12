@@ -167,3 +167,27 @@ try {
 기본 31개·확장 4개 의미상 대비 쌍을 검사하며 결과 배열과 진단 객체는 동결됩니다.
 기존 48개 역할 스킴은 확장 쌍을 생략합니다. 확장 쌍의 한쪽만 있으면 `TypeError`입니다.
 실제 화면의 임의 인접 관계는 추론하지 않으며 투명 색은 배경과 합성한 뒤 검사하세요.
+
+### JS 확장 키 생략과 undefined
+
+`contrastIssues`는 최종 스킴을 검사합니다. 확장 쌍의 두 키가 모두 없을 때만 그 쌍을
+생략합니다. 키 존재 여부는 `in` 기준(상속된 키 포함)이며, 키가 있으면 양쪽 모두 유효한
+`#RRGGBB`여야 합니다. 두 값이 모두 `undefined`여도 `TypeError`입니다.
+반면 `createMaterialTheme`의 override에서 `undefined`는 템플릿 기본값 유지라는 뜻입니다.
+
+```ts
+import { contrastIssues, createMaterialTheme, lightColorScheme,
+         materialColorSchemeRoles } from '@swift-man/material-design-color';
+import type { MaterialColorScheme } from '@swift-man/material-design-color';
+const legacy = Object.fromEntries(
+  materialColorSchemeRoles.map(role => [role, lightColorScheme[role]])
+) as MaterialColorScheme; // 기본 48개 키만 복사
+contrastIssues(legacy); // 확장 쌍 생략
+try {
+  contrastIssues({ ...legacy, warning: undefined, onWarning: undefined });
+} catch (error) {
+  if (!(error instanceof TypeError)) throw error;
+}
+const theme = createMaterialTheme({ colorScheme: { warning: undefined } });
+contrastIssues(theme.colorScheme); // 기본 warning이 채워진 최종 스킴 검사
+```
