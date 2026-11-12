@@ -375,7 +375,7 @@ This keeps Android aligned with platform dynamic color behavior instead of shipp
 Recommended initial strategy: one repository tag for all non-Android packages.
 
 ```text
-v2.2.0
+v2.3.0
 ```
 
 Each package can publish its own artifact from that same tag:
@@ -389,7 +389,7 @@ Each package can publish its own artifact from that same tag:
 If platform release cycles become very different later, use platform-prefixed tags:
 
 ```text
-ios-v2.2.0
+ios-v2.3.0
 js-v1.2.0
 python-v1.0.0
 ```

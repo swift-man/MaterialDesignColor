@@ -923,9 +923,8 @@ def react_native_color_scheme(roles, presets)
       colorScheme: MaterialColorScheme & Partial<MaterialExtendedColors>,
       role: MaterialColorRole | MaterialExtendedColorRole,
     ): string {
-      const value = colorScheme[role];
-      if (value === undefined) throw new RangeError(`missing Material color role: ${role}`);
-      return value;
+      // Preserve legacy undefined results for unchecked JavaScript inputs.
+      return colorScheme[role] as string;
     }
   TS
 end

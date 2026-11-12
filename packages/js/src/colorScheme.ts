@@ -1332,7 +1332,6 @@ export function getSchemeColor(
   colorScheme: MaterialColorScheme & Partial<MaterialExtendedColors>,
   role: MaterialColorRole | MaterialExtendedColorRole,
 ): string {
-  const value = colorScheme[role];
-  if (value === undefined) throw new RangeError(`missing Material color role: ${role}`);
-  return value;
+  // Preserve legacy undefined results for unchecked JavaScript inputs.
+  return colorScheme[role] as string;
 }

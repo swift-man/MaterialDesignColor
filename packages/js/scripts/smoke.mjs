@@ -130,4 +130,5 @@ assert.notEqual(extended.lightColorScheme.success, '#123456');
 
 assert.equal(extended.getSchemeColor(extended.lightColorScheme, 'warning'), extended.lightColorScheme.warning);
 assert.equal(extended.getSchemeColor(extended.createMaterialTheme({colorScheme: {success: '#123456'}}).colorScheme, 'success'), '#123456');
-assert.throws(() => extended.getSchemeColor({}, 'warning'), RangeError);
+assert.equal(extended.getSchemeColor({}, 'warning'), undefined);
+assert.equal(extended.getSchemeColor({}, 'primary'), undefined);
