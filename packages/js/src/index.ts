@@ -30,3 +30,6 @@ export type {
   MaterialThemeOptions,
   MaterialThemePreset,
 } from "./colorScheme.js";
+
+export { contrastRatio, contrastIssues } from "./contrast.js";
+export type { MaterialContrastIssue } from "./contrast.js";

@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from enum import Enum
+from math import isfinite
 from types import MappingProxyType
 from typing import Optional, Union
 
@@ -142,6 +143,55 @@ EXTENDED_COLOR_SCHEMES = MappingProxyType({
 })
 
 @dataclass(frozen=True)
+class MaterialContrastIssue:
+    """Diagnostic value with camelCase role names and an unrounded ratio.
+
+    Fields are stored verbatim; construction does not measure colors or validate roles.
+    """
+    color_role: str
+    on_role: str
+    ratio: float
+
+
+_CONTRAST_PAIRS = (
+    ("primary", "onPrimary"),
+    ("primaryContainer", "onPrimaryContainer"),
+    ("secondary", "onSecondary"),
+    ("secondaryContainer", "onSecondaryContainer"),
+    ("tertiary", "onTertiary"),
+    ("tertiaryContainer", "onTertiaryContainer"),
+    ("error", "onError"),
+    ("errorContainer", "onErrorContainer"),
+    ("background", "onBackground"),
+    ("surface", "onSurface"),
+    ("surfaceVariant", "onSurfaceVariant"),
+    ("inverseSurface", "inverseOnSurface"),
+    ("surfaceBright", "onSurface"),
+    ("surfaceContainer", "onSurface"),
+    ("surfaceContainerHigh", "onSurface"),
+    ("surfaceContainerHighest", "onSurface"),
+    ("surfaceContainerLow", "onSurface"),
+    ("surfaceContainerLowest", "onSurface"),
+    ("surfaceDim", "onSurface"),
+    ("primaryFixed", "onPrimaryFixed"),
+    ("primaryFixed", "onPrimaryFixedVariant"),
+    ("primaryFixedDim", "onPrimaryFixed"),
+    ("primaryFixedDim", "onPrimaryFixedVariant"),
+    ("secondaryFixed", "onSecondaryFixed"),
+    ("secondaryFixed", "onSecondaryFixedVariant"),
+    ("secondaryFixedDim", "onSecondaryFixed"),
+    ("secondaryFixedDim", "onSecondaryFixedVariant"),
+    ("tertiaryFixed", "onTertiaryFixed"),
+    ("tertiaryFixed", "onTertiaryFixedVariant"),
+    ("tertiaryFixedDim", "onTertiaryFixed"),
+    ("tertiaryFixedDim", "onTertiaryFixedVariant"),
+    ("success", "onSuccess"),
+    ("successContainer", "onSuccessContainer"),
+    ("warning", "onWarning"),
+    ("warningContainer", "onWarningContainer"),
+)
+
+@dataclass(frozen=True)
 class MaterialColorScheme:
     appearance: str
     primary: MaterialColor
@@ -250,6 +300,20 @@ class MaterialColorScheme:
 
     def role_color(self, role: str) -> MaterialColor:
         return self.extended_colors[role] if role in EXTENDED_COLOR_ROLES else getattr(self, ROLE_FIELDS[role])
+
+    def contrast_issues(self, minimum: float = 4.5) -> tuple[MaterialContrastIssue, ...]:
+        """Check standard and extended semantic pairs, not arbitrary UI adjacency.
+
+        Raises ValueError unless minimum is finite and in 1...21. No clamping.
+        """
+        if not isfinite(minimum) or not 1 <= minimum <= 21:
+            raise ValueError("minimum must be finite and in 1...21")
+        issues = []
+        for color_role, on_role in _CONTRAST_PAIRS:
+            ratio = self.role_color(color_role).contrast_ratio(self.role_color(on_role))
+            if ratio < minimum:
+                issues.append(MaterialContrastIssue(color_role, on_role, ratio))
+        return tuple(issues)
 
     def as_hex_map(self) -> dict[str, str]:
         """Map of camelCase role name to ``#RRGGBB`` hex. Not a round-trip

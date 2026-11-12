@@ -42,28 +42,6 @@ let theme = try MaterialTheme.custom(
 
 For existing call sites, ``MaterialTheme/light``, ``MaterialTheme/dark``, ``MaterialColorScheme/baselineLight``, and ``MaterialColorScheme/baselineDark`` remain aliases for the `tonalSpot` preset.
 
-## Topics
-
-### Material 3 Themes
-
-- ``MaterialTheme``
-- ``MaterialThemePreset``
-- ``MaterialThemeKeyColors``
-- ``MaterialAppearance``
-
-### Material 3 Color Schemes
-
-- ``MaterialColorScheme``
-- ``MaterialColorRole``
-- ``MaterialColorSchemeError``
-
-### Material Colors
-
-- ``MaterialColor``
-- ``MaterialColorError``
-- ``MaterialPalette``
-
-
 ## Custom status colors
 
 The standard 48 roles remain unchanged. ``MaterialExtendedColorRole`` defines
@@ -115,3 +93,66 @@ AppKit/UIKit `.material(light:dark:_:)`에 전달하세요.
 자동 전환되지 않으므로 별도 창·설정 창에도 각 루트에 주입해야 합니다.
 ``MaterialContrastIssue``는 기본·확장 on 쌍의 미달 대비를 반환합니다. 실제 다른 인접 색상은
 contrastRatio(with:)로 검사하세요. 투명도가 적용된 UI는 배경 합성 후 검증합니다.
+
+
+## 기존 테마 묶기와 외부 입력 검증
+
+```swift
+let pair = MaterialThemePair(
+    light: MaterialTheme.preset(.fidelity, appearance: .light),
+    dark: MaterialTheme.preset(.fidelity, appearance: .dark)
+)
+// SwiftUI 루트: ContentView().materialTheme(light: pair.light, dark: pair.dark)
+let expected = MaterialContrastIssue(colorRole: "warning", onRole: "onWarning", ratio: 1)
+let issues = pair.light.colorScheme.contrastIssues()
+assert(!issues.contains(expected))
+do {
+    let checked = try pair.light.colorScheme.validatedContrastIssues(minimum: 4.5)
+    assert(checked.isEmpty)
+} catch MaterialContrastError.invalidMinimum(let value) {
+    print("대비 기준은 유한한 1...21이어야 합니다: \(value)")
+}
+```
+
+`MaterialThemePair.init(light:dark:)`는 색과 appearance 메타데이터를 그대로 보관합니다.
+인수 이름은 표시할 모드를 지정하므로 앱이 각 모드에 맞는 테마를 전달해야 합니다.
+`MaterialContrastIssue.init(colorRole:onRole:ratio:)`는 테스트 기대값 등 진단 기록을
+직접 구성하며 입력을 검증하거나 대비를 계산하지 않습니다.
+외부 설정에는 throwing `validatedContrastIssues`를 사용하세요. 기존 `contrastIssues`의
+유한한 1...21 precondition은 유지하며 값을 자동으로 보정하지 않습니다.
+
+
+## Topics
+
+### Material 3 Themes
+
+- ``MaterialTheme``
+- ``MaterialThemePair``
+- ``MaterialThemePreset``
+- ``MaterialThemeKeyColors``
+- ``MaterialAppearance``
+
+### Material 3 Color Schemes
+
+- ``MaterialColorScheme``
+- ``MaterialColorRole``
+- ``MaterialColorSchemeError``
+
+### Custom Status Colors
+
+- ``MaterialExtendedColors``
+- ``MaterialExtendedColorRole``
+
+### Contrast Validation
+
+- ``MaterialContrastIssue``
+- ``MaterialContrastError``
+- ``MaterialColor/contrastRatio(with:)``
+- ``MaterialColorScheme/contrastIssues(minimum:)``
+- ``MaterialColorScheme/validatedContrastIssues(minimum:)``
+
+### Material Colors
+
+- ``MaterialColor``
+- ``MaterialColorError``
+- ``MaterialPalette``
