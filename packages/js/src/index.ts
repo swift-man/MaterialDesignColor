@@ -9,6 +9,7 @@ export {
   getSchemeColor,
   lightColorScheme,
   materialColorSchemeRoles,
+  materialExtendedColorRoles,
   materialSourceColor,
   materialThemePresetKeyColors,
   materialThemePresetSchemes,
@@ -17,9 +18,13 @@ export {
 } from "./colorScheme.js";
 export type {
   MaterialColorRole,
+  MaterialExtendedColorRole,
+  MaterialExtendedColors,
+  MaterialColorSchemeWithExtended,
   MaterialColorScheme,
   MaterialColorSchemeInput,
   MaterialTheme,
+  MaterialThemeWithExtended,
   MaterialThemeKeyColorRole,
   MaterialThemeKeyColors,
   MaterialThemeOptions,

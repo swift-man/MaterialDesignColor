@@ -49,4 +49,33 @@ rgb = MaterialColors.PINK_400.rgb
 
 ## Material 3 color roles
 
-See the [shared color role guide](../../README.md#material-3-color-roles) for Google-defined role meanings, fill/content pairings, surface and fixed roles, and platform naming conventions. All platforms use the same 48 role tokens.
+See the [shared color role guide](../../README.md#material-3-color-roles) for Google-defined role meanings, fill/content pairings, surface and fixed roles, and platform naming conventions. All platforms use the same 48 standard role tokens plus 8 separate custom status roles.
+
+
+## Extended success / warning roles
+
+```python
+from material_design_color import create_theme, EXTENDED_COLOR_ROLES
+
+theme = create_theme(dark=True)
+safe = theme.color_scheme.success
+text = theme.color_scheme.on_success
+caution = theme.color_scheme.warning_container
+caution_text = theme.color_scheme.on_warning_container
+assert theme.color_scheme.role_color("onWarningContainer") == caution_text
+custom = create_theme(color_scheme={"success": "#006D37", "onSuccess": "#FFFFFF"})
+```
+
+`COLOR_SCHEME_ROLES` and `as_hex_map()` retain the 48 standard roles. `EXTENDED_COLOR_ROLES` lists the 8 camelCase custom roles, and `extended_colors` is an immutable mapping of those names to `MaterialColor` values. `EXTENDED_COLOR_SCHEMES` provides immutable default light/dark mappings. Properties follow Python snake_case conventions. All four generated fill/content pairs meet 4.5:1 in both modes; arbitrary overrides must be checked separately.
+
+Use the [build-time tool](../../README.md#generate-a-brand-theme-at-build-time) for another seed:
+
+```python
+import json
+from material_design_color import create_theme
+with open("brand.json") as file:
+    brand = json.load(file)
+light = create_theme(color_scheme={**brand["light"], **brand["extended"]["light"]})
+dark = create_theme(dark=True, color_scheme={**brand["dark"], **brand["extended"]["dark"]})
+# Custom Python themes have source_color=None; the seed remains in brand["sourceColor"].
+```

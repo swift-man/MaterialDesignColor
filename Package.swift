@@ -13,6 +13,9 @@ let package = Package(
   ],
   products: [
     .library(
+      name: "MaterialDesignColorAppKit",
+      targets: ["MaterialDesignColorAppKit"]),
+    .library(
       name: "MaterialDesignColor",
       targets: ["MaterialDesignColor"]),
     .library(
@@ -27,6 +30,14 @@ let package = Package(
   ],
   dependencies: [],
   targets: [
+    .target(
+      name: "MaterialDesignColorAppKit",
+      dependencies: ["MaterialDesignColorCore"],
+      path: "packages/ios/Sources/MaterialDesignColorAppKit"),
+    .testTarget(
+      name: "MaterialDesignColorMacOSTests",
+      dependencies: ["MaterialDesignColorSwiftUI", "MaterialDesignColorAppKit"],
+      path: "packages/ios/Tests/MaterialDesignColorMacOSTests"),
     .target(
       name: "MaterialDesignColor",
       dependencies: ["MaterialDesignColorSwiftUI"],

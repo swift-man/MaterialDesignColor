@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 2.2.0
+
+- 기본 48개 M3 롤을 유지하고 harmonized success/warning 확장 롤 8개를 Swift, JS, Python에 추가했습니다.
+- SwiftUI 루트에서 시스템 모드에 따라 preset 또는 custom light/dark 테마를 자동 주입합니다.
+- macOS AppKit 제품과 sRGB NSColor 변환, 동적 baseline 색상을 추가했습니다.
+- MCU 0.4.0 기반 seed/variant 빌드 시 생성 도구와 전체 스킴 스냅샷, 대비 검증을 추가했습니다.
+- macOS SwiftUI 환경 전파 및 AppKit 검증을 CI에 추가했습니다.
+
 ## 2.1.0
 
 ### New
