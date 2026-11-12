@@ -69,3 +69,7 @@ let scheme = MaterialColorScheme.baseline(.dark)
 label.textColor = scheme.onSurface.uiColor
 view.backgroundColor = scheme.surface.uiColor
 ```
+
+## Material 3 color roles
+
+See the [shared color role guide](../../README.md#material-3-color-roles) for Google-defined role meanings, fill/content pairings, surface and fixed roles, and platform naming conventions. All platforms use the same 48 role tokens.

@@ -51,6 +51,56 @@ rainbow
 fruitSalad
 ```
 
+## Material 3 Color Roles
+
+Google defines color roles by their purpose in the UI. A role keeps its meaning when the theme changes, while its color value can change. Choose roles for the component's state and emphasis rather than hard-coding a palette shade.
+
+### Main color groups
+
+| Group | Purpose | Fill / content pair | Container / content pair |
+| --- | --- | --- | --- |
+| Primary | Prominent actions and active states | `primary` / `onPrimary` | `primaryContainer` / `onPrimaryContainer` |
+| Secondary | Less prominent supporting elements | `secondary` / `onSecondary` | `secondaryContainer` / `onSecondaryContainer` |
+| Tertiary | Contrasting accents | `tertiary` / `onTertiary` | `tertiaryContainer` / `onTertiaryContainer` |
+| Error | Errors and invalid input | `error` / `onError` | `errorContainer` / `onErrorContainer` |
+| Surface | Backgrounds and large areas | `surface` / `onSurface` | Surface containers below / `onSurface` |
+| Outline | Boundaries and separators | `outline` (important boundaries) | `outlineVariant` (subtle separators) |
+
+An `on*` role colors text or icons on its matching fill: use `onPrimary` on `primary`, and `onPrimaryContainer` on `primaryContainer`. A container is a colored area holding content. These pairings support contrast; arbitrary custom hex overrides still require contrast checks.
+
+Sources: [Google Material 3 color roles](https://m3.material.io/styles/color/roles) and [Android Developers: Material 3 color usage](https://developer.android.com/develop/ui/compose/designsystems/material3#color-usage).
+
+### Surface, inverse, and fixed roles
+
+| Roles | Purpose |
+| --- | --- |
+| `surfaceContainerLowest`, `surfaceContainerLow`, `surfaceContainer`, `surfaceContainerHigh`, `surfaceContainerHighest` | Increasing surface-container emphasis; these are not fixed elevation distances. |
+| `surfaceDim`, `surfaceBright` | Dim and bright surface options. |
+| `onSurfaceVariant` | Lower-emphasis surface content. |
+| `inverseSurface`, `inverseOnSurface`, `inversePrimary` | Contrasting surfaces, their content, and accent color. |
+| `surfaceTint` | Tint for components applying tonal elevation. |
+| `scrim` | Overlay obscuring content behind a modal. |
+| `primaryFixed`, `secondaryFixed`, `tertiaryFixed` | Container alternatives retaining their tone across light/dark themes. |
+| `primaryFixedDim`, `secondaryFixedDim`, `tertiaryFixedDim` | Stronger fixed alternatives. |
+| `onPrimaryFixed`, `onSecondaryFixed`, `onTertiaryFixed` | Content on corresponding fixed and fixed-dim fills. |
+| `onPrimaryFixedVariant`, `onSecondaryFixedVariant`, `onTertiaryFixedVariant` | Lower-emphasis content on those fixed fills. |
+| `background`, `onBackground`, `surfaceVariant` | Older background/content and surface roles retained by this package for compatibility. Prefer `surface`, `onSurface`, and `surfaceContainerHighest`, respectively, for new designs. |
+
+Reference: [Google's Compose Material 3 ColorScheme API](https://developer.android.com/reference/kotlin/androidx/compose/material3/ColorScheme).
+
+### Accessing roles in this repository
+
+The tables cover the **48 roles currently provided by this repository**, defined in [`tokens/material3/color-scheme-roles.json`](tokens/material3/color-scheme-roles.json). This is the package's supported set, not a claim that every Material 3 API has exactly 48 roles.
+
+| Platform | Example |
+| --- | --- |
+| SwiftUI | `theme.colorScheme.onPrimaryContainer.color` |
+| UIKit | `theme.colorScheme.onPrimaryContainer.uiColor` |
+| JavaScript / TypeScript | `theme.colorScheme.onPrimaryContainer` |
+| Python | `theme.color_scheme.on_primary_container.hex` |
+
+Swift and JavaScript use camelCase properties; Python uses snake_case attributes, but its `create_theme(color_scheme=...)` override keys use camelCase. Baseline, preset, and custom schemes expose the same roles. This package supplies color values; apply the appropriate fill/content pair in your UI.
+
 ## API Documentation
 
 Swift DocC API documentation for `MaterialDesignColorCore` is available at [docs.gorani.me/MaterialDesignColor/documentation/materialdesigncolorcore](https://docs.gorani.me/MaterialDesignColor/documentation/materialdesigncolorcore/).

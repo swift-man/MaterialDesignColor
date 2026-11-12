@@ -101,3 +101,7 @@ console.log(lightColorScheme.primary);    // "#65558F"
 ## Cross-language consistency
 
 The hex values here are generated from the same JSON tokens as the iOS Swift package and the Python package, so a `colors.pink400` in your RN app is byte-identical to `MaterialPalette.pink400` on iOS and `colors.pink400` in Python. Useful when you ship the same product across stacks.
+
+## Material 3 color roles
+
+See the [shared color role guide](../../README.md#material-3-color-roles) for Google-defined role meanings, fill/content pairings, surface and fixed roles, and platform naming conventions. All platforms use the same 48 role tokens.

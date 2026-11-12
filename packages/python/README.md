@@ -46,3 +46,7 @@ from material_design_color import MaterialColors
 hex_value = MaterialColors.PINK_400.hex
 rgb = MaterialColors.PINK_400.rgb
 ```
+
+## Material 3 color roles
+
+See the [shared color role guide](../../README.md#material-3-color-roles) for Google-defined role meanings, fill/content pairings, surface and fixed roles, and platform naming conventions. All platforms use the same 48 role tokens.
