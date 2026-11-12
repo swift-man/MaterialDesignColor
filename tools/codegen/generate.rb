@@ -10,8 +10,17 @@ MATERIAL3_ROLES_PATH = File.join(ROOT, "tokens/material3/color-scheme-roles.json
 MATERIAL3_BASELINE_PATH = File.join(ROOT, "tokens/material3/baseline-color-schemes.json")
 MATERIAL3_PRESETS_PATH = File.join(ROOT, "tokens/material3/theme-presets.json")
 
-EXTENDED = JSON.parse(File.read(File.join(ROOT, "tokens/material3/extended-color-schemes.json")))
-EXTENDED_ROLES = EXTENDED.fetch("light").keys
+def validate_extended_tokens(data)
+  abort("extended color tokens must be an object") unless data.is_a?(Hash)
+  %w[light dark].each do |mode|
+    abort("extended.#{mode} must be a non-empty role map") unless data[mode].is_a?(Hash) && !data[mode].empty?
+  end
+  abort("extended light/dark role names must match") unless data["light"].keys.sort == data["dark"].keys.sort
+  data["light"].keys.each do |role|
+    abort("invalid extended role name: #{role}") unless role.match?(/\A[a-z][A-Za-z0-9]*\z/)
+    %w[light dark].each { |mode| validate_hex!(data[mode][role], "extended.#{mode}.#{role}") }
+  end
+end
 
 def swift_extended
   cases = EXTENDED_ROLES.map { |r| "  /// Custom status role `#{r}` (outside the 48 M3 roles).\n  case #{r}" }.join("\n")
@@ -913,7 +922,9 @@ def python_theme(roles, presets)
     #{enum_cases}
 
 
-    EXTENDED_COLOR_ROLES = #{JSON.generate(EXTENDED_ROLES).sub("[", "(").sub("]", ")")}
+    EXTENDED_COLOR_ROLES: tuple[str, ...] = (
+    #{EXTENDED_ROLES.map { |role| "    #{role.inspect}," }.join("\n")}
+    )
     EXTENDED_COLOR_SCHEMES = MappingProxyType({
     #{%w[light dark].map { |mode| "    #{mode.inspect}: MappingProxyType({" + EXTENDED.fetch(mode).map { |r,h| "#{r.inspect}: MaterialColor(#{r.inspect}, #{h.inspect})" }.join(", ") + "})," }.join("\n")}
     })
@@ -925,6 +936,8 @@ def python_theme(roles, presets)
         extended_colors: Optional[Mapping[str, MaterialColor]] = field(default=None, hash=False)
 
         def __post_init__(self) -> None:
+            if self.appearance not in ("light", "dark"):
+                raise ValueError(f"appearance must be 'light' or 'dark', got {self.appearance!r}")
             base = dict(EXTENDED_COLOR_SCHEMES[self.appearance])
             if self.extended_colors is not None:
                 for role, color in self.extended_colors.items():
@@ -1082,9 +1095,9 @@ material3_roles = JSON.parse(File.read(MATERIAL3_ROLES_PATH))
 material3_baseline = JSON.parse(File.read(MATERIAL3_BASELINE_PATH))
 material3_presets = JSON.parse(File.read(MATERIAL3_PRESETS_PATH)).reject { |key, _| key.start_with?("$") }
 
-EXTENDED_ROLES.each do |role|
-  %w[light dark].each { |mode| validate_hex!(EXTENDED.fetch(mode).fetch(role), "extended.#{mode}.#{role}") }
-end
+EXTENDED = JSON.parse(File.read(File.join(ROOT, "tokens/material3/extended-color-schemes.json")))
+validate_extended_tokens(EXTENDED)
+EXTENDED_ROLES = EXTENDED.fetch("light").keys
 validate_material2_tokens(material2_tokens)
 validate_material3_tokens(material3_roles, material3_baseline, material3_presets)
 

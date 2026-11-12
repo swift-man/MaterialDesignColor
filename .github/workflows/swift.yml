@@ -49,4 +49,4 @@ jobs:
     - name: Test Python package
       run: |
         python3 -m pip install --upgrade pip pytest
-        PYTHONPATH=packages/python/src python3 -m pytest packages/python/tests -v
+        PYTHONPATH=packages/python/src python3 -m pytest packages/python/tests tools/codegen/tests -v

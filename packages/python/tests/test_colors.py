@@ -125,3 +125,13 @@ def test_extended_colors_are_separate_immutable_and_customizable():
     assert preset_color_scheme(MaterialThemePreset.TONAL_SPOT).success.hex != "#123456"
     with pytest.raises(ValueError):
         custom_color_scheme({"warning": "not-a-color"})
+
+
+@pytest.mark.parametrize("appearance", ["Light", "", "system", None, []])
+def test_invalid_appearance_raises_value_error(appearance):
+    from dataclasses import replace
+    from material_design_color import material_theme_builder_color_scheme
+    with pytest.raises(ValueError, match="appearance must be 'light' or 'dark'"):
+        material_theme_builder_color_scheme(appearance, LIGHT_COLOR_SCHEME.as_hex_map())
+    with pytest.raises(ValueError, match="appearance must be 'light' or 'dark'"):
+        replace(LIGHT_COLOR_SCHEME, appearance=appearance)

@@ -126,7 +126,16 @@ class MaterialThemePreset(str, Enum):
     FRUIT_SALAD = "fruitSalad"
 
 
-EXTENDED_COLOR_ROLES = ("success","onSuccess","successContainer","onSuccessContainer","warning","onWarning","warningContainer","onWarningContainer")
+EXTENDED_COLOR_ROLES: tuple[str, ...] = (
+    "success",
+    "onSuccess",
+    "successContainer",
+    "onSuccessContainer",
+    "warning",
+    "onWarning",
+    "warningContainer",
+    "onWarningContainer",
+)
 EXTENDED_COLOR_SCHEMES = MappingProxyType({
     "light": MappingProxyType({"success": MaterialColor("success", "#006D40"), "onSuccess": MaterialColor("onSuccess", "#FFFFFF"), "successContainer": MaterialColor("successContainer", "#8BF9B5"), "onSuccessContainer": MaterialColor("onSuccessContainer", "#002110"), "warning": MaterialColor("warning", "#994704"), "onWarning": MaterialColor("onWarning", "#FFFFFF"), "warningContainer": MaterialColor("warningContainer", "#FFDBC9"), "onWarningContainer": MaterialColor("onWarningContainer", "#321200")}),
     "dark": MappingProxyType({"success": MaterialColor("success", "#6EDC9B"), "onSuccess": MaterialColor("onSuccess", "#00391F"), "successContainer": MaterialColor("successContainer", "#00522F"), "onSuccessContainer": MaterialColor("onSuccessContainer", "#8BF9B5"), "warning": MaterialColor("warning", "#FFB68C"), "onWarning": MaterialColor("onWarning", "#532200"), "warningContainer": MaterialColor("warningContainer", "#753400"), "onWarningContainer": MaterialColor("onWarningContainer", "#FFDBC9")}),
@@ -186,6 +195,8 @@ class MaterialColorScheme:
     extended_colors: Optional[Mapping[str, MaterialColor]] = field(default=None, hash=False)
 
     def __post_init__(self) -> None:
+        if self.appearance not in ("light", "dark"):
+            raise ValueError(f"appearance must be 'light' or 'dark', got {self.appearance!r}")
         base = dict(EXTENDED_COLOR_SCHEMES[self.appearance])
         if self.extended_colors is not None:
             for role, color in self.extended_colors.items():
