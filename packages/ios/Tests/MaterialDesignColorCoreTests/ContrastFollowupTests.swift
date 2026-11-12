@@ -17,6 +17,31 @@ struct ContrastFollowupTests {
       MaterialContrastIssue(colorRole: "primary", onRole: "onPrimary", ratio: 1)))
   }
 
+  @Test func contrastErrorsHaveDiagnosticEquality() throws {
+    let nanA = MaterialContrastError.invalidMinimum(.nan)
+    let nanB = MaterialContrastError.invalidMinimum(Double(bitPattern: 0x7ff8000000000001))
+    let nanC = MaterialContrastError.invalidMinimum(-Double.nan)
+    #expect(nanA == nanA)
+    #expect(nanA == nanB && nanB == nanA)
+    #expect(nanB == nanC && nanA == nanC)
+    #expect(nanA != .invalidMinimum(.infinity))
+    #expect(MaterialContrastError.invalidMinimum(.infinity) == .invalidMinimum(.infinity))
+    #expect(MaterialContrastError.invalidMinimum(.infinity) != .invalidMinimum(-.infinity))
+    #expect(MaterialContrastError.invalidMinimum(0) == .invalidMinimum(-0.0))
+    #expect(MaterialContrastError.invalidMinimum(22) == .invalidMinimum(22))
+    #expect(MaterialContrastError.invalidMinimum(22) != .invalidMinimum(23))
+    let original = Double(bitPattern: 0x7ff8000000000001)
+    do {
+      _ = try MaterialTheme.light.colorScheme.validatedContrastIssues(minimum: original)
+      Issue.record("NaN accepted")
+    } catch let error as MaterialContrastError {
+      #expect(error == nanA)
+      if case .invalidMinimum(let actual) = error {
+        #expect(actual.bitPattern == original.bitPattern)
+      }
+    }
+  }
+
   @Test func externalThresholdValidation() throws {
     let scheme = MaterialTheme.light.colorScheme
     for minimum in [1.0, 4.5, 21.0] {

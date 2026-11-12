@@ -157,4 +157,22 @@ assert.throws(() => contrastIssues({ ...legacy, warning: '#000000' }), TypeError
 assert.ok(contrastIssues(lightColorScheme, 21).some(x => x.colorRole === 'primaryFixedDim' && x.onRole === 'onPrimaryFixedVariant'));
 assert.ok(contrastIssues(lightColorScheme, 21).some(x => x.colorRole === 'surfaceContainerHighest' && x.onRole === 'onSurface'));
 
+// A missing key differs from an explicitly supplied invalid final color.
+for (const custom of [
+  { warning: undefined },
+  { onWarning: undefined },
+  { warning: undefined, onWarning: undefined },
+  { warning: '#000000', onWarning: undefined },
+  { warning: undefined, onWarning: '#FFFFFF' },
+]) {
+  assert.throws(() => contrastIssues({ ...legacy, ...custom }), TypeError);
+}
+assert.equal(contrastIssues({ ...legacy, warning: '#000000', onWarning: '#FFFFFF' }, 21).length, 31);
+const inheritedInvalid = Object.assign(Object.create({ warning: undefined }), legacy);
+assert.throws(() => contrastIssues(inheritedInvalid), TypeError);
+// Factory overrides have a different contract: undefined retains template defaults.
+const defaulted = createMaterialTheme({ colorScheme: { warning: undefined, onWarning: undefined } });
+assert.equal(defaulted.colorScheme.warning, lightColorScheme.warning);
+assert.doesNotThrow(() => contrastIssues(defaulted.colorScheme));
+
 console.log("ESM smoke test passed.");

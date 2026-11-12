@@ -4,6 +4,9 @@
 
 ## 2.4.0
 
+- MaterialContrastError에 NaN을 같은 진단 범주로 취급하는 Equatable 비교를 추가하고 연관값은 그대로 보존합니다.
+- JS 최종 스킴에서 없는 확장 키와 명시적인 undefined를 구분하는 계약 및 factory override와의 차이를 문서·회귀 테스트로 명시했습니다.
+
 - 이미 생성된 앱 테마를 묶는 MaterialThemePair 공개 생성자와 테스트 기대값용 MaterialContrastIssue 공개 생성자를 추가했습니다. 입력 값은 그대로 보존합니다.
 - 외부 대비 기준 입력을 오류로 반환하는 Swift validatedContrastIssues와 MaterialContrastError를 추가했습니다. 기존 precondition API는 유지합니다.
 - JS contrastRatio/contrastIssues 및 Python contrast_ratio/contrast_issues를 추가하고 35개 의미상 대비 쌍을 생성기에서 공유합니다.

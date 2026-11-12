@@ -434,9 +434,20 @@ def swift_core(material2_tokens, material3_roles, material3_presets)
     }
 
     /// Invalid external input to contrast validation.
-    public enum MaterialContrastError: Error, Sendable {
+    /// Equality compares thresholds numerically, treating all NaN thresholds as equal.
+    /// The original threshold remains available through pattern matching.
+    public enum MaterialContrastError: Error, Equatable, Sendable {
       /// The requested threshold is not finite or is outside 1...21.
       case invalidMinimum(Double)
+
+      /// Compares diagnostic values; all NaNs represent the same invalid-input category.
+      /// Other values use Double equality, including signed zero and infinity.
+      public static func == (lhs: Self, rhs: Self) -> Bool {
+        switch (lhs, rhs) {
+        case let (.invalidMinimum(a), .invalidMinimum(b)):
+          return a == b || (a.isNaN && b.isNaN)
+        }
+      }
     }
 
     /// A failing semantic fill/content pair in an app's final scheme.
@@ -1000,7 +1011,10 @@ def javascript_contrast
 
     /** Checks standard and present extended semantic pairs; does not infer arbitrary UI adjacency.
      * Legacy 48-role schemes omit custom pairs. If either member of a custom pair is present,
-     * both must be valid hex colors. Returns frozen diagnostics without mutating the scheme.
+     * both must be valid hex colors. Presence uses the `in` operator, including inherited keys;
+     * explicit undefined values are invalid, even when both members are undefined.
+     * Unlike createMaterialTheme overrides, this validates a final scheme, not an override map.
+     * Returns frozen diagnostics without mutating the scheme.
      * @throws RangeError unless minimum is finite and in 1...21; TypeError for invalid pair colors.
      */
     export function contrastIssues(

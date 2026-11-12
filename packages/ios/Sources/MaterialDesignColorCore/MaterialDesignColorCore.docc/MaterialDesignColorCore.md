@@ -122,6 +122,20 @@ do {
 유한한 1...21 precondition은 유지하며 값을 자동으로 보정하지 않습니다.
 
 
+
+### 대비 오류 비교
+
+`MaterialContrastError`는 `Equatable`을 지원합니다. 같은 숫자 기준은 같고, 모든 NaN은
+같은 잘못된 입력 범주로 비교합니다. +∞와 −∞는 다르고, +0과 −0은 같습니다.
+비교 정책은 원래 연관값을 바꾸지 않아 패턴 매칭으로 NaN의 원래 비트도 읽을 수 있습니다.
+
+```swift
+let first = MaterialContrastError.invalidMinimum(.nan)
+let second = MaterialContrastError.invalidMinimum(-Double.nan)
+assert(first == second)
+assert(MaterialContrastError.invalidMinimum(22) != .invalidMinimum(23))
+```
+
 ## Topics
 
 ### Material 3 Themes
